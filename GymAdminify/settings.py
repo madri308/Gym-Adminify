@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'apps.core',
+    'apps.core'
 ]
 
 MIDDLEWARE = [
@@ -76,9 +76,17 @@ WSGI_APPLICATION = 'GymAdminify.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'sI9eL5baMe',
+        'USER': 'sI9eL5baMe',
+        'PASSWORD': 'THwdZlvsMp',
+        'HOST': 'remotemysql.com',
+        'PORT': '3306',
     }
 }
 
