@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'djoser',
 
-    'gymSettings'
+    'gymSettings',
+    'gymServices',
 ]
 
 CORS_ALLOWED_ORIGINS = [
