@@ -1,5 +1,5 @@
 <template>
-  <div id="wrapper">
+  <div id="wrapper" :style="{'background-image':'url(https://i.imgur.com/FTYWtID.jpg)', 'background-size': 'cover','background-position':'center','background-repeat':'no-repeat'}">
     <nav class="navbar is-dark">
       <div class="navbar-brand">
         <router-link to="/" class="navbar-item"><strong>Gym-Adminify</strong></router-link>
@@ -17,23 +17,6 @@
           <router-link to="/actividades" class="navbar-item">Actividades</router-link>
           <router-link to="/facturas" class="navbar-item">Facturas</router-link>
           <router-link to="/instructores" class="navbar-item">Instructores</router-link>
-          <!-- <div class="navbar-item">
-            <form method="get" action="/search">
-              <div class="field has-addons">
-                <div class="control">
-                  <input type="text" class="input" placeholder="What are you looking for?" name="query">
-                </div>
-
-                <div class="control">
-                  <button class="button is-success">
-                      <span class="icon">
-                      <i class="fas fa-search"></i>
-                      </span>
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div> -->
         </div>
       </div>
       <div class="navbar-end">
@@ -64,6 +47,9 @@
     </footer>
   </div>
 </template>
+
+
+
 <script>
 export default {
   data() {
