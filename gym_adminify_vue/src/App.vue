@@ -42,7 +42,7 @@
     <section class="section">
       <router-view/>
     </section>
-    <div class="clear" :style="{'clear': 'both'}"></div>
+    <div class="clear" :style="{'clear': 'left'}"></div>
     <footer class="footer">
       <p class="has-text-centered">Copyright (c) 2021</p>
     </footer>
