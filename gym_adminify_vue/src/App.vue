@@ -62,10 +62,17 @@
     <footer class="footer">
       <p class="has-text-centered">Copyright (c) 2021</p>
     </footer>
-
   </div>
 </template>
-
+<script>
+export default {
+  data() {
+    return {
+      showMobileMenu: false,
+    }
+  }
+}
+</script>
 <style lang="scss">
 @import '../node_modules/bulma';
 </style>
