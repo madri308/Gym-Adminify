@@ -11,3 +11,26 @@ class ConfigSerializer(serializers.ModelSerializer):
             "timeperday",
             "get_absolute_url"
         )
+
+class GymSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gym
+        fields = (
+            "id",
+            "name",
+            "tuitioncost",
+            "config",
+            "get_absolute_url"
+        )
+    
+class RoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Room
+        fields = (
+            "id",
+            "name",
+            "capacity",
+            "gym",
+            # "schedule",
+            "get_absolute_url"
+        )

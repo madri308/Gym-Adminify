@@ -1,5 +1,5 @@
 <template>
-  <div id="wrapper" :style="{'background-image':'url(https://i.imgur.com/FTYWtID.jpg)', 'background-size': 'cover','background-position':'center','background-repeat':'no-repeat'}">
+  <div id="wrapper">
     <nav class="navbar is-dark">
       <div class="navbar-brand">
         <router-link to="/" class="navbar-item"><strong>Gym-Adminify</strong></router-link>
@@ -31,7 +31,7 @@
               <router-link to="/log-in" class="button is-light">Log in</router-link>
             </template>
 
-            <router-link to="/configuracion" class="button is-success">
+            <router-link to="/gym_settings" class="button is-success">
               <span class="icon"><i class="fas fa-cog"></i></span>
             </router-link>
             <router-link to="/log-in" class="button is-light">Salir</router-link>

@@ -20,6 +20,8 @@ class Gym(models.Model):
     class Meta:
         managed = False
         db_table = 'Gym'
+    def get_absolute_url(self):
+        return f'/{self.id}/'
 
 class Room(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -31,3 +33,5 @@ class Room(models.Model):
     class Meta:
         managed = False
         db_table = 'Room'
+    def get_absolute_url(self):
+        return f'/{self.id}/'
