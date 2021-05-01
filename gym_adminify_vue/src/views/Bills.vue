@@ -11,6 +11,7 @@
 import { Accordion } from  '../components/Accordion.vue';    
 
     export default {
+        
       components: {
         Accordion,
       },

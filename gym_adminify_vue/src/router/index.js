@@ -21,7 +21,6 @@ const routes = [
     path:'/bills',
     name:'Bills',
     component: Bills, 
-  }
   },
   {
     path: '/gym_settings',
