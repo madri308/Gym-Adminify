@@ -15,7 +15,7 @@
           <router-link to="/clientes" class="navbar-item">Clientes</router-link>
           <router-link to="/servicios" class="navbar-item">Servicios</router-link>
           <router-link to="/actividades" class="navbar-item">Actividades</router-link>
-          <router-link to="/facturas" class="navbar-item">Facturas</router-link>
+          <router-link to="/bills" class="navbar-item">Facturas</router-link>
           <router-link to="/instructores" class="navbar-item">Instructores</router-link>
         </div>
       </div>
@@ -57,6 +57,7 @@
 
 
 <script>
+
 export default {
   data() {
     return {
