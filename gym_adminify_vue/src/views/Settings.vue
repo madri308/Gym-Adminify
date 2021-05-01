@@ -36,6 +36,7 @@
 
 <script>
 import axios from "axios";
+import { toast } from "bulma-toast";
 
 export default {
   name: "Settings",
@@ -51,35 +52,63 @@ export default {
     this.getGym(), this.getRoom();
   },
   methods: {
-    getConfig() {
-      axios
+    async getConfig() {
+      this.$store.commit("setIsLoading", true);
+      await axios
         .get("/api/v1/gym-config/")
         .then((response) => {
           this.config = response.data;
         })
         .catch((error) => {
-          console.log(error);
+          toast({
+            message: "Ocurrio un problema con los datos de: Configuracion",
+            type: "is-danger",
+            dismissible: true,
+            pauseOnHover: true,
+            duration: 2000,
+            position: "bottom-right",
+          });
         });
+      this.$store.commit("setIsLoading", false);
     },
-    getGym() {
-      axios
+    async getGym() {
+      this.$store.commit("setIsLoading", true);
+      await axios
         .get("/api/v1/gym-info/")
         .then((response) => {
           this.gym = response.data;
+          document.title = this.gym.name;
         })
         .catch((error) => {
-          console.log(error);
+          toast({
+            message: "Ocurrio un problema con los datos de: Gimnasio",
+            type: "is-danger",
+            dismissible: true,
+            pauseOnHover: true,
+            duration: 2000,
+            position: "bottom-right",
+          });
         });
+      this.$store.commit("setIsLoading", false);
     },
-    getRoom() {
-      axios
+    async getRoom() {
+      this.$store.commit("setIsLoading", true);
+      await axios
         .get("/api/v1/room-info/")
         .then((response) => {
           this.room = response.data;
         })
         .catch((error) => {
-          console.log(error);
+          toast({
+            message: "Ocurrio un problema con los datos de: Cuartos",
+            type: "is-danger",
+            dismissible: true,
+            pauseOnHover: true,
+            duration: 2000,
+            position: "bottom-right",
+          });
         });
+      this.$store.commit("setIsLoading", false);
     },
   },
 };
