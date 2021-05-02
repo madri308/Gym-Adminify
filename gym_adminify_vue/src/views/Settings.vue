@@ -1,35 +1,53 @@
 <template>
   <div class="page-settings">
     <div class="columns is-multiline">
-      <div class="column is-9">
-        <h1 class="title">{{ gym.name }}</h1>
-        <p>Costo de matricula: ₡{{ gym.tuitioncost }}</p>
 
-        <h1 class="title mt-4">Configuracion General</h1>
-        <p>Fecha inicio: {{ config.effectivedate }}</p>
-        <p>Porcentaje de capacidad: {{ config.capacitypercentage }}</p>
+      <div class="column is-5">
+        <section class="flex flex-wrap justify-center px-4 bg-white">
+          <div class="max-w-lg w-full rounded-lg shadow-lg p-4">
 
-        <h1 class="title mt-4">Horario General</h1>
+            <h1 class="title">{{ gym.name }}</h1>
+            <p>Costo de matricula: ₡{{ gym.tuitioncost }}</p>
 
-        <div class="table-responsive">
-          <table class="table-hover" v-if="config.timeperday">
-            <thead>
-              <tr>
-                <th>Dia</th>
-                <th>Inicio</th>
-                <th>Fin</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in config.timeperday" :key="item">
-                <td>{{ item.dia }}</td>
-                <td>{{ item.inicio }}</td>
-                <td>{{ item.fin }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            <h1 class="title mt-4">Configuracion General</h1>
+            <p>Fecha inicio: {{ config.effectivedate }}</p>
+            <p>Porcentaje de capacidad: {{ config.capacitypercentage }}</p>
+
+            <h1 class="title mt-4">Horario General</h1>
+            <div class="table-responsive">
+              <table class="table-hover" v-if="config.timeperday">
+                <thead>
+                  <tr>
+                    <th>Dia</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in config.timeperday" :key="item">
+                    <td>{{ item.dia }}</td>
+                    <td>{{ item.inicio }}</td>
+                    <td>{{ item.fin }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </section>
       </div>
+
+      <div class="column is-5">
+        <section class="flex flex-wrap px-4 bg-white">
+
+          <div class="max-w-lg w-full rounded-lg shadow-lg p-4">
+            <h1 class="title">Room-1</h1>
+            <p>Info del room</p>
+          </div>
+          
+        </section>
+      </div>
+
     </div>
   </div>
 </template>
