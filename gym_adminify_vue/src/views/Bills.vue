@@ -3,7 +3,7 @@
   <div class="bg-white">
     <Menu as="div" class="relative inline-block text-left">
       <div>
-        <MenuButton 
+        <MenuButton
           class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
         >
           Options
@@ -33,7 +33,7 @@
                 >Account settings</a
               >
             </MenuItem>
-            <MenuItem v-slot="{ active }"> 
+            <MenuItem v-slot="{ active }">
               <a
                 href="#"
                 :class="[
@@ -86,24 +86,29 @@
                   class="w-5 h-5 text-blue-500"
                 />
               </DisclosureButton>
-              <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500">
-                <Disclosure as="div" class="mt-2">
-                  <DisclosureButton
-                    class="flex justify-between w-full px-7 py-4 text-lg font-medium text-left text-blue-100 bg-blue-700 rounded-lg hover:bg-blue-500 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75"
-                  >
-                    <span>{{ bill.description.name }}</span>
-                    <ChevronUpIcon
-                      :class="open ? 'transform rotate-180' : ''"
-                      class="w-5 h-5 text-blue-500"
-                    />
-                  </DisclosureButton>
-                  <DisclosurePanel
-                    class="px-4 pt-4 pb-2 text-sm text-gray-500 bg-blue-50">
-                    <span>{{ bill.description.fecha }}</span><br>
-                    <span>{{ bill.description.cliente }}</span><br>
-                    <span>{{ bill.description.intructor }}</span><br>
-                  </DisclosurePanel>
-                </Disclosure>
+              <DisclosurePanel v-if="Object.keys(bill.description).length != 0" class="px-4 pt-4 pb-2 text-sm text-gray-500">
+                <div  v-for="bill2 in bill.description"  :key="bill2.name"  class="relative"       >
+                  <Disclosure as="div" class="mt-2">
+                    <DisclosureButton 
+                      class="flex justify-between w-full px-7 py-4 text-lg font-medium text-left text-blue-100 bg-blue-700 rounded-lg hover:bg-blue-500 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75"
+                    >
+                      <span>{{ bill2.name }}</span>
+                      <ChevronUpIcon
+                        :class="open ? 'transform rotate-180' : ''"
+                        class="w-5 h-5 text-blue-500"
+                      />
+                    </DisclosureButton>
+                    <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500 bg-blue-50"
+                    >
+                      <span>{{ bill2.fecha }}</span
+                      ><br />
+                      <span>{{ bill2.cliente }}</span
+                      ><br />
+                      <span>{{ bill2.intructor }}</span
+                      ><br />
+                    </DisclosurePanel>
+                  </Disclosure>
+                </div>
               </DisclosurePanel>
             </Disclosure>
           </div>
@@ -129,43 +134,63 @@ import {
 const bills = [
   {
     name: "Yoga",
-    description: 
-      { name:"Gilberto Gomez - FAC# 34546N3",
-        fecha:"16-3-21",
+    description: [
+      {
+        name: "Gilberto Gomez - FAC# 34546N3",
+        fecha: "16-3-21",
         intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock"
+        cliente: "Sandra Bullock",
       },
+      {
+        name: "Jose Salazar - FAC# 34546N3",
+        fecha: "16-3-21",
+        intructor: "Joaquin Jimenez",
+        cliente: "Sandra Bullock",
+      },
+      {
+        name: "Mariela Gamero - FAC# 34546N3",
+        fecha: "16-3-21",
+        intructor: "Joaquin Jimenez",
+        cliente: "Sandra Bullock",
+      },
+      {
+        name: "Silver Pilsen - FAC# 34546N3",
+        fecha: "16-3-21",
+        intructor: "Joaquin Jimenez",
+        cliente: "Sandra Bullock",
+      },
+    ],
     icon: GlobeAltIcon,
   },
   {
     name: "Pilates",
-    description:
-      { name:"Gilberto Gomez - FAC# 34546N3",
-        fecha:"16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock"
-      },
-        icon: ScaleIcon,
+    description: {
+      name: "Gilberto Gomez - FAC# 34546N3",
+      fecha: "16-3-21",
+      intructor: "Joaquin Jimenez",
+      cliente: "Sandra Bullock",
+    },
+    icon: ScaleIcon,
   },
   {
     name: "Aerobicos-X98",
-    description:
-      { name:"Gilberto Gomez - FAC# 34546N3",
-        fecha:"16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock"
-      },
-        icon: LightningBoltIcon,
+    description: {
+      name: "Gilberto Gomez - FAC# 34546N3",
+      fecha: "16-3-21",
+      intructor: "Joaquin Jimenez",
+      cliente: "Sandra Bullock",
+    },
+    icon: LightningBoltIcon,
   },
   {
     name: "Spinning-X98",
-    description:
-      { name:"Gilberto Gomez - FAC# 34546N3",
-        fecha:"16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock"
-      },
-        icon: LightningBoltIcon,
+    description: {
+      name: "Gilberto Gomez - FAC# 34546N3",
+      fecha: "16-3-21",
+      intructor: "Joaquin Jimenez",
+      cliente: "Sandra Bullock",
+    },
+    icon: LightningBoltIcon,
   },
 ];
 
@@ -183,16 +208,16 @@ export default {
     MenuItems,
     ChevronDownIcon,
   },
-  data(){
-    return{
-      orderedByMonth:{},
-      orderedByPersons:{},
-      orderedByServices:{},
-    }
+  data() {
+    return {
+      orderedByMonth: {},
+      orderedByPersons: {},
+      orderedByServices: {},
+    };
   },
   methods: {
     async orderPerMonth() {
-    this.$store.commit("setIsLoading", true);
+      this.$store.commit("setIsLoading", true);
       await axios
         .get("/api/v1/gym-config/")
         .then((response) => {
@@ -205,13 +230,13 @@ export default {
             dismissible: true,
             pauseOnHover: true,
             duration: 3000,
-            position: "bottom-right", 
+            position: "bottom-right",
           });
         });
       this.$store.commit("setIsLoading", false);
     },
     async orderPerPerson() {
-    this.$store.commit("setIsLoading", true);
+      this.$store.commit("setIsLoading", true);
       await axios
         .get("/api/v1/gym-config/")
         .then((response) => {
@@ -224,7 +249,7 @@ export default {
             dismissible: true,
             pauseOnHover: true,
             duration: 3000,
-            position: "bottom-right", 
+            position: "bottom-right",
           });
         });
       this.$store.commit("setIsLoading", false);
