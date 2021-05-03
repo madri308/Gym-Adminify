@@ -4,7 +4,7 @@
     <Menu as="div" class="relative inline-block text-left">
       <div>
         <MenuButton class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500">
-          Options
+          Opciones
           <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
         </MenuButton>
       </div>
@@ -18,12 +18,12 @@
           <div class="py-1">
             <MenuItem v-slot="{ active }">
               <a :class="[ active ? 'bg-gray-100 text-gray-900' : 'text-gray-600','block px-4 py-2 text-sm',]"
-                >Account settings</a>
+                >De Planta</a>
             </MenuItem>
             <form method="POST" action="#">
               <MenuItem v-slot="{ active }">
                 <button type="submit" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block w-full text-left px-4 py-2 text-sm',]">
-                  Sign out
+                  Suplentes
                 </button>
               </MenuItem>
             </form>
@@ -34,30 +34,20 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <div class>
         <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-          <div v-for="bill in bills" :key="bill.name" class="relative">
+          <div v-for="teacher in teachers" :key="teacher" class="relative">
             <Disclosure as="div" class="mt-2">
-              <DisclosureButton class="z-0 flex justify-between w-full px-7 py-4 text-lg font-medium text-left text-blue-100 bg-blue-700 rounded-lg hover:bg-blue-500 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75">
-                <span>{{ bill.name }}</span>
-                <ChevronUpIcon :class="open ? 'transform rotate-180' : ''" class="w-5 h-5 text-blue-500"/>
+              <DisclosureButton class="z-0 flex justify-between w-full px-7 py-4 text-lg font-medium text-left text-blue-100 bg-green-500 rounded-lg hover:bg-green-400 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75">
+                <span>{{ teacher.person.name }}</span>
+                <ChevronUpIcon :class="open ? 'transform rotate-180' : ''" class="w-5 h-5 text-green-900"/>
               </DisclosureButton>
-              <DisclosurePanel v-if="Object.keys(bill.description).length != 0" class="px-4 pt-4 pb-2 text-sm text-gray-500">
-                <div v-for="bill2 in bill.description" :key="bill2.name" class="relative">
-                  <Disclosure as="div" class="mt-2">
-                    <DisclosureButton class="flex justify-between w-full px-7 py-4 text-lg font-medium text-left text-blue-100 bg-blue-700 rounded-lg hover:bg-blue-500 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75">
-                      <span>{{ bill2.name }}</span>
-                      <ChevronUpIcon :class="open ? 'transform rotate-180' : ''" class="w-5 h-5 text-blue-500"/>
-                    </DisclosureButton>
-                    <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500 bg-blue-50">
-                      <span>{{ bill2.fecha }}</span>
-                      <br />
-                      <span>{{ bill2.cliente }}</span>
-                      <br />
-                      <span>{{ bill2.intructor }}</span>
-                      <br />
-                    </DisclosurePanel>
-                  </Disclosure>
-                </div>
-              </DisclosurePanel>
+              <!-- <DisclosurePanel v-if="Object.keys(bill.description).length != 0" class="px-4 pt-4 pb-2 text-sm text-gray-500">
+                <span>{{ bill2.fecha }}</span>
+                <br />
+                <span>{{ bill2.cliente }}</span>
+                <br />
+                <span>{{ bill2.intructor }}</span>
+                <br />
+              </DisclosurePanel> -->
             </Disclosure>
           </div>
         </dl>
@@ -79,74 +69,6 @@ import {
 } from "@headlessui/vue";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/vue/solid";
 import Selector from "../components/Selector";
-import {
-  GlobeAltIcon,
-  LightningBoltIcon,
-  ScaleIcon,
-} from "@heroicons/vue/outline";
-
-const bills = [
-  {
-    name: "Yoga",
-    description: [
-      {
-        name: "Gilberto Gomez - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-      {
-        name: "Jose Salazar - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-      {
-        name: "Mariela Gamero - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-      {
-        name: "Silver Pilsen - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-    ],
-    icon: GlobeAltIcon,
-  },
-  {
-    name: "Pilates",
-    description: {
-      name: "Gilberto Gomez - FAC# 34546N3",
-      fecha: "16-3-21",
-      intructor: "Joaquin Jimenez",
-      cliente: "Sandra Bullock",
-    },
-    icon: ScaleIcon,
-  },
-  {
-    name: "Aerobicos-X98",
-    description: {
-      name: "Gilberto Gomez - FAC# 34546N3",
-      fecha: "16-3-21",
-      intructor: "Joaquin Jimenez",
-      cliente: "Sandra Bullock",
-    },
-    icon: LightningBoltIcon,
-  },
-  {
-    name: "Spinning-X98",
-    description: {
-      name: "Gilberto Gomez - FAC# 34546N3",
-      fecha: "16-3-21",
-      intructor: "Joaquin Jimenez",
-      cliente: "Sandra Bullock",
-    },
-    icon: LightningBoltIcon,
-  },
-];
 
 export default {
   name: "Teachers",
@@ -164,22 +86,23 @@ export default {
   },
   data() {
     return {
-      orderedByMonth: {},
-      orderedByPersons: {},
-      orderedByServices: {},
+      teachers: [],
     };
+  },
+  mounted() {
+    this.getTeachers();
   },
   methods: {
-    async orderPerMonth() {
+    async getTeachers() {
       this.$store.commit("setIsLoading", true);
       await axios
-        .get("/api/v1/gym-config/")
+        .get("/api/v1/teachersNames/")
         .then((response) => {
-          this.orderedByMonth = response.data;
+          this.teachers = response.data;
         })
         .catch((error) => {
           toast({
-            message: "Ocurrio un problema con los datos de: Configuracion",
+            message: "Ocurrio un problema con los datos de: Instructores",
             type: "is-danger",
             dismissible: true,
             pauseOnHover: true,
@@ -189,31 +112,6 @@ export default {
         });
       this.$store.commit("setIsLoading", false);
     },
-    async orderPerPerson() {
-      this.$store.commit("setIsLoading", true);
-      await axios
-        .get("/api/v1/gym-config/")
-        .then((response) => {
-          this.orderedByPersons = response.data;
-        })
-        .catch((error) => {
-          toast({
-            message: "Ocurrio un problema con los datos de: Configuracion",
-            type: "is-danger",
-            dismissible: true,
-            pauseOnHover: true,
-            duration: 3000,
-            position: "bottom-right",
-          });
-        });
-      this.$store.commit("setIsLoading", false);
-    },
-  },
-
-  setup() {
-    return {
-      bills,
-    };
   },
 };
 </script>
