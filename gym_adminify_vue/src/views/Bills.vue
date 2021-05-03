@@ -77,12 +77,12 @@
           <div v-for="bill in bills" :key="bill.name" class="relative">
             <Disclosure as="div" class="mt-2">
               <DisclosureButton
-                class="z-0 flex justify-between w-full px-7 py-4 text-lg font-medium text-left text-blue-100 bg-blue-700 rounded-lg hover:bg-blue-500 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75"
+                class="z-0 flex justify-between w-full px-7 py-4 text-lg font-medium text-left text-blue-100 bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75"
               >
                 <span>{{ bill.name }}</span>
                 <ChevronUpIcon
                   :class="open ? 'transform rotate-180' : ''"
-                  class="w-5 h-5 text-blue-500"
+                  class="w-5 h-5 text-blue-200"
                 />
               </DisclosureButton>
               <DisclosurePanel v-if="Object.keys(bill.description).length != 0" class="px-4 pt-4 pb-2 text-sm text-gray-500">
