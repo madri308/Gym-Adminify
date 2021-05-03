@@ -32,7 +32,7 @@
             >Actividades</router-link
           >
           <router-link to="/bills" class="navbar-item">Facturas</router-link>
-          <router-link to="/instructores" class="navbar-item"
+          <router-link to="/teachers" class="navbar-item"
             >Instructores</router-link
           >
         </div>
