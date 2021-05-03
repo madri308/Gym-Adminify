@@ -18,3 +18,15 @@ class TeacherNames(APIView):
         teacherNames = Teacher.objects.all().only('person')
         serializer = TeacherNamesSerializer(teacherNames,many=True)
         return Response(serializer.data)
+
+class TeacherDetail(APIView):
+    def get_object(self, product_id):
+        try:
+            return Teacher.objects.get(person=product_id)
+        except Product.DoesNotExist:
+            raise Http404
+    
+    def get(self, request, product_id, format=None):
+        teacher = self.get_object(product_id)
+        serializer = TeacherSerializer(teacher)
+        return Response(serializer.data)
