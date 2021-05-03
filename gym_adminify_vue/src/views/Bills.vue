@@ -25,7 +25,6 @@
           <div class="py-1">
             <MenuItem v-slot="{ active }">
               <a
-                @click=""
                 :class="[
                   active ? 'bg-gray-100 text-gray-900' : 'text-gray-600',
                   'block px-4 py-2 text-sm',
