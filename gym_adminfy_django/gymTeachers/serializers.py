@@ -18,10 +18,11 @@ class TeachercategorySerializer(serializers.ModelSerializer):
         model = Teachercategory
 
 class TeacherNamesSerializer(serializers.ModelSerializer):
-    person = PersonNameSerializer(many=False)
+    # person = PersonNameSerializer(many=False)
+    name = serializers.CharField(source='person.name',read_only=True)
     class Meta:
         model = Teacher
         fields = (
-            "person",
+            "name",
             "get_absolute_url"
         )
