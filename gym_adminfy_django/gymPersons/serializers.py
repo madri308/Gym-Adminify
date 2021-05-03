@@ -7,9 +7,7 @@ class PersonSerializer(serializers.ModelSerializer):
         model = Person
         fields = (
             "id",
-            "teachercategory",
             "name",
             "phone",
-            "mail",
-            "get_absolute_url"
+            "mail"
         )

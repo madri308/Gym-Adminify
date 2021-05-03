@@ -9,6 +9,12 @@ from .serializers import TeacherSerializer
 
 class AllTeachers(APIView):
     def get(self, request, format=None):
-        teachers = Teacher.objects.select_related('TeacherCategory')
+        teachers = Teacher.objects.all()
         serializer = TeacherSerializer(teachers,many=True)
         return Response(serializer.data)
+
+# class TeacherNames(APIView):
+#     def get(self,request,format = none):
+#         teacherNames = Teacher.objects.only('name')
+#         serializer = TeacherSerializer(teachers,many=True)
+#         return Response(serializer.data)
