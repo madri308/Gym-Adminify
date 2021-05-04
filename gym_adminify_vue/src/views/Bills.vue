@@ -242,7 +242,7 @@ export default {
     async orderPerMonth() {
       this.$store.commit("setIsLoading", true);
       await axios
-        .get("/api/v1/gym-config/")
+        .get("/api/v1/gym-services/")
         .then((response) => {
           this.orderedByMonth = response.data;
         })

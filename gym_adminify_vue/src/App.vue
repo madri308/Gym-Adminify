@@ -25,7 +25,7 @@
       >
         <div class="navbar-start">
           <router-link to="/clientes" class="navbar-item">Clientes</router-link>
-          <router-link to="/servicios" class="navbar-item"
+          <router-link to="/services" class="navbar-item"
             >Servicios</router-link
           >
           <router-link to="/actividades" class="navbar-item"

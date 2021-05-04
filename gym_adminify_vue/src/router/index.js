@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import Bills from '../views/Bills.vue'
 import Settings from '../views/Settings.vue'
 import Teachers from '../views/Teachers.vue'
+import Services from '../views/Services.vue'
 
 const routes = [
   {
@@ -33,6 +34,11 @@ const routes = [
     name: 'Teachers',
     component: Teachers
   },
+  {
+    path: '/services',
+    name: 'Services',
+    component: Services
+  }
 ]
 
 const router = createRouter({

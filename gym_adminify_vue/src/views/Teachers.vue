@@ -79,9 +79,8 @@ export default {
   data() {
     return {
       teachers: [],
-      loadedTecaher: {},
+      loadedTeacher: {},
       is_loaded:false,
-      open: false
     };
   },
   mounted() {
