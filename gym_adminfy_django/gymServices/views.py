@@ -7,8 +7,8 @@ from .serializers import ServiceSerializer
 
 from .models import Service
 
-
-class ServiceOne(APIView):
+# Queries
+class AllServices(APIView):
     def get(self, request, format=None):
         services = Service.objects.all()
         serializer = ServiceSerializer(services, many=True)
