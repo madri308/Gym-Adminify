@@ -1,97 +1,44 @@
 <template>
-  <div class="w-72 fixed top-520">
-    <Listbox v-model="selectedPerson">
-      <div class="relative mt-1">
-        <ListboxButton
-          class="relative w-full py-1 pl-3 pr-10 text-left bg-white rounded-lg shadow-md cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-orange-300 focus-visible:ring-offset-2 focus-visible:border-indigo-500 sm:text-sm"
-        >
-          <span class="block truncate">{{ selectedPerson.name }}</span>
-          <span
-            class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
-          >
-            <SelectorIcon class="w-5 h-5 text-gray-400" aria-hidden="true" />
-          </span>
-        </ListboxButton>
-
-        <transition
-          leave-active-class="transition duration-100 ease-in"
-          leave-from-class="opacity-100"
-          leave-to-class="opacity-0"
-        >
-          <ListboxOptions
-            class="absolute w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
-          >
-            <ListboxOption
-              v-slot="{ active, selected }"
-              v-for="person in opciones"
-              :key="person"
-              :value="person"
-              as="template"
-            >
-              <li
-                :class="[
-                  active ? 'text-amber-900 bg-amber-100' : 'text-gray-900',
-                  'cursor-default select-none relative py-2 pl-10 pr-4',
-                ]"
-              >
-                <span
-                  :class="[
-                    selected ? 'font-medium' : 'font-normal',
-                    'block truncate',
-                  ]"
-                  >{{ person.name }}</span
-                >
-                <span
-                  v-if="selected"
-                  class="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600"
-                >
-                  <CheckIcon class="w-5 h-5" aria-hidden="true" />
-                </span>
-              </li>
-            </ListboxOption>
-          </ListboxOptions>
-        </transition>
+  <Menu as="div" class="relative inline-block text-left">
+      <div>
+        <MenuButton class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500">
+          Opciones
+          <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
+        </MenuButton>
       </div>
-    </Listbox>
-  </div>
+      <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95"
+        enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75"
+        leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+        <MenuItems class="z-50 origin-top-right absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <div v-for="option in options" :key="option" class="relative py-1">
+            <form method="POST" action="#">
+              <MenuItem v-slot="{ active }">
+                <button type="submit" :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block w-full text-left px-4 py-2 text-sm',]">
+                  {{option.name}}
+                </button>
+              </MenuItem>
+            </form>
+          </div>
+        </MenuItems>
+      </transition>
+    </Menu>
 </template>
 
 <script>
-import { ref } from "vue";
-import {
-  Listbox,
-  ListboxLabel,
-  ListboxButton,
-  ListboxOptions,
-  ListboxOption,
-} from "@headlessui/vue";
-import { CheckIcon, SelectorIcon } from "@heroicons/vue/solid";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
+import { ChevronDownIcon } from "@heroicons/vue/solid";
 
 export default {
   name:'Selector',
-  components: {
-    Listbox,
-    ListboxLabel,
-    ListboxButton,
-    ListboxOptions,
-    ListboxOption,
-    CheckIcon,
-    SelectorIcon,
+  props:{
+    options: Array,
   },
-
-  setup() {
-    const opciones = [
-      { name: "Mes" },
-      { name: "Persona" },
-      { name: "Actividad" },
-    ];
-
-    const selectedPerson = ref(opciones[0]);
-
-    return {
-      opciones,
-      selectedPerson,
-    };
+  components: {
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuItems,
+    ChevronDownIcon,
   },
 };
 </script>
