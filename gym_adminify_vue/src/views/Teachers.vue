@@ -1,6 +1,9 @@
 <template>
   <div class="bg-white">
-    <Selector v-bind:options="options" />    
+    <button class="fixed z-50 bottom-10 right-10 w-12 h-12 bg-red-600 rounded-full hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
+      <PlusIcon class="text-white" aria-hidden="true" />
+    </button>
+    <Selector @clicked="getByCategory" v-bind:options="options" />    
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <div class>
         <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
@@ -28,25 +31,22 @@ import axios from "axios";
 import {DisclosurePanel} from "@headlessui/vue";
 import Selector from "../components/Selector";
 import Disclosure from "../components/Disclosure";
+import { PlusIcon } from "@heroicons/vue/outline";
 
 export default {
   name: "Teachers",
   components: {
-    Disclosure, Selector, DisclosurePanel
+    Disclosure, Selector, DisclosurePanel,PlusIcon
   },
   data() {
     return {
       teachers: [],
-      options:[
-        {name:"De planta",
-        route:""},
-        {name:"Suplente",
-        route:""},
-      ]
+      options: Array
     };
   },
   mounted() {
     this.getTeachers();
+    this.getCategories();
   },
   methods: {
     async getTeachers() {
@@ -64,6 +64,43 @@ export default {
           });
         });
       this.$store.commit("setIsLoading", false);
+    },
+    async getCategories() {
+      this.$store.commit("setIsLoading", true);
+      await axios
+        .get("/api/v1/teachersCategories/")
+        .then((response) => {
+          this.options = response.data;
+          this.options.push({name: "Todos",get_absolute_url:"/-1/"});
+        })
+        .catch((error) => {
+          toast({
+            message: "Ocurrio un problema con los datos de: Categorias", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+        });
+      this.$store.commit("setIsLoading", false);
+    },
+    async getByCategory(id) {
+      if(id == "/-1/"){
+        this.getTeachers();
+      }else{
+        this.$store.commit("setIsLoading", true);
+        await axios
+          .get("/api/v1/teachersByCategory"+id)
+          .then((response) => {
+            this.teachers = response.data;
+          })
+          .catch((error) => {
+            toast({
+              message: "Ocurrio un problema con los datos de: Categorias", type: "is-danger",
+              dismissible: true, pauseOnHover: true,
+              duration: 3000, position: "bottom-right",
+            });
+          });
+        this.$store.commit("setIsLoading", false);
+      }
     },
     // async getTeacher(id) {
       

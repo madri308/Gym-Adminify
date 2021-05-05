@@ -16,6 +16,10 @@ class TeacherSerializer(serializers.ModelSerializer):
 class TeachercategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Teachercategory
+        fields = (
+            "name",
+            "get_absolute_url"
+        )
 
 class TeacherNamesSerializer(serializers.ModelSerializer):
     # person = PersonNameSerializer(many=False)

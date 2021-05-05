@@ -33,6 +33,11 @@ const routes = [
     name: 'Teachers',
     component: Teachers
   },
+  {
+    path: '/teachers/substitutes',
+    name: 'TeachersSubstitutes',
+    component: Teachers
+  },
 ]
 
 const router = createRouter({
