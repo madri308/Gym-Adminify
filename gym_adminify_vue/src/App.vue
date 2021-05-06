@@ -80,10 +80,7 @@
             </p>
           </div>
           <div class="order-2 flex-shrink-0 sm:order-3 sm:ml-3">
-            <button @click='toggle = !toggle '
-              type="button"
-              class="-mr-1 flex p-2 rounded-md transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"
-            >
+            <button @click='toggle = !toggle ' type="button" class="-mr-1 flex p-2 rounded-md transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
               <span class="sr-only">Dismiss</span>
               <XIcon class="h-6 w-6 text-white" aria-hidden="true" />
             </button>
