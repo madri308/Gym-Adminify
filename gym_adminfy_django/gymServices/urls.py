@@ -3,5 +3,5 @@ from django.urls import path, include
 from gymServices import views
 
 urlpatterns = [
-    path('gym-services/', views.ServiceOne.as_view())
+    path('services/', views.AllServices.as_view())
 ]

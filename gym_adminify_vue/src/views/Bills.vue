@@ -69,23 +69,19 @@
         </MenuItems>
       </transition>
     </Menu>
-    <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8"> 
       <div class>
         <dl
           class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10"
         >
           <div v-for="bill in bills" :key="bill.name" class="relative">
-            <Disclosure as="div" class="mt-2">
+            <Disclosure as="div" v-slot="{ open }" class="mt-2">
               <DisclosureButton
-                class="z-0 flex justify-between w-full px-7 py-4 text-lg font-medium text-left text-blue-100 bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75"
-              >
+                class="z-0 flex justify-between w-full px-7 py-4 text-lg font-medium text-left text-blue-100 bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75">
                 <span>{{ bill.name }}</span>
-                <ChevronUpIcon
-                  :class="open ? 'transform rotate-180' : ''"
-                  class="w-5 h-5 text-blue-200"
-                />
+                <ChevronUpIcon :class="open ? 'transform rotate-180' : ''" class="w-5 h-5 text-blue-200"/>
               </DisclosureButton>
-              <DisclosurePanel v-if="Object.keys(bill.description).length != 0" class="px-4 pt-4 pb-2 text-sm text-gray-500">
+              <DisclosurePanel  class="px-4 pt-4 pb-2 text-sm text-gray-500">
                 <div  v-for="bill2 in bill.description"  :key="bill2.name"  class="relative"       >
                   <Disclosure as="div" class="mt-2">
                     <DisclosureButton 
@@ -97,14 +93,18 @@
                         class="w-5 h-5 text-blue-500"
                       />
                     </DisclosureButton>
+
                     <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500 bg-blue-50"
                     >
-                      <span>{{ bill2.fecha }}</span
-                      ><br />
-                      <span>{{ bill2.cliente }}</span
-                      ><br />
-                      <span>{{ bill2.intructor }}</span
-                      ><br />
+                      <span class="font-extrabold height: 100% width:25% float:left">Fecha: </span>
+                      <span>{{ bill2.fecha }}</span>
+                      <br/>
+                      <span class="font-extrabold height: 100% width:25% float:left">Cliente: </span>
+                      <span>{{ bill2.cliente }}</span>
+                      <br/>
+                      <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
+                      <span>{{ bill2.intructor }}</span>
+                      <br/>
                     </DisclosurePanel>
                   </Disclosure>
                 </div>
@@ -163,32 +163,56 @@ const bills = [
   },
   {
     name: "Pilates",
-    description: {
-      name: "Gilberto Gomez - FAC# 34546N3",
-      fecha: "16-3-21",
-      intructor: "Joaquin Jimenez",
-      cliente: "Sandra Bullock",
-    },
+    description: [
+      {
+        name: "Gilberto Gomez - FAC# 34546N3",
+        fecha: "16-3-21",
+        intructor: "Joaquin Jimenez",
+        cliente: "Sandra Bullock",
+      },
+      {
+        name: "Jose Salazar - FAC# 34546N3",
+        fecha: "16-3-21",
+        intructor: "Joaquin Jimenez",
+        cliente: "Sandra Bullock",
+      },
+      {
+        name: "Mariela Gamero - FAC# 34546N3",
+        fecha: "16-3-21",
+        intructor: "Joaquin Jimenez",
+        cliente: "Sandra Bullock",
+      },
+     
+    ],
     icon: ScaleIcon,
   },
   {
     name: "Aerobicos-X98",
-    description: {
-      name: "Gilberto Gomez - FAC# 34546N3",
-      fecha: "16-3-21",
-      intructor: "Joaquin Jimenez",
-      cliente: "Sandra Bullock",
-    },
+    description:[
+      {
+        name: "Mariela Gamero - FAC# 34546N3",
+        fecha: "16-3-21",
+        intructor: "Joaquin Jimenez",
+        cliente: "Sandra Bullock",
+      },
+      {
+        name: "Silver Pilsen - FAC# 34546N3",
+        fecha: "16-3-21",
+        intructor: "Joaquin Jimenez",
+        cliente: "Sandra Bullock",
+      },
+        {
+          name: "Jose Salazar - FAC# 34546N3",
+          fecha: "16-3-21",
+          intructor: "Joaquin Jimenez",
+          cliente: "Sandra Bullock",
+        },
+    ],
     icon: LightningBoltIcon,
   },
   {
     name: "Spinning-X98",
-    description: {
-      name: "Gilberto Gomez - FAC# 34546N3",
-      fecha: "16-3-21",
-      intructor: "Joaquin Jimenez",
-      cliente: "Sandra Bullock",
-    },
+    description: [],
     icon: LightningBoltIcon,
   },
 ];
@@ -218,7 +242,7 @@ export default {
     async orderPerMonth() {
       this.$store.commit("setIsLoading", true);
       await axios
-        .get("/api/v1/gym-config/")
+        .get("/api/v1/gym-services/")
         .then((response) => {
           this.orderedByMonth = response.data;
         })

@@ -9,4 +9,5 @@ urlpatterns = [
     path('api/v1/', include('gymServices.urls')),
     path('api/v1/', include('gymTeachers.urls')),
     path('api/v1/', include('gymPersons.urls')),
+    path('api/v1/', include('gymClients.urls')),
 ]
