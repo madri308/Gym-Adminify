@@ -24,11 +24,11 @@
         v-bind:class="{ 'is-active': showMobileMenu }"
       >
         <div class="navbar-start">
-          <router-link to="/clientes" class="navbar-item">Clientes</router-link>
+          <router-link to="/clients" class="navbar-item">Clientes</router-link>
           <router-link to="/services" class="navbar-item"
             >Servicios</router-link
           >
-          <router-link to="/actividades" class="navbar-item"
+          <router-link to="/activities" class="navbar-item"
             >Actividades</router-link
           >
           <router-link to="/bills" class="navbar-item">Facturas</router-link>

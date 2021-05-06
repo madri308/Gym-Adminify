@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'gymSettings',
     'gymServices',
     'gymPersons',
-    'gymTeachers'
+    'gymTeachers',
+    'gymClients',
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -98,14 +99,7 @@ DATABASES = {
         'HOST': 'remotemysql.com',
         'PORT': '3306',
     },
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'ga_db',
-    #     'USER': 'root',
-    #     'PASSWORD': 'root',
-    #     'HOST': 'localhost',
-    #     'PORT': '3308',
-    # }
+    
 }
 
 

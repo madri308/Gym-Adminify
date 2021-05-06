@@ -29,29 +29,30 @@
     </Menu>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
-      <div class>
         <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-          <div v-for="teacher in teachers" :key="teacher" class="relative">
+          <div v-for="client in clients" :key="client" class="relative">
             <Disclosure as="div" class="mt-2" v-slot="{ open }">
               <DisclosureButton class="z-0 flex justify-between w-full px-7 py-4 text-lg font-medium text-left text-blue-100 bg-green-500 rounded-lg hover:bg-green-400 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75">
-                <span>{{ teacher.person.name }}</span>
+                <span>{{ client.person.name }}</span>
                 <ChevronUpIcon :class="open ? 'transform rotate-180' : ''" class="w-5 h-5 text-green-900"/>
                 </DisclosureButton>
                 <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500">
                   <span class="font-extrabold height: 100% width:25% float:left">Telefono: </span>
-                  <span>{{ teacher.person.phone }}</span>
+                  <span>{{ client.person.phone }}</span>
                   <span class="font-extrabold height: 100% width:25% float:left"> | Correo: </span>
-                  <span>{{ teacher.person.mail }}</span>
+                  <span>{{ client.person.mail }}</span>
                   <br />
-                  <span class="font-extrabold height: 100% width:25% float:left">Tipo: </span>
-                  <span>{{ teacher.category_name }}</span>
+                  <span class="font-extrabold height: 100% width:25% float:left">Estado Actual: </span>
+                  <span>{{ client.clientstate }}</span>
+                  <br />
+                  <span class="font-extrabold height: 100% width:25% float:left">Balance: </span>
+                  <span>{{ client.balance }}</span>
                 </DisclosurePanel>
             </Disclosure>
           </div>
         </dl>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -61,7 +62,7 @@ import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/vue/solid";
 import Selector from "../components/Selector";
 
 export default {
-  name: "Teachers",
+  name: "Clients",
   components: {
     Disclosure,
     DisclosureButton,
@@ -76,44 +77,43 @@ export default {
   },
   data() {
     return {
-      teachers: [],
-      loadedTeacher: {},
+      clients: [],
       is_loaded:false,
     };
   },
   mounted() {
-    this.getTeachers();
+    this.getClients();
   },
   methods: {
-    async getTeachers() {
+    async getClients() {
       this.$store.commit("setIsLoading", true);
       await axios
-        .get("/api/v1/teachers/")
+        .get("/api/v1/clients/")
         .then((response) => {
-          this.teachers = response.data;
-          console.log(this.teachers[0])
+          this.clients = response.data;
+          console.log(this.clients[0])
         })
         .catch((error) => {
           toast({
-            message: "Ocurrio un problema con los datos de: Instructores", type: "is-danger",
+            message: "Ocurrio un problema cargando los clientes", type: "is-danger",
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
         });
       this.$store.commit("setIsLoading", false);
     },
-    async getTeacher(id) {
+    async getClientsByState(state) {
       
       this.$store.commit("setIsLoading", true);
       await axios
-        .get("/api/v1/teachers"+id)
+        .get("/api/v1/clients"+state)
         .then((response) => {
-          this.teacherDetail = response.data;
+          this.clients = response.data;
           this.is_loaded = true;
         })
         .catch((error) => {
           toast({
-            message: "Ocurrio un problema con los datos de: Instructor", type: "is-danger",
+            message: "Ocurrio un problema obteniendo los clientes por estado", type: "is-danger",
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
