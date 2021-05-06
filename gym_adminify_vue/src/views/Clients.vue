@@ -91,7 +91,6 @@ export default {
         .get("/api/v1/clients/")
         .then((response) => {
           this.clients = response.data;
-          console.log(this.clients[0])
         })
         .catch((error) => {
           toast({

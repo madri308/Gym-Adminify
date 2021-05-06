@@ -91,7 +91,6 @@ export default {
         .get("/api/v1/teachers/")
         .then((response) => {
           this.teachers = response.data;
-          console.log(this.teachers[0])
         })
         .catch((error) => {
           toast({
