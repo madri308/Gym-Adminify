@@ -1,10 +1,10 @@
 <template>
   <div class="home">
-    <div class="grid justify-around grid-cols-2">
-      <div class="bg-gray-800 h-72 bg-opacity-50" >
+    <div class="grid grid-cols-2 gap-4 space-x-40">
+      <div class="bg-gray-800 h-72 bg-opacity-50">
         <div class="hero-body has-text-centered">
-          <p class="text-white title mb-6 text-7xl">EL MEJOR GIMNASIO</p>
-          <p class="text-white subtitle">Ahora desde tu ordenador</p>
+          <p class="text-white text-7xl align-middle ">EL MEJOR GIMNASIO</p>
+          <p class="text-white subtitle align-middle ">Ahora desde tu ordenador</p>
         </div>
       </div>
       <div>
@@ -23,6 +23,7 @@
         </template>
         <template v-else>
           <div class="h-96 w-80 page-log-in rounded-lg shadow-lg p-4">
+            <!-- <UserIcon class="h-6 w-6 text-white" aria-hidden="true" /> -->
             <h1 class="title">Inicio de Sesion</h1>
             <form @submit.prevent="submitForm">
                 <div class="field">
@@ -61,11 +62,13 @@
 <script>
 import { Calendar } from "v-calendar";
 import axios from 'axios'
+import { UserIcon } from "@vue-hero-icons/solid"
 
 export default {
   name: "Home",
   components: {
-    Calendar
+    Calendar,
+    UserIcon
   },
 
   data() {

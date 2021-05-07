@@ -1,4 +1,7 @@
 from django.http import Http404
+from django.contrib.auth.decorators import permission_required
+from django.utils.decorators import method_decorator
+
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -13,7 +16,9 @@ class OneConfig(APIView):
             return Config.objects.first()
         except Config.DoesNotExist:
             raise Http404
+    
     def get(self, request, format=None):
+        user = request.user
         config = self.get_first_object()
         serializer = ConfigSerializer(config,many=False)
         return Response(serializer.data)
@@ -24,7 +29,9 @@ class OneGym(APIView):
             return Gym.objects.first()
         except Gym.DoesNotExist:
             raise Http404
+
     def get(self, request, format=None):
+        self.user = request.user
         gym = self.get_first_object()
         serializer = GymSerializer(gym,many=False)
         return Response(serializer.data)
