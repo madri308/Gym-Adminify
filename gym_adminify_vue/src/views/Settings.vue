@@ -78,6 +78,7 @@ export default {
           this.config = response.data;
         })
         .catch((error) => {
+          console.log(error);
           toast({
             message: "Ocurrio un problema con los datos de: Configuracion",
             type: "is-danger",
@@ -98,6 +99,7 @@ export default {
           document.title = this.gym.name;
         })
         .catch((error) => {
+          console.log(error);
           toast({
             message: "Ocurrio un problema con los datos de: Gimnasio",
             type: "is-danger",

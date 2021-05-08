@@ -1,10 +1,10 @@
 <template>
   <div class="home">
-    <div class="grid justify-around grid-cols-2">
-      <div class="bg-gray-800 h-72 bg-opacity-50" >
+    <div class="grid grid-cols-2 gap-4 space-x-40">
+      <div class="bg-gray-800 h-72 bg-opacity-50">
         <div class="hero-body has-text-centered">
-          <p class="text-white title mb-6 text-7xl">EL MEJOR GIMNASIO</p>
-          <p class="text-white subtitle">Ahora desde tu ordenador</p>
+          <p class="text-white text-7xl align-middle ">EL MEJOR GIMNASIO</p>
+          <p class="text-white subtitle align-middle ">Ahora desde tu ordenador</p>
         </div>
       </div>
       <div>
@@ -61,11 +61,13 @@
 <script>
 import { Calendar } from "v-calendar";
 import axios from 'axios'
+import { UserIcon } from "@vue-hero-icons/solid"
 
 export default {
   name: "Home",
   components: {
-    Calendar
+    Calendar,
+    UserIcon
   },
 
   data() {
@@ -93,6 +95,7 @@ export default {
   },
   methods: {
       async submitForm() {
+          this.$store.commit("setIsLoading", true);
           axios.defaults.headers.common["Authorization"] = ""
           localStorage.removeItem("token")
           const formData = {
@@ -121,6 +124,7 @@ export default {
                   console.log(JSON.stringify(error))
               }
           })
+          this.$store.commit("setIsLoading", false);
       }
   },
   computed: {
