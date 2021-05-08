@@ -53,7 +53,7 @@
         <div class="navbar-item">
           <div class="buttons">
             <template v-if="$store.state.isAuthenticated">
-              <router-link to="/gym_settings" class="button is-success">
+              <router-link  v-if="this.$store.state.permissions.indexOf('gymSettings.view_config') >= 0" to="/gym_settings" class="button is-success">
                 <span class="icon"><i class="fas fa-cog"></i></span>
               </router-link>
               <button @click="logout()" class="button is-light">
