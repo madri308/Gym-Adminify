@@ -124,98 +124,26 @@ import { ChevronDownIcon } from "@heroicons/vue/solid";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 import Selector from "../components/Selector";
 import { ChevronUpIcon } from "@heroicons/vue/solid";
-import {
-  GlobeAltIcon,
-  LightningBoltIcon,
-  ScaleIcon,
-} from "@heroicons/vue/outline";
 
-const bills = [
-  {
-    name: "Yoga",
-    description: [
-      {
-        name: "Gilberto Gomez - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-      {
-        name: "Jose Salazar - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-      {
-        name: "Mariela Gamero - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-      {
-        name: "Silver Pilsen - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-    ],
-    icon: GlobeAltIcon,
-  },
-  {
-    name: "Pilates",
-    description: [
-      {
-        name: "Gilberto Gomez - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-      {
-        name: "Jose Salazar - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-      {
-        name: "Mariela Gamero - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-     
-    ],
-    icon: ScaleIcon,
-  },
-  {
-    name: "Aerobicos-X98",
-    description:[
-      {
-        name: "Mariela Gamero - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-      {
-        name: "Silver Pilsen - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-        {
-          name: "Jose Salazar - FAC# 34546N3",
-          fecha: "16-3-21",
-          intructor: "Joaquin Jimenez",
-          cliente: "Sandra Bullock",
-        },
-    ],
-    icon: LightningBoltIcon,
-  },
-  {
-    name: "Spinning-X98",
-    description: [],
-    icon: LightningBoltIcon,
-  },
-];
+const orderedMonths = {
+  "January": 1,
+  "February": 2,
+  "March": 3,
+  "April": 4,
+  "May": 5,
+  "June": 6,
+  "July": 7,
+  "August": 8,
+  "September": 9,
+  "October": 10,
+  "November": 11,
+  "December": 12
+};
+
+
+data.sort(function(month1, month2) {
+  return orderedMonths[month1[0]] - orderedMonths[month2[0]];
+});
 
 export default {
   name: "Bill",
@@ -233,18 +161,17 @@ export default {
   },
   data() {
     return {
-      orderedByMonth: {},
-      orderedByPersons: {},
-      orderedByServices: {},
+      bills: [],
     };
   },
   methods: {
-    async orderPerMonth() {
+    async getBills() {
       this.$store.commit("setIsLoading", true);
       await axios
-        .get("/api/v1/gym-services/")
+        .get("/api/v1/bills/")
         .then((response) => {
-          this.orderedByMonth = response.data;
+          this.bills = response.data;
+          console.log(this.bills)
         })
         .catch((error) => {
           toast({
@@ -257,26 +184,7 @@ export default {
           });
         });
       this.$store.commit("setIsLoading", false);
-    },
-    async orderPerPerson() {
-      this.$store.commit("setIsLoading", true);
-      await axios
-        .get("/api/v1/gym-config/")
-        .then((response) => {
-          this.orderedByPersons = response.data;
-        })
-        .catch((error) => {
-          toast({
-            message: "Ocurrio un problema con los datos de: Configuracion",
-            type: "is-danger",
-            dismissible: true,
-            pauseOnHover: true,
-            duration: 3000,
-            position: "bottom-right",
-          });
-        });
-      this.$store.commit("setIsLoading", false);
-    },
+    }
   },
 
   setup() {

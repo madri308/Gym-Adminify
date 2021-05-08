@@ -43,11 +43,13 @@ INSTALLED_APPS = [
     'corsheaders',
     'djoser',
 
+    # Project Apps
+    'AdmBills',
+    'gymPersons',
+    'gymClients',
     'gymSettings',
     'gymServices',
-    'gymPersons',
     'gymTeachers',
-    'gymClients',
 ]
 
 CORS_ALLOWED_ORIGINS = [
