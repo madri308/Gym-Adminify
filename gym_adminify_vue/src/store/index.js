@@ -6,6 +6,7 @@ export default createStore({
     token: '',
     isLoading: false,
     permissions:[],
+    permsLoaded: false,
   },
   mutations: {
     initializeStore(state){
@@ -24,12 +25,17 @@ export default createStore({
       state.token = token
       state.isAuthenticated = true
     },  
+    removePermissions(state) {
+      state.permissions = []
+      state.permsLoaded = false
+    },
     removeToken(state) {
-        state.token = ''
-        state.isAuthenticated = false
+      state.token = ''
+      state.isAuthenticated = false
     },
     setPermissions(state,permissions) {
       state.permissions = permissions
+      state.permsLoaded = true
     }, 
   },
   actions: {

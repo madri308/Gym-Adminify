@@ -1,8 +1,10 @@
 <template>
   <div class="bg-white">
-    <button v-on:click ='newOne = !newOne' class="fixed z-50 bottom-10 right-10 w-12 h-12 bg-red-600 rounded-full hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
-      <PlusIcon class="text-white" aria-hidden="true" />
-    </button>
+    <div v-if="canAddTeacher">
+      <button v-on:click ='newOne = !newOne' class="fixed z-50 bottom-10 right-10 w-12 h-12 bg-red-600 rounded-full hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
+        <PlusIcon class="text-white" aria-hidden="true" />
+      </button>
+    </div>
     <Selector @clicked="getByCategory" v-bind:options="options" />    
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <div class>
@@ -79,12 +81,21 @@ export default {
     
       teacherServices:[],
       teacherType: [],
+
+      // permissions: localStorage.getItem("userPermissions"),
+      permissions: this.$store.state.permissions,
     };
   },
   mounted() {
     this.getTeachers();
     this.getCategories();
     this.getServices();
+  },
+  computed:{
+    canAddTeacher() {
+      console.log(this.permissions.includes("gymTeachers.add_teacher"))
+      return this.permissions.includes("gymTeachers.add_teacher")
+    },
   },
   methods: {
     createJson(original, newOne){

@@ -78,7 +78,7 @@ export default {
           this.config = response.data;
         })
         .catch((error) => {
-          console.log(error);
+          // console.log(error);
           toast({
             message: "Ocurrio un problema con los datos de: Configuracion",
             type: "is-danger",
@@ -99,15 +99,13 @@ export default {
           document.title = this.gym.name;
         })
         .catch((error) => {
-          console.log(error);
+          // console.log(error.response);
           toast({
-            message: "Ocurrio un problema con los datos de: Gimnasio",
-            type: "is-danger",
-            dismissible: true,
-            pauseOnHover: true,
-            duration: 2000,
-            position: "bottom-right",
+            message: "Ocurrio un problema con los datos de: Gimnasio", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 2000, position: "bottom-right",
           });
+          this.$router.push({ name: 'Home' })
         });
       this.$store.commit("setIsLoading", false);
     },

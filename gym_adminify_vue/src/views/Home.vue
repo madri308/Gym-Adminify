@@ -87,7 +87,7 @@ export default {
       todos,
       username: '',
       password: '',
-      errors: []
+      errors: [],
     };
   },
   mounted() {
@@ -107,12 +107,11 @@ export default {
           .then(response => {
               const token = response.data.auth_token
               this.$store.commit('setToken', token)
-              
               axios.defaults.headers.common["Authorization"] = "Token " + token
               localStorage.setItem("token", token)
+              this.getPermissions();
               const toPath = this.$route.query.to || '/'
               this.$router.push(toPath)
-              this.getPermissions();
           })
           .catch(error => {
               if (error.response) {
@@ -121,32 +120,24 @@ export default {
                   }
               } else {
                   this.errors.push('Something went wrong. Please try again')
-                  
-                  console.log(JSON.stringify(error))
               }
           })
           this.$store.commit("setIsLoading", false);
       },
-      async getPermissions() {
-      this.$store.commit("setIsLoading", true);
-      await axios
+      getPermissions() {
+        axios
         .get("/api/v1/permissions/")
         .then((response) => {
-          this.$store.commit('setPermissions', response.data)
-          console.log(this.$store.state.permissions)
+          this.$store.commit('setPermissions', response.data);
+          // localStorage.setItem("userPermissions", response.data);
         })
         .catch((error) => {
-          console.log(error)
           toast({
-            message: "Ocurrio un problema con los datos de: Cuartos",
-            type: "is-danger",
-            dismissible: true,
-            pauseOnHover: true,
-            duration: 2000,
-            position: "bottom-right",
+            message: "Ocurrio un problema con los datos de: Permisos", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 2000, position: "bottom-right",
           });
         });
-      this.$store.commit("setIsLoading", false);
     },
   },
   computed: {
