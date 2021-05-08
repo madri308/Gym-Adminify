@@ -81,6 +81,7 @@ router.beforeEach((to, from, next) => {
       dismissible: true, pauseOnHover: true,
       duration: 2000, position: "bottom-right",
     });
+    next({ name: 'Home', query: { to: to.path } });
   }else if ((to.matched.some(record => record.meta.requireLogin) && !store.state.isAuthenticated) || !hasAccess(to.name)) {
     toast({
       message: "No puede acceder a la direccion", type: "is-danger",

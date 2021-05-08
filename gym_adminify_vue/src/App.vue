@@ -53,9 +53,11 @@
         <div class="navbar-item">
           <div class="buttons">
             <template v-if="$store.state.isAuthenticated">
-              <router-link to="/gym_settings" class="button is-success">
-                <span class="icon"><i class="fas fa-cog"></i></span>
-              </router-link>
+              <div v-if="canViewConfig">
+                <router-link to="/gym_settings" class="button is-success">
+                  <span class="icon"><i class="fas fa-cog"></i></span>
+                </router-link>
+              </div>
               <button @click="logout()" class="button is-light">
                 Salir
               </button>
@@ -115,6 +117,7 @@ export default {
     return {
       showMobileMenu: false,
       toggle: true,
+      permissions: this.$store.state.permissions,
     };
   },
   beforeCreate() {
@@ -124,6 +127,13 @@ export default {
         axios.defaults.headers.common['Authorization'] = "Token " + token
     } else {
         axios.defaults.headers.common['Authorization'] = ""
+    }
+  },
+  computed:{
+    canViewConfig(){
+      // console.log(this.permissions.includes("gymSettings.view_gym"))
+      // console.log(this.permissions)
+      return this.$store.state.permissions.includes("gymSettings.view_gym");
     }
   },
   components: {
