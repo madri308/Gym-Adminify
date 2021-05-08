@@ -11,4 +11,5 @@ urlpatterns = [
     path('api/v1/', include('gymPersons.urls')),
     path('api/v1/', include('gymClients.urls')),
     path('api/v1/', include('gymPermissions.urls')),
+    path('api/v1/', include('gymActivities.urls')),
 ]
