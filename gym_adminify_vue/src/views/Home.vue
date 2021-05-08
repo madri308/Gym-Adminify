@@ -23,7 +23,6 @@
         </template>
         <template v-else>
           <div class="h-96 w-80 page-log-in rounded-lg shadow-lg p-4">
-            <!-- <UserIcon class="h-6 w-6 text-white" aria-hidden="true" /> -->
             <h1 class="title">Inicio de Sesion</h1>
             <form @submit.prevent="submitForm">
                 <div class="field">
@@ -96,6 +95,7 @@ export default {
   },
   methods: {
       async submitForm() {
+          this.$store.commit("setIsLoading", true);
           axios.defaults.headers.common["Authorization"] = ""
           localStorage.removeItem("token")
           const formData = {
@@ -124,6 +124,7 @@ export default {
                   console.log(JSON.stringify(error))
               }
           })
+          this.$store.commit("setIsLoading", false);
       }
   },
   computed: {
