@@ -4,7 +4,8 @@ export default createStore({
   state: {
     isAuthenticated: false,
     token: '',
-    isLoading: false
+    isLoading: false,
+    permissions:[],
   },
   mutations: {
     initializeStore(state){
@@ -27,6 +28,9 @@ export default createStore({
         state.token = ''
         state.isAuthenticated = false
     },
+    setPermissions(state,permissions) {
+      state.permissions = permissions
+    }, 
   },
   actions: {
   },

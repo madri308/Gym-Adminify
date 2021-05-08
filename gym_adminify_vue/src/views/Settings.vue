@@ -66,7 +66,8 @@ export default {
   },
   mounted() {
     this.getConfig();
-    this.getGym(), this.getRoom();
+    this.getGym();
+    this.getRoom();
   },
   methods: {
     async getConfig() {
@@ -129,6 +130,7 @@ export default {
         });
       this.$store.commit("setIsLoading", false);
     },
+    
   },
 };
 </script>
