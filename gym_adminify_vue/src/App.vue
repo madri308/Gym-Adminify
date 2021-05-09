@@ -28,7 +28,7 @@
             <router-link to="/clientes" class="navbar-item">
               Clientes
             </router-link>
-            <router-link to="/bills" class="navbar-item">
+            <router-link to="/billsByMonth" class="navbar-item">
               Facturas
             </router-link>
             <router-link to="/teachers" class="navbar-item">
