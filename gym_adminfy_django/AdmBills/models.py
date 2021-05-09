@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from gymPersons.models import Person
 from gymClients.models import Client
@@ -28,3 +29,7 @@ class Bill(models.Model):
 
     def get_absolute_url(self):
         return f'/{self.id}/'
+
+    def get_month(self):
+        month = self.issuedate.month
+        return month
