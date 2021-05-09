@@ -24,29 +24,17 @@
         v-bind:class="{ 'is-active': showMobileMenu }"
       >
         <div class="navbar-start">
-          <template v-if="$store.state.isAuthenticated">
-            <router-link to="/clientes" class="navbar-item">
-              Clientes
-            </router-link>
-            <router-link to="/bills" class="navbar-item">
-              Facturas
-            </router-link>
-            <router-link to="/teachers" class="navbar-item">
-              Instructores
-            </router-link>
-          </template>
-
-          <template v-else>
-            <router-link to="/about" class="navbar-item">
-              ¿Quienes somos?
-            </router-link>
-          </template>
-          <router-link to="/services" class="navbar-item">
-            Servicios
-          </router-link>
-          <router-link to="/activities" class="navbar-item">
-            Actividades
-          </router-link>
+          <router-link to="/clients" class="navbar-item">Clientes</router-link>
+          <router-link to="/services" class="navbar-item"
+            >Servicios</router-link
+          >
+          <router-link to="/activities" class="navbar-item"
+            >Actividades</router-link
+          >
+          <router-link to="/billsByMonth" class="navbar-item">Facturas</router-link>
+          <router-link to="/teachers" class="navbar-item"
+            >Instructores</router-link
+          >
         </div>
       </div>
       <div class="navbar-end">

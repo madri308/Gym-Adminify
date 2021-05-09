@@ -23,4 +23,5 @@ class BillSerializer(serializers.ModelSerializer):
             #"description",
             "get_absolute_url"
         )
+        depth = 2
 
