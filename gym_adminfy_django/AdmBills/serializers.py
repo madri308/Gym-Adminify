@@ -10,7 +10,6 @@ class BillSerializer(serializers.ModelSerializer):
     #service = serializers.CharField(source='activity.service',read_only=True) 
     #description = serializers.CharField(source='service.description',read_only=True) 
     clientname = serializers.CharField(source='client.person.name',read_only=True)
-
     class Meta:
         model = Bill
         fields = (
@@ -22,9 +21,7 @@ class BillSerializer(serializers.ModelSerializer):
             "paymethod",
             "paymentday",
             #"description",
-            "get_month",
             "get_absolute_url"
-
         )
-        depth = 1
+        depth = 2
 
