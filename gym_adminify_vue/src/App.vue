@@ -24,40 +24,44 @@
         v-bind:class="{ 'is-active': showMobileMenu }"
       >
         <div class="navbar-start">
-          <router-link to="/clients" class="navbar-item">Clientes</router-link>
-          <router-link to="/services" class="navbar-item"
-            >Servicios</router-link
-          >
-          <router-link to="/activities" class="navbar-item"
-            >Actividades</router-link
-          >
-          <router-link to="/bills" class="navbar-item">Facturas</router-link>
-          <router-link to="/teachers" class="navbar-item"
-            >Instructores</router-link
-          >
+          <template v-if="$store.state.isAuthenticated">
+            <router-link to="/clientes" class="navbar-item">
+              Clientes
+            </router-link>
+            <router-link to="/bills" class="navbar-item">
+              Facturas
+            </router-link>
+            <router-link to="/teachers" class="navbar-item">
+              Instructores
+            </router-link>
+          </template>
+
+          <template v-else>
+            <router-link to="/about" class="navbar-item">
+              ¿Quienes somos?
+            </router-link>
+          </template>
+          <router-link to="/services" class="navbar-item">
+            Servicios
+          </router-link>
+          <router-link to="/activities" class="navbar-item">
+            Actividades
+          </router-link>
         </div>
       </div>
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
             <template v-if="$store.state.isAuthenticated">
-              <router-link to="/my-account" class="button is-light"
-                >My account</router-link
-              >
+              <div v-if="canViewConfig">
+                <router-link to="/gym_settings" class="button is-success">
+                  <span class="icon"><i class="fas fa-cog"></i></span>
+                </router-link>
+              </div>
+              <button @click="logout()" class="button is-light">
+                Salir
+              </button>
             </template>
-
-            <template v-else>
-              <router-link to="/log-in" class="button is-light"
-                >Log in</router-link
-              >
-            </template>
-
-            <router-link to="/gym_settings" class="button is-success">
-              <span class="icon"><i class="fas fa-cog"></i></span>
-            </router-link>
-            <router-link to="/log-in" class="button is-light"
-              >Salir</router-link
-            >
           </div>
         </div>
       </div>
@@ -89,10 +93,7 @@
       </div>
     </div>
 
-    <div
-      class="is-loading-bar has-text-centered"
-      v-bind:class="{ 'is-loading': $store.state.isLoading }"
-    >
+    <div class="is-loading-bar has-text-centered" v-bind:class="{ 'is-loading': $store.state.isLoading }">
       <div class="lds-dual-ring"></div>
     </div>
 
@@ -110,18 +111,47 @@
 
 <script>
 import { SpeakerphoneIcon, XIcon } from "@heroicons/vue/outline";
+import axios from 'axios'
 export default {
   data() {
     return {
       showMobileMenu: false,
       toggle: true,
+      permissions: this.$store.state.permissions,
     };
   },
- 
+  beforeCreate() {
+    this.$store.commit('initializeStore')
+    const token = this.$store.state.token
+    if (token) {
+        axios.defaults.headers.common['Authorization'] = "Token " + token
+    } else {
+        axios.defaults.headers.common['Authorization'] = ""
+    }
+  },
+  computed:{
+    canViewConfig(){
+      // console.log(this.permissions.includes("gymSettings.view_gym"))
+      // console.log(this.permissions)
+      return this.$store.state.permissions.includes("gymSettings.view_gym");
+    }
+  },
   components: {
     SpeakerphoneIcon,
     XIcon,
   },
+  methods:{
+    logout() {
+        axios.defaults.headers.common["Authorization"] = ""
+        localStorage.removeItem("token")
+        localStorage.removeItem("username")
+        localStorage.removeItem("userid")
+        // localStorage.removeItem("userPermissions")
+        this.$store.commit('removeToken')
+        this.$store.commit('removePermissions')
+        this.$router.push('/')
+    },
+  }
 };
 </script>
 
