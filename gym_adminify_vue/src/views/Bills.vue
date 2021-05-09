@@ -75,13 +75,14 @@
           class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
           <div v-for="bill in bills" :key="bill.clientname" class="relative">      
             <Disclosure v-bind:title="bill.clientname">
+              
                   <Disclosure v-bind:title="bill.issuedate">
                       <span class="font-extrabold height: 100% width:25% float:left">Fecha por Pagar:
                       </span>
                       <span>{{ bill.issuedate }}</span>
                       <br />
                       <span class="font-extrabold height: 100% width:25% float:left">Fecha de Pago:
-                      </span>
+                      </span> 
                       <span>{{ bill.paymentday }}</span>
                       <br />
                       <span class="font-extrabold height: 100% width:25% float:left" >Cliente:
@@ -94,7 +95,7 @@
                       <br />
                       <span class="font-extrabold height: 100% width:25% float:left" >Método de Pago:
                       </span>
-                      <span>{{ bill.paymethod }}</span>
+                      <span>{{ bill.paymethod.name }}</span>
                       <br />
                   </Disclosure>
             </Disclosure>
