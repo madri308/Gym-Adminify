@@ -9,6 +9,7 @@ import Teachers from '../views/Teachers.vue'
 import Services from '../views/Services.vue'
 import Clients from '../views/Clients.vue'
 import SignUp from '../views/SignUp.vue'
+import Activities from '../views/Activities.vue'
 
 const routes = [
   {
@@ -33,6 +34,14 @@ const routes = [
     path: '/gym_settings',
     name: 'Settings',
     component: Settings,
+    meta: {
+      requireLogin: true
+    }
+  },
+  {
+    path: '/activities',
+    name: 'Activities',
+    component: Activities,
     meta: {
       requireLogin: true
     }

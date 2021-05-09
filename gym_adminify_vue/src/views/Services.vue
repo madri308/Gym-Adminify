@@ -60,7 +60,7 @@ export default {
         })
         .catch((error) => {
           toast({
-            message: "Ocurrio un problema con los datos de: Instructores", type: "is-danger",
+            message: "Ocurrio un problema con los datos de: Servicios", type: "is-danger",
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
