@@ -19,10 +19,10 @@
                 <br />
                 <span class="font-extrabold height: 100% width:25% float:left">Tipo: </span>
                 <span>{{ teacher.category_name }}</span>
-                <button v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                <button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                   <i class="fa fa-trash fa-lg"></i>
                 </button> 
-                <button type="button" class="absolute top-0 right-7 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                <button  v-if="canChangeTeacher" type="button" class="absolute top-0 right-7 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                   <i class="fas fa-pencil-alt fa-lg"></i>
                 </button> 
               </div>
@@ -60,6 +60,7 @@ import Selector from "../components/Selector";
 import Disclosure from "../components/Disclosure";
 import { PlusIcon,CheckCircleIcon  } from "@heroicons/vue/outline";
 import Multiselect from '@vueform/multiselect'
+import { toast } from 'bulma-toast'
 
 
 export default {
@@ -91,8 +92,13 @@ export default {
   },
   computed:{
     canAddTeacher() {
-      console.log(this.permissions.includes("gymTeachers.add_teacher"))
       return this.permissions.includes("gymTeachers.add_teacher")
+    },
+    canDeleteTeacher() {
+      return this.permissions.includes("gymTeachers.delete_teacher")
+    },
+    canChangeTeacher() {
+      return this.permissions.includes("gymTeachers.change_teacher")
     },
   },
   methods: {

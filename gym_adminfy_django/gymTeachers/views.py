@@ -2,6 +2,7 @@ from django.http import Http404
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 
 from .models import Teacher,Teachercategory
 from .serializers import TeacherSerializer,TeacherNamesSerializer, TeachercategorySerializer
@@ -34,5 +35,5 @@ class TeacherDetail(APIView):
         return Response(serializer.data)
     def delete(self, request, teacher_id, format=None):
         teacher = Teacher.objects.get(person=teacher_id)
-        teacher.person.delete()
-        return Response(status.HTTP_204_NO_CONTENT)
+        teacher.delete()
+        return Response(status=status.HTTP_200_OK)
