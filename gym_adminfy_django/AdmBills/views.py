@@ -6,6 +6,14 @@ from rest_framework.response import Response
 from .models import Bill
 from .serializers import BillSerializer
 
-class AllBills(ListCreateAPIView):
-    queryset = Bill.objects.select_related()
+# class AllBillsOrderedByActivity(ListCreateAPIView):
+#     queryset = Bill.objects.select_related().order_by('activity')
+#     serializer_class = BillSerializer
+
+class AllBillsOrderedByClient(ListCreateAPIView):
+    queryset = Bill.objects.select_related().order_by('client')
+    serializer_class = BillSerializer
+
+class AllBillsOrderedByMonth(ListCreateAPIView):
+    queryset = Bill.objects.select_related().order_by('issuedate__month')
     serializer_class = BillSerializer

@@ -9,12 +9,13 @@ class BillSerializer(serializers.ModelSerializer):
     #activity = 
     #service = serializers.CharField(source='activity.service',read_only=True) 
     #description = serializers.CharField(source='service.description',read_only=True) 
+    clientname = serializers.CharField(source='client.person.name',read_only=True)
     class Meta:
         model = Bill
         fields = (
             "cost",
             "paid",
-            "client",
+            "clientname",
             #"activity",
             "issuedate",
             "paymethod",
