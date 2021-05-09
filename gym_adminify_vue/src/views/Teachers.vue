@@ -13,16 +13,18 @@
             <Disclosure v-bind:title="teacher.person.name">
               <div class="relative">
                 <span class="font-extrabold height: 100% width:25% float:left">Telefono: </span>
-                <span>{{ teacher.person.phone }}</span>
+                <!-- <span>{{ teacher.person.phone }}</span> -->
+                <input :disabled="disabled" type="int" v-model="teacher.person.phone" placeholder="Telefono" aria-label="Full name">
                 <span class="font-extrabold height: 100% width:25% float:left"> | Correo: </span>
-                <span>{{ teacher.person.mail }}</span>
+                <!-- <span>{{ teacher.person.mail }}</span> -->
+                <input :disabled="disabled" type="int" v-model="teacher.person.mail" placeholder="Telefono" aria-label="Full name">
                 <br />
                 <span class="font-extrabold height: 100% width:25% float:left">Tipo: </span>
                 <span>{{ teacher.category_name }}</span>
-                <button v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                <button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                   <i class="fa fa-trash fa-lg"></i>
                 </button> 
-                <button type="button" class="absolute top-0 right-7 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                <button @click="disabled = !disabled" v-if="canChangeTeacher" type="button" class="absolute top-0 right-7 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                   <i class="fas fa-pencil-alt fa-lg"></i>
                 </button> 
               </div>
@@ -32,7 +34,7 @@
             <div class="relative">
               <form class="w-full max-w-sm">
                 <div class="flex items-center border-b border-teal-500 py-2">
-                  <input class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Nombre" aria-label="Full name">
+                  <input disabled class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Nombre" aria-label="Full name">
                 </div>
                 <div class="flex items-center border-b border-teal-500 py-2">
                   <input class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Correo" aria-label="Full name">
@@ -60,6 +62,7 @@ import Selector from "../components/Selector";
 import Disclosure from "../components/Disclosure";
 import { PlusIcon,CheckCircleIcon  } from "@heroicons/vue/outline";
 import Multiselect from '@vueform/multiselect'
+import { toast } from 'bulma-toast'
 
 
 export default {
@@ -81,9 +84,8 @@ export default {
     
       teacherServices:[],
       teacherType: [],
-
-      // permissions: localStorage.getItem("userPermissions"),
       permissions: this.$store.state.permissions,
+      disabled: true,
     };
   },
   mounted() {
@@ -93,8 +95,13 @@ export default {
   },
   computed:{
     canAddTeacher() {
-      console.log(this.permissions.includes("gymTeachers.add_teacher"))
       return this.permissions.includes("gymTeachers.add_teacher")
+    },
+    canDeleteTeacher() {
+      return this.permissions.includes("gymTeachers.delete_teacher")
+    },
+    canChangeTeacher() {
+      return this.permissions.includes("gymTeachers.change_teacher")
     },
   },
   methods: {
@@ -103,27 +110,31 @@ export default {
         newOne.push({value: element['get_absolute_url'],label:element['name']});
       });
     },
-    deleteTeacher(id) {
+    async deleteTeacher(id) {
+      this.$store.commit("setIsLoading", true);
       this.teachers.forEach(element => {
         if(element['person']['id'] == id){
           const index = this.teachers.indexOf(element);
           this.teachers.splice(index, 1);
         };
       });
-      // this.$store.commit("setIsLoading", true);
-      // await axios
-      //   .get("/api/v1/teachers/")
-      //   .then((response) => {
-      //     this.teachers = response.data;
-      //   })
-      //   .catch((error) => {
-      //     toast({
-      //       message: "Ocurrio un problema con los datos de: Instructores", type: "is-danger",
-      //       dismissible: true, pauseOnHover: true,
-      //       duration: 3000, position: "bottom-right",
-      //     });
-      //   });
-      // this.$store.commit("setIsLoading", false);
+      await axios
+        .delete("/api/v1/teachers/"+id)
+        .then((response) => {
+          toast({
+            message: "Instructor eliminado exitosamente", type: "is-success",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+        })
+        .catch((error) => {
+          toast({
+            message: "Ocurrio un problema con los datos de: Instructores", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+        });
+      this.$store.commit("setIsLoading", false);
     },
     async getTeachers() {
       this.$store.commit("setIsLoading", true);

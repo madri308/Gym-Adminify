@@ -11,11 +11,15 @@ export default createStore({
   mutations: {
     initializeStore(state){
       if (localStorage.getItem('token')) {
+        state.permissions = localStorage.getItem('UP')
+        state.permsLoaded = true
         state.token = localStorage.getItem('token')
         state.isAuthenticated = true
       } else {
-          state.token = ''
-          state.isAuthenticated = false
+        state.token = ''
+        state.isAuthenticated = false
+        state.permsLoaded = false
+        state.permissions = []
       } 
     },
     setIsLoading(state,status){
@@ -26,6 +30,7 @@ export default createStore({
       state.isAuthenticated = true
     },  
     removePermissions(state) {
+      localStorage.removeItem('UP')
       state.permissions = []
       state.permsLoaded = false
     },
@@ -34,6 +39,7 @@ export default createStore({
       state.isAuthenticated = false
     },
     setPermissions(state,permissions) {
+      localStorage.setItem('UP',permissions)
       state.permissions = permissions
       state.permsLoaded = true
     }, 
