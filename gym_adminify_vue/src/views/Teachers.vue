@@ -81,8 +81,6 @@ export default {
     
       teacherServices:[],
       teacherType: [],
-
-      // permissions: localStorage.getItem("userPermissions"),
       permissions: this.$store.state.permissions,
     };
   },
@@ -103,27 +101,31 @@ export default {
         newOne.push({value: element['get_absolute_url'],label:element['name']});
       });
     },
-    deleteTeacher(id) {
+    async deleteTeacher(id) {
+      this.$store.commit("setIsLoading", true);
       this.teachers.forEach(element => {
         if(element['person']['id'] == id){
           const index = this.teachers.indexOf(element);
           this.teachers.splice(index, 1);
         };
       });
-      // this.$store.commit("setIsLoading", true);
-      // await axios
-      //   .get("/api/v1/teachers/")
-      //   .then((response) => {
-      //     this.teachers = response.data;
-      //   })
-      //   .catch((error) => {
-      //     toast({
-      //       message: "Ocurrio un problema con los datos de: Instructores", type: "is-danger",
-      //       dismissible: true, pauseOnHover: true,
-      //       duration: 3000, position: "bottom-right",
-      //     });
-      //   });
-      // this.$store.commit("setIsLoading", false);
+      await axios
+        .delete("/api/v1/teachers/"+id)
+        .then((response) => {
+          toast({
+            message: "Instructor eliminado exitosamente", type: "is-success",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+        })
+        .catch((error) => {
+          toast({
+            message: "Ocurrio un problema con los datos de: Instructores", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+        });
+      this.$store.commit("setIsLoading", false);
     },
     async getTeachers() {
       this.$store.commit("setIsLoading", true);
