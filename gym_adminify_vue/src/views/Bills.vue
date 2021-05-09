@@ -69,46 +69,38 @@
         </MenuItems>
       </transition>
     </Menu>
-    <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8"> 
+    <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <div class>
-        <dl
-          class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10"
-        >
-          <div v-for="bill in bills" :key="bill.name" class="relative">
-            <Disclosure as="div" v-slot="{ open }" class="mt-2">
-              <DisclosureButton
-                class="z-0 flex justify-between w-full px-7 py-4 text-lg font-medium text-left text-blue-100 bg-blue-600 rounded-lg hover:bg-blue-500 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75">
-                <span>{{ bill.name }}</span>
-                <ChevronUpIcon :class="open ? 'transform rotate-180' : ''" class="w-5 h-5 text-blue-200"/>
-              </DisclosureButton>
-              <DisclosurePanel  class="px-4 pt-4 pb-2 text-sm text-gray-500">
-                <div  v-for="bill2 in bill.description"  :key="bill2.name"  class="relative"       >
+        <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10" >
+          <div v-for="billType in bills" :key="billType" class="relative">      
+            <Disclosure v-bind:title="billType">
+                <div v-for="bill2 in bill.description" :key="bill2.name" class="relative" >
                   <Disclosure as="div" class="mt-2">
-                    <DisclosureButton 
-                      class="flex justify-between w-full px-7 py-4 text-lg font-medium text-left text-blue-100 bg-blue-700 rounded-lg hover:bg-blue-500 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75"
-                    >
-                      <span>{{ bill2.name }}</span>
-                      <ChevronUpIcon
-                        :class="open ? 'transform rotate-180' : ''"
-                        class="w-5 h-5 text-blue-500"
-                      />
-                    </DisclosureButton>
-
-                    <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500 bg-blue-50"
-                    >
-                      <span class="font-extrabold height: 100% width:25% float:left">Fecha: </span>
-                      <span>{{ bill2.fecha }}</span>
+                    <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500 bg-blue-50" >
+                      <span class="font-extrabold height: 100% width:25% float:left" >Fecha por Pago:
+                      </span>
+                      <span>{{ bill2.issuedate }}</span>
                       <br/>
-                      <span class="font-extrabold height: 100% width:25% float:left">Cliente: </span>
-                      <span>{{ bill2.cliente }}</span>
+                      <span class="font-extrabold height: 100% width:25% float:left" >Fecha por Pago:
+                      </span>
+                      <span>{{ bill2.paymethod }}</span>
                       <br/>
-                      <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
-                      <span>{{ bill2.intructor }}</span>
+                      <span class="font-extrabold height: 100% width:25% float:left" >Fecha por Pago:
+                      </span>
+                      <span>{{ bill2.paymentday }}</span>
                       <br/>
-                    </DisclosurePanel>
+                      <span class="font-extrabold height: 100% width:25% float:left" >Fecha por Pago:
+                      </span>
+                      <span>{{ bill2.clientname }}</span>
+                      <br/>
+                      <span class="font-extrabold height: 100% width:25% float:left">Cliente:
+                      </span>
+                      <span>{{ bill2.cost }}</span>
+                      <br/>
+                      <br/>
+                      </DisclosurePanel>
                   </Disclosure>
                 </div>
-              </DisclosurePanel>
             </Disclosure>
           </div>
         </dl>
@@ -119,110 +111,16 @@
 
 <script>
 import axios from "axios";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { ChevronDownIcon } from "@heroicons/vue/solid";
-import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 import Selector from "../components/Selector";
 import { ChevronUpIcon } from "@heroicons/vue/solid";
-import {
-  GlobeAltIcon,
-  LightningBoltIcon,
-  ScaleIcon,
-} from "@heroicons/vue/outline";
-
-const bills = [
-  {
-    name: "Yoga",
-    description: [
-      {
-        name: "Gilberto Gomez - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-      {
-        name: "Jose Salazar - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-      {
-        name: "Mariela Gamero - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-      {
-        name: "Silver Pilsen - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-    ],
-    icon: GlobeAltIcon,
-  },
-  {
-    name: "Pilates",
-    description: [
-      {
-        name: "Gilberto Gomez - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-      {
-        name: "Jose Salazar - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-      {
-        name: "Mariela Gamero - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-     
-    ],
-    icon: ScaleIcon,
-  },
-  {
-    name: "Aerobicos-X98",
-    description:[
-      {
-        name: "Mariela Gamero - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-      {
-        name: "Silver Pilsen - FAC# 34546N3",
-        fecha: "16-3-21",
-        intructor: "Joaquin Jimenez",
-        cliente: "Sandra Bullock",
-      },
-        {
-          name: "Jose Salazar - FAC# 34546N3",
-          fecha: "16-3-21",
-          intructor: "Joaquin Jimenez",
-          cliente: "Sandra Bullock",
-        },
-    ],
-    icon: LightningBoltIcon,
-  },
-  {
-    name: "Spinning-X98",
-    description: [],
-    icon: LightningBoltIcon,
-  },
-];
+import  Disclosure  from "../components/Disclosure";
+import { ChevronDownIcon } from "@heroicons/vue/solid";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 
 export default {
   name: "Bill",
   components: {
     Disclosure,
-    DisclosureButton,
-    DisclosurePanel,
     ChevronUpIcon,
     Selector,
     Menu,
@@ -231,20 +129,36 @@ export default {
     MenuItems,
     ChevronDownIcon,
   },
+
   data() {
     return {
-      orderedByMonth: {},
-      orderedByPersons: {},
-      orderedByServices: {},
+      bills: [],
+      orderedMonths: {
+        January: 1,
+        February: 2,
+        March: 3,
+        April: 4,
+        May: 5,
+        June: 6,
+        July: 7,
+        August: 8,
+        September: 9,
+        October: 10,
+        November: 11,
+        December: 12,
+      },
     };
+  },
+  mounted() {
+    this.getBills()
   },
   methods: {
-    async orderPerMonth() {
+    async getBills() {
       this.$store.commit("setIsLoading", true);
       await axios
-        .get("/api/v1/gym-services/")
+        .get("/api/v1/bills/")
         .then((response) => {
-          this.orderedByMonth = response.data;
+          this.bills = response.data;
         })
         .catch((error) => {
           toast({
@@ -258,31 +172,6 @@ export default {
         });
       this.$store.commit("setIsLoading", false);
     },
-    async orderPerPerson() {
-      this.$store.commit("setIsLoading", true);
-      await axios
-        .get("/api/v1/gym-config/")
-        .then((response) => {
-          this.orderedByPersons = response.data;
-        })
-        .catch((error) => {
-          toast({
-            message: "Ocurrio un problema con los datos de: Configuracion",
-            type: "is-danger",
-            dismissible: true,
-            pauseOnHover: true,
-            duration: 3000,
-            position: "bottom-right",
-          });
-        });
-      this.$store.commit("setIsLoading", false);
-    },
-  },
-
-  setup() {
-    return {
-      bills,
-    };
   },
 };
 </script>
