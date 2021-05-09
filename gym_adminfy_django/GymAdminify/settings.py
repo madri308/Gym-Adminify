@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'gymSettings',
     'gymServices',
     'gymTeachers',
-    'gymClients',
     'gymPermissions',
 ]
 

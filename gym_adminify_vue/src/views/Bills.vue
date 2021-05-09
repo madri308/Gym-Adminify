@@ -71,43 +71,34 @@
     </Menu>
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <div class>
-        <dl
-          class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10"
-        >
+        <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10" >
           <div v-for="billType in bills" :key="billType" class="relative">      
             <Disclosure v-bind:title="billType">
                 <div v-for="bill2 in bill.description" :key="bill2.name" class="relative" >
                   <Disclosure as="div" class="mt-2">
-                    <DisclosureButton
-                      class="flex justify-between w-full px-7 py-4 text-lg font-medium text-left text-blue-100 bg-blue-700 rounded-lg hover:bg-blue-500 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75"
-                    >
-                      <span>{{ bill2[0] }}</span>
-                      <ChevronUpIcon :class="open ? 'transform rotate-180' : ''"   class="w-5 h-5 text-blue-500"
-                      />
-                    </DisclosureButton>
-
-                    <DisclosurePanel
-                      class="px-4 pt-4 pb-2 text-sm text-gray-500 bg-blue-50"
-                    >
-                      <span
-                        class="font-extrabold height: 100% width:25% float:left"
-                        >Fecha:
+                    <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500 bg-blue-50" >
+                      <span class="font-extrabold height: 100% width:25% float:left" >Fecha por Pago:
                       </span>
                       <span>{{ bill2.issuedate }}</span>
-                      <br />
-                      <span
-                        class="font-extrabold height: 100% width:25% float:left"
-                        >Cliente:
+                      <br/>
+                      <span class="font-extrabold height: 100% width:25% float:left" >Fecha por Pago:
                       </span>
                       <span>{{ bill2.paymethod }}</span>
-                      <br />
-                      <span
-                        class="font-extrabold height: 100% width:25% float:left"
-                        >Instructor:
+                      <br/>
+                      <span class="font-extrabold height: 100% width:25% float:left" >Fecha por Pago:
                       </span>
-                      <span>{{ bill2.intructor }}</span>
-                      <br />
-                    </DisclosurePanel>
+                      <span>{{ bill2.paymentday }}</span>
+                      <br/>
+                      <span class="font-extrabold height: 100% width:25% float:left" >Fecha por Pago:
+                      </span>
+                      <span>{{ bill2.clientname }}</span>
+                      <br/>
+                      <span class="font-extrabold height: 100% width:25% float:left">Cliente:
+                      </span>
+                      <span>{{ bill2.cost }}</span>
+                      <br/>
+                      <br/>
+                      </DisclosurePanel>
                   </Disclosure>
                 </div>
             </Disclosure>
@@ -120,11 +111,11 @@
 
 <script>
 import axios from "axios";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { ChevronDownIcon } from "@heroicons/vue/solid";
 import Selector from "../components/Selector";
 import { ChevronUpIcon } from "@heroicons/vue/solid";
-import { Disclosure } from "../components/Disclosure";
+import  Disclosure  from "../components/Disclosure";
+import { ChevronDownIcon } from "@heroicons/vue/solid";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 
 export default {
   name: "Bill",
