@@ -31,7 +31,7 @@
           <router-link to="/activities" class="navbar-item"
             >Actividades</router-link
           >
-          <router-link to="/bills" class="navbar-item">Facturas</router-link>
+          <router-link to="/billsByMonth" class="navbar-item">Facturas</router-link>
           <router-link to="/teachers" class="navbar-item"
             >Instructores</router-link
           >

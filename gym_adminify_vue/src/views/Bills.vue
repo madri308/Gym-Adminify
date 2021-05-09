@@ -72,44 +72,31 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <div class>
         <dl
-          class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10"
-        >
-          <div v-for="billType in bills" :key="billType" class="relative">      
-            <Disclosure v-bind:title="billType">
-                <div v-for="bill2 in bill.description" :key="bill2.name" class="relative" >
-                  <Disclosure as="div" class="mt-2">
-                    <DisclosureButton
-                      class="flex justify-between w-full px-7 py-4 text-lg font-medium text-left text-blue-100 bg-blue-700 rounded-lg hover:bg-blue-500 focus:outline-none focus-visible:ring focus-visible:ring-blue-500 focus-visible:ring-opacity-75"
-                    >
-                      <span>{{ bill2[0] }}</span>
-                      <ChevronUpIcon :class="open ? 'transform rotate-180' : ''"   class="w-5 h-5 text-blue-500"
-                      />
-                    </DisclosureButton>
-
-                    <DisclosurePanel
-                      class="px-4 pt-4 pb-2 text-sm text-gray-500 bg-blue-50"
-                    >
-                      <span
-                        class="font-extrabold height: 100% width:25% float:left"
-                        >Fecha:
+          class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
+          <div v-for="bill in bills" :key="bill.clientname" class="relative">      
+            <Disclosure v-bind:title="bill.clientname">
+                  <Disclosure v-bind:title="bill.issuedate">
+                      <span class="font-extrabold height: 100% width:25% float:left">Fecha por Pagar:
                       </span>
-                      <span>{{ bill2.issuedate }}</span>
+                      <span>{{ bill.issuedate }}</span>
                       <br />
-                      <span
-                        class="font-extrabold height: 100% width:25% float:left"
-                        >Cliente:
+                      <span class="font-extrabold height: 100% width:25% float:left">Fecha de Pago:
                       </span>
-                      <span>{{ bill2.paymethod }}</span>
+                      <span>{{ bill.paymentday }}</span>
                       <br />
-                      <span
-                        class="font-extrabold height: 100% width:25% float:left"
-                        >Instructor:
+                      <span class="font-extrabold height: 100% width:25% float:left" >Cliente:
                       </span>
-                      <span>{{ bill2.intructor }}</span>
+                      <span>{{ bill.clientname }}</span>
                       <br />
-                    </DisclosurePanel>
+                      <span class="font-extrabold height: 100% width:25% float:left" >Costo:
+                      </span>
+                      <span>{{ bill.cost }}</span>
+                      <br />
+                      <span class="font-extrabold height: 100% width:25% float:left" >Método de Pago:
+                      </span>
+                      <span>{{ bill.paymethod }}</span>
+                      <br />
                   </Disclosure>
-                </div>
             </Disclosure>
           </div>
         </dl>
@@ -122,20 +109,18 @@
 import axios from "axios";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { ChevronDownIcon } from "@heroicons/vue/solid";
-import Selector from "../components/Selector";
 import { ChevronUpIcon } from "@heroicons/vue/solid";
-import { Disclosure } from "../components/Disclosure";
+import  Disclosure  from "../components/Disclosure";
 
 export default {
   name: "Bill",
   components: {
-    Disclosure,
-    ChevronUpIcon,
-    Selector,
     Menu,
-    MenuButton,
     MenuItem,
     MenuItems,
+    Disclosure,
+    MenuButton,
+    ChevronUpIcon,
     ChevronDownIcon,
   },
 
@@ -160,14 +145,16 @@ export default {
   },
   mounted() {
     this.getBills()
+    
   },
   methods: {
     async getBills() {
       this.$store.commit("setIsLoading", true);
       await axios
-        .get("/api/v1/bills/")
+        .get("/api/v1/billsByMonth/")
         .then((response) => {
           this.bills = response.data;
+          console.log(this.bills[0])
         })
         .catch((error) => {
           toast({
