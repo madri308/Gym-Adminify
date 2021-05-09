@@ -70,69 +70,70 @@
       </transition>
     </Menu>
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
-      <div class>
-        <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10" >
-          <div v-for="billType in bills" :key="billType" class="relative">      
-            <Disclosure v-bind:title="billType">
-                <div v-for="bill2 in bill.description" :key="bill2.name" class="relative" >
-                  <Disclosure as="div" class="mt-2">
-                    <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500 bg-blue-50" >
-                      <span class="font-extrabold height: 100% width:25% float:left" >Fecha por Pago:
-                      </span>
-                      <span>{{ bill2.issuedate }}</span>
-                      <br/>
-                      <span class="font-extrabold height: 100% width:25% float:left" >Fecha por Pago:
-                      </span>
-                      <span>{{ bill2.paymethod }}</span>
-                      <br/>
-                      <span class="font-extrabold height: 100% width:25% float:left" >Fecha por Pago:
-                      </span>
-                      <span>{{ bill2.paymentday }}</span>
-                      <br/>
-                      <span class="font-extrabold height: 100% width:25% float:left" >Fecha por Pago:
-                      </span>
-                      <span>{{ bill2.clientname }}</span>
-                      <br/>
-                      <span class="font-extrabold height: 100% width:25% float:left">Cliente:
-                      </span>
-                      <span>{{ bill2.cost }}</span>
-                      <br/>
-                      <br/>
-                      </DisclosurePanel>
-                  </Disclosure>
-                </div>
+      <dl
+        class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10"
+      >
+        <div v-for="(billType,key) in billsSorted" :key="key" class="relative">
+          <Disclosure :title="key">
+            <div v-for="bill in billType" :key="bill" class="relative">
+            <Disclosure v-bind:title="bill.issuedate">
+              <span class="font-extrabold height: 100% width:25% float:left"
+                >Fecha por Pagar:
+              </span>
+              <span>{{ bill.issuedate }}</span>
+              <br />
+              <span class="font-extrabold height: 100% width:25% float:left"
+                >Fecha de Pago:
+              </span>
+              <span>{{ bill.paymentday }}</span>
+              <br />
+              <span class="font-extrabold height: 100% width:25% float:left"
+                >Cliente:
+              </span>
+              <span>{{ bill.clientname }}</span>
+              <br />
+              <span class="font-extrabold height: 100% width:25% float:left"
+                >Costo:
+              </span>
+              <span>{{ bill.cost }}</span>
+              <br />
+              <span class="font-extrabold height: 100% width:25% float:left"
+                >Método de Pago:
+              </span>
+              <span>{{ bill.paymethod.name }}</span>
+              <br />
             </Disclosure>
-          </div>
-        </dl>
-      </div>
+            </div>
+          </Disclosure>
+        </div>
+      </dl>
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import Selector from "../components/Selector";
-import { ChevronUpIcon } from "@heroicons/vue/solid";
-import  Disclosure  from "../components/Disclosure";
-import { ChevronDownIcon } from "@heroicons/vue/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
+import { ChevronDownIcon } from "@heroicons/vue/solid";
+import { ChevronUpIcon } from "@heroicons/vue/solid";
+import Disclosure from "../components/Disclosure";
 
 export default {
   name: "Bill",
   components: {
-    Disclosure,
-    ChevronUpIcon,
-    Selector,
     Menu,
-    MenuButton,
     MenuItem,
     MenuItems,
+    Disclosure,
+    MenuButton,
+    ChevronUpIcon,
     ChevronDownIcon,
   },
 
   data() {
     return {
       bills: [],
+      billsSorted:null,
       orderedMonths: {
         January: 1,
         February: 2,
@@ -150,13 +151,16 @@ export default {
     };
   },
   mounted() {
-    this.getBills()
+    this.getBills().then(()=>{
+        this.billsSorted = this.groupBy('clientname')
+        console.log(this.billsSorted);
+    })
   },
   methods: {
     async getBills() {
       this.$store.commit("setIsLoading", true);
       await axios
-        .get("/api/v1/bills/")
+        .get("/api/v1/billsByMonth/")
         .then((response) => {
           this.bills = response.data;
         })
@@ -171,6 +175,13 @@ export default {
           });
         });
       this.$store.commit("setIsLoading", false);
+    },
+    groupBy(key) {
+      return this.bills.reduce((objectsByKeyValue, obj) => {
+        const value = obj[key];
+        objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
+        return objectsByKeyValue;
+      }, {});
     },
   },
 };
