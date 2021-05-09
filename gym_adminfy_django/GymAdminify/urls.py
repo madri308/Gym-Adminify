@@ -11,4 +11,5 @@ urlpatterns = [
     path('api/v1/', include('gymServices.urls')),
     path('api/v1/', include('gymTeachers.urls')),
     path('api/v1/', include('gymPermissions.urls')),
+    path('api/v1/', include('djoser.urls.authtoken')),
 ]
