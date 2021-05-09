@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from .models import Teacher,Teachercategory
 from .serializers import TeacherSerializer,TeacherNamesSerializer, TeachercategorySerializer
 
+
 class AllTeachers(ListCreateAPIView):
     queryset = Teacher.objects.select_related()
     serializer_class = TeacherSerializer
