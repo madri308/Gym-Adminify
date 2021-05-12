@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Teacher,Teachercategory
-from gymPersons.serializers import PersonSerializer,PersonNameSerializer
+from gymPersons.serializers import PersonSerializer
 
 class TeacherSerializer(serializers.ModelSerializer):
     person = PersonSerializer(many=False)
@@ -13,16 +13,24 @@ class TeacherSerializer(serializers.ModelSerializer):
             "get_absolute_url"
         )
 
+class NewTeacherSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Teacher
+        fields = (
+            "person",
+            "teachercategory",
+        )
+
 class TeachercategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Teachercategory
         fields = (
             "name",
-            "get_absolute_url"
+            "get_absolute_url",
+            "id"
         )
 
 class TeacherNamesSerializer(serializers.ModelSerializer):
-    # person = PersonNameSerializer(many=False)
     name = serializers.CharField(source='person.name',read_only=True)
     class Meta:
         model = Teacher

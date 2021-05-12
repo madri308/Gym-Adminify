@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Client,ClientState
-from gymPersons.serializers import PersonSerializer,PersonNameSerializer
+from gymPersons.serializers import PersonSerializer
 
 class ClientSerializer(serializers.ModelSerializer):
     person = PersonSerializer(many=False)
