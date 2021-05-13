@@ -14,7 +14,7 @@
               <div class="grid relative md:grid-cols-2 sm:grid-cols-1">
                 <div>
                   <span class="font-extrabold">Nombre: </span>
-                  <input class="sm:w-16 md:w-52" :disabled="!isBeingChange(teacher.get_absolute_url)" type="int" v-model="teacher.person.name" placeholder="Telefono" aria-label="Full name">
+                  <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(teacher.get_absolute_url)" type="int" v-model="teacher.person.name" placeholder="Telefono" aria-label="Full name">
                 </div>
                 <div>
                   <button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
@@ -25,7 +25,7 @@
                       <i class="fas fa-pencil-alt fa-lg"></i>
                     </button> 
                     <div v-else>
-                      <button  type="button" class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                      <button  type="button"  v-on:click ="modifyTeacher(teacher)"  class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                         <i class="fas fa-save fa-lg"></i>
                       </button>
                       <button v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
@@ -208,30 +208,30 @@ export default {
       this.$store.commit("setIsLoading", false);
     },
     async modifyTeacher(newTeacher){
-      
+      console.log(newTeacher)
       this.$store.commit("setIsLoading", true);
       const formData = {
         person:{
-          name: this.name,
-          phone: this.phone,
-          mail: this.mail,
+          name: newTeacher.person.name,
+          phone: newTeacher.person.phone,
+          mail: newTeacher.person.mail,
         },
         teacher:{
-          teachercategory: this.teacherType,
+          teachercategory: newTeacher.teachercategory,
         }
       }
       await axios
-      .post("/api/v1/teachers"+id, formData)
+      .put("/api/v1/teachers"+newTeacher.get_absolute_url, formData)
       .then(response => {
           toast({
-            message: "Instructor guardado exitosamente", type: "is-success",
+            message: "Instructor editado exitosamente", type: "is-success",
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
       })
       .catch(error => {
           toast({
-            message: "Ocurrio un problema con los datos de: Categorias", type: "is-danger",
+            message: "Ocurrio un problema al editar el instructor", type: "is-danger",
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
