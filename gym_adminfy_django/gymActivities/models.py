@@ -1,4 +1,5 @@
 from django.db import models
+
 from gymClients.models import Client
 from gymServices.models import Service
 from gymTeachers.models import Teacher
@@ -12,17 +13,18 @@ class Activity(models.Model):
     #schedule = models.ForeignKey('Schedule', models.DO_NOTHING, db_column='Schedule_ID')  # Field name made lowercase.
     service = models.ForeignKey('gymServices.Service', models.DO_NOTHING, db_column='Service_ID')  # Field name made lowercase.
     teacher = models.ForeignKey('gymTeachers.Teacher', models.DO_NOTHING, db_column='Teacher_ID')  # Field name made lowercase.
+    client = models.ManyToManyField(Client)
 
     class Meta:
         managed = False
         db_table = 'Activity'
 
+# class ActivityHasClient(models.Model):
+#     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+#     activity = models.ForeignKey(Activity, models.DO_NOTHING, db_column='Activity_ID')  # Field name made lowercase.
+#     client = models.ForeignKey('gymClients.Client', models.DO_NOTHING, db_column='Client_ID')  # Field name made lowercase.
+    
+#     class Meta:
+#         managed = False
+#         db_table = 'Activity_has_Client'
 
-class ActivityHasClient(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    activity = models.ForeignKey(Activity, models.DO_NOTHING, db_column='Activity_ID')  # Field name made lowercase.
-    client = models.ForeignKey('gymClients.Client', models.DO_NOTHING, db_column='Client_ID')  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'Activity_has_Client'

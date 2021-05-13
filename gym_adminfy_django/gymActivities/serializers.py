@@ -1,32 +1,35 @@
 from rest_framework import serializers
-from .models import Activity, ActivityHasClient, Service, Teacher, Client #, Schedule, ActivityHasClient
+from .models import Activity, Service, Teacher, Client #, Schedule, ActivityHasClient
 
-from gymClients.serializers import ClientSerializer
+from gymClients.serializers import ClientSerializer, ClientNameSerializer
 from gymServices.serializers import ServiceSerializer
 from gymTeachers.serializers import TeacherSerializer
-
-class ActivityHasClientSerializer(serializers.ModelSerializer):
-    client = ClientSerializer(many=True)
-    class Meta:
-        model = ActivityHasClient
-        fields = (
-            "id",
-            "activity",
-            "client"
-        )
 
 class ActivitiesSerializer(serializers.ModelSerializer):
     service = ServiceSerializer(many=False)
     teacher = TeacherSerializer(many=False)
+    client = ClientNameSerializer(many=True)
     class Meta:
         model = Activity
         fields = (
+            "id",
             "capacity",
             "dayofweek",
             "startime",
             "endtime",
             "service",
-            "teacher"
+            "teacher", 
+            "client"
             #,"schedule"
         )
 
+# class ActivityHasClientSerializer(serializers.ModelSerializer):
+#     client = ClientSerializer(many=False)
+#     activity = ActivitiesSerializer(many=False)
+#     class Meta:
+#         model = ActivityHasClient
+#         fields = (
+#             "id",
+#             "activity",
+#             "client"
+#         )

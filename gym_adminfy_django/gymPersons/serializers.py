@@ -16,5 +16,6 @@ class PersonNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
         fields = (
-            "name",
+            "id",
+            "name"
         )
