@@ -75,7 +75,7 @@
               <SpeakerphoneIcon class="h-6 w-6 text-white" aria-hidden="true" />
             </span>
             <p class="ml-3 font-medium text-white">
-              <span class="hidden md:inline">
+              <span class="md:inline sm:inline-flex">
                 Debido a la situación del COVID-19, el aforo en las
                 instalaciones varía dependiendo del tipo de actividad y de las
                 restricciones establecidas por el ministerio de Salud de Costa

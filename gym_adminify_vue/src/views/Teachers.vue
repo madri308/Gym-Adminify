@@ -11,32 +11,45 @@
         <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
           <div v-for="teacher in teachers" :key="teacher" class="relative">
             <Disclosure v-bind:title="teacher.person.name">
-              <div class="relative">
-                <span class="font-extrabold height: 100% width:25% float:left">Telefono: </span>
-                <input :disabled="!isBeingChange(teacher.get_absolute_url)" type="int" v-model="teacher.person.phone" placeholder="Telefono" aria-label="Full name">
-                <span class="font-extrabold height: 100% width:25% float:left"> | Correo: </span>
-                <input :disabled="!isBeingChange(teacher.get_absolute_url)" type="int" v-model="teacher.person.mail" placeholder="Telefono" aria-label="Full name">
-                <br />
-                <span class="font-extrabold height: 100% width:25% float:left">Tipo: </span>
-                <!-- <span>{{ teacher.category_name }}</span> -->
-                <!-- <Multiselect mode="single" v-model="teacherType" singlelabel="value" :options="categoriesOption"/> -->
-                <Multiselect :disabled="!(changing === teacher.get_absolute_url)" class="Sticky w-52 left-0" label="label" mode="single" v-model="teacherType" :options="categoriesOption"/>
-                <button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                  <i class="fa fa-trash fa-lg"></i>
-                </button> 
-                <div v-if="canChangeTeacher">
-                  <button v-if="!(changing === teacher.get_absolute_url)" @click="changing = teacher.get_absolute_url" type="button" class="absolute top-0 right-7 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="fas fa-pencil-alt fa-lg"></i>
+              <div class="grid relative md:grid-cols-2 sm:grid-cols-1">
+                <div>
+                  <span class="font-extrabold">Nombre: </span>
+                  <input class="sm:w-16 md:w-52" :disabled="!isBeingChange(teacher.get_absolute_url)" type="int" v-model="teacher.person.name" placeholder="Telefono" aria-label="Full name">
+                </div>
+                <div>
+                  <button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <i class="fa fa-trash fa-lg"></i>
                   </button> 
-                  <div v-else>
-                    <button  type="button" class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                      <i class="fas fa-save fa-lg"></i>
-                    </button>
-                    <button v-on:click ='changing = ""' type="button" class="absolute top-16 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                      <i class="fas fa-times-circle fa-lg"></i>
-                    </button>
-                  </div>
-                </div> 
+                  <div v-if="canChangeTeacher">
+                    <button v-if="!(changing === teacher.get_absolute_url)" @click="changing = teacher.get_absolute_url" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                      <i class="fas fa-pencil-alt fa-lg"></i>
+                    </button> 
+                    <div v-else>
+                      <button  type="button" class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                        <i class="fas fa-save fa-lg"></i>
+                      </button>
+                      <button v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                        <i class="fas fa-times-circle fa-lg"></i>
+                      </button>
+                    </div>
+                  </div> 
+                </div>
+                <div class="mt-3">
+                  <span class="font-extrabold">Telefono: </span>
+                  <input :disabled="!isBeingChange(teacher.get_absolute_url)" type="int" v-model="teacher.person.phone" placeholder="Telefono" aria-label="Full name">
+                </div>
+                <div class="mt-3">
+                  <span class="font-extrabold">Correo: </span>
+                  <input :disabled="!isBeingChange(teacher.get_absolute_url)" type="int" v-model="teacher.person.mail" placeholder="Telefono" aria-label="Full name">
+                </div>
+                <div class="mt-4">
+                  <span class="font-extrabold height: 100% width:0% float:left">Tipo: </span>
+                  <Multiselect :disabled="!(changing === teacher.get_absolute_url)" class="object-left w-36" label="label" mode="single" v-model="teacher['teachercategory']" :options="categoriesOption"/>
+                </div>
+                <div class="mt-4">
+                  <span class="font-extrabold height: 100% width:0% float:left">Servicios: </span>
+                  <Multiselect :disabled="!(changing === teacher.get_absolute_url)" class="object-left md:w-52 sm:w-36" label="label" mode="tags" v-model="teacherServices" :options="servicesOption"/>
+                </div>
               </div>
             </Disclosure>
           </div>
@@ -53,8 +66,8 @@
                   <input v-model="phone" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="int" placeholder="Telefono" aria-label="Full name">
                 </div>
               </form>
-              <!-- <Multiselect class="mt-3" v-model="teacherServices" mode="tags" placeholder="Seleccione los servicios que brindara" :options="servicesOption"/> -->
-              <Multiselect class="mt-3"  mode="single" v-model="teacherType" placeholder="Seleccione el tipo" :options="categoriesOption"/>
+              <Multiselect class="mt-3"  mode="single" v-model="teacherType" placeholder="Tipo de instructor" :options="categoriesOption"/>
+              <Multiselect class="mt-3" mode="tags" v-model="teacherServices" placeholder="Seleccione los servicios que brindara" :options="servicesOption"/>
               <button type="button" v-on:click ="addTeacher" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                 <i class="far fa-save fa-lg"></i>
               </button>   
@@ -74,7 +87,6 @@ import { PlusIcon,CheckCircleIcon  } from "@heroicons/vue/outline";
 import Multiselect from '@vueform/multiselect'
 import { toast } from 'bulma-toast'
 
-
 export default {
   name: "Teachers",
   components: {
@@ -93,13 +105,13 @@ export default {
       servicesOption:[],
     
       teacherServices:[],
-      teacherType: 1,
+      teacherType: 0,
       permissions: this.$store.state.permissions,
       changing: String,
 
       name: "",
       mail: "",
-      phone: 0,
+      phone: null,
 
     };
   },
@@ -188,6 +200,37 @@ export default {
       }
       await axios
       .post("/api/v1/teachers/", formData)
+      .then(response => {
+          toast({
+            message: "Instructor guardado exitosamente", type: "is-success",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+      })
+      .catch(error => {
+          toast({
+            message: "Ocurrio un problema con los datos de: Categorias", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+      })
+      this.$store.commit("setIsLoading", false);
+    },
+    async modifyTeacher(newTeacher){
+      
+      this.$store.commit("setIsLoading", true);
+      const formData = {
+        person:{
+          name: this.name,
+          phone: this.phone,
+          mail: this.mail,
+        },
+        teacher:{
+          teachercategory: this.teacherType,
+        }
+      }
+      await axios
+      .post("/api/v1/teachers"+id, formData)
       .then(response => {
           toast({
             message: "Instructor guardado exitosamente", type: "is-success",
