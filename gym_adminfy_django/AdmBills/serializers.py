@@ -3,7 +3,7 @@ from rest_framework import serializers
 from gymTeachers.models import Teacher,Teachercategory
 from gymClients.serializers import ClientSerializer
 from gymTeachers.serializers import TeacherSerializer
-from gymPersons.serializers import PersonSerializer,PersonNameSerializer
+from gymPersons.serializers import PersonSerializer
 
 class BillSerializer(serializers.ModelSerializer):
     #activity = 
