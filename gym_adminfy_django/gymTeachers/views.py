@@ -4,13 +4,36 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import Teacher,Teachercategory
-from .serializers import TeacherSerializer,TeacherNamesSerializer, TeachercategorySerializer
-
+from .serializers import TeacherSerializer, TeachercategorySerializer, NewTeacherSerializer
+from gymPersons.serializers import PersonSerializer
 
 class AllTeachers(ListCreateAPIView):
-    queryset = Teacher.objects.select_related()
-    serializer_class = TeacherSerializer
+    model = Teacher
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return NewTeacherSerializer
+        return TeacherSerializer
 
+    def get_queryset(self):
+        return Teacher.objects.select_related()
+        
+    def create(self, request, pk=None):
+        ##CREA LA PERSONA
+        person = PersonSerializer(data=request.data["person"])
+        if not person.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        personObject = person.save()
+        ##CREA EL INSTRUCTOR
+        serializer = NewTeacherSerializer(data={
+                                            'person':personObject.pk,
+                                            'teachercategory':request.data["teacher"]["teachercategory"]
+                                        })
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        
+        return Response(status=status.HTTP_201_CREATED)
+            
 class AllCategories(ListCreateAPIView):
     queryset = Teachercategory.objects.all()
     serializer_class = TeachercategorySerializer
