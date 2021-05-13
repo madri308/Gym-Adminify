@@ -4,12 +4,12 @@ from gymPersons.serializers import PersonSerializer
 
 class TeacherSerializer(serializers.ModelSerializer):
     person = PersonSerializer(many=False)
-    category_name = serializers.CharField(source='teachercategory.name',read_only=True)
+    # category_name = serializers.CharField(source='teachercategory.id',read_only=True)
     class Meta:
         model = Teacher
         fields = (
             "person",
-            "category_name",
+            "teachercategory",
             "get_absolute_url"
         )
 
