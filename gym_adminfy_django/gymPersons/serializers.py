@@ -11,10 +11,3 @@ class PersonSerializer(serializers.ModelSerializer):
             "phone",
             "mail"
         )
-
-class PersonNameSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Person
-        fields = (
-            "name",
-        )

@@ -24,28 +24,40 @@
         v-bind:class="{ 'is-active': showMobileMenu }"
       >
         <div class="navbar-start">
-          <router-link to="/clients" class="navbar-item">Clientes</router-link>
-          <router-link to="/services" class="navbar-item"
-            >Servicios</router-link
-          >
-          <router-link to="/activities" class="navbar-item"
-            >Actividades</router-link
-          >
-          <router-link to="/billsByMonth" class="navbar-item">Facturas</router-link>
-          <router-link to="/teachers" class="navbar-item"
-            >Instructores</router-link
-          >
+          <template v-if="$store.state.isAuthenticated">
+            <router-link to="/clientes" class="navbar-item">
+              Clientes
+            </router-link>
+            <router-link to="/billsByMonth" class="navbar-item">
+              Facturas
+            </router-link>
+            <router-link to="/teachers" class="navbar-item">
+              Instructores
+            </router-link>
+          </template>
+
+          <template v-else>
+            <router-link to="/about" class="navbar-item">
+              ¿Quienes somos?
+            </router-link>
+          </template>
+          <router-link to="/services" class="navbar-item">
+            Servicios
+          </router-link>
+          <router-link to="/activities" class="navbar-item">
+            Actividades
+          </router-link>
         </div>
       </div>
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
             <template v-if="$store.state.isAuthenticated">
-              <div v-if="canViewConfig">
-                <router-link to="/gym_settings" class="button is-success">
-                  <span class="icon"><i class="fas fa-cog"></i></span>
-                </router-link>
-              </div>
+              
+              <router-link v-if="canViewConfig" to="/gym_settings" class="button is-success">
+                <span class="icon"><i class="fas fa-cog"></i></span>
+              </router-link>
+              
               <button @click="logout()" class="button is-light">
                 Salir
               </button>
@@ -63,7 +75,7 @@
               <SpeakerphoneIcon class="h-6 w-6 text-white" aria-hidden="true" />
             </span>
             <p class="ml-3 font-medium text-white">
-              <span class="hidden md:inline">
+              <span class="md:inline sm:inline-flex">
                 Debido a la situación del COVID-19, el aforo en las
                 instalaciones varía dependiendo del tipo de actividad y de las
                 restricciones establecidas por el ministerio de Salud de Costa
@@ -95,8 +107,6 @@
   </div>
 </template>
 
-
-
 <script>
 import { SpeakerphoneIcon, XIcon } from "@heroicons/vue/outline";
 import axios from 'axios'
@@ -119,8 +129,6 @@ export default {
   },
   computed:{
     canViewConfig(){
-      // console.log(this.permissions.includes("gymSettings.view_gym"))
-      // console.log(this.permissions)
       return this.$store.state.permissions.includes("gymSettings.view_gym");
     }
   },
@@ -134,7 +142,7 @@ export default {
         localStorage.removeItem("token")
         localStorage.removeItem("username")
         localStorage.removeItem("userid")
-        // localStorage.removeItem("userPermissions")
+        localStorage.removeItem("UP")
         this.$store.commit('removeToken')
         this.$store.commit('removePermissions')
         this.$router.push('/')

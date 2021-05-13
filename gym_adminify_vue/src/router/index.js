@@ -75,16 +75,17 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if(!store.state.permsLoaded && to.name != 'Home'){
+  console.log(store.state.isAuthenticated)
+  if ((to.matched.some(record => record.meta.requireLogin) && !store.state.isAuthenticated) || !hasAccess(to.name)) {
     toast({
-      message: "Cargando permisos espere un momento", type: "is-info",
+      message: "No puede acceder a la direccion", type: "is-danger",
       dismissible: true, pauseOnHover: true,
       duration: 2000, position: "bottom-right",
     });
-    next({ name: 'Home', query: { to: to.path } });
-  }else if ((to.matched.some(record => record.meta.requireLogin) && !store.state.isAuthenticated) || !hasAccess(to.name)) {
+    next({ name: 'Home' });
+  }else if(!store.state.permsLoaded && to.name != 'Home'){
     toast({
-      message: "No puede acceder a la direccion", type: "is-danger",
+      message: "Cargando permisos espere un momento", type: "is-info",
       dismissible: true, pauseOnHover: true,
       duration: 2000, position: "bottom-right",
     });
