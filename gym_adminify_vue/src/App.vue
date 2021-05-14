@@ -25,7 +25,7 @@
       >
         <div class="navbar-start">
           <template v-if="$store.state.isAuthenticated">
-            <router-link to="/clientes" class="navbar-item">
+            <router-link to="/clients" class="navbar-item">
               Clientes
             </router-link>
             <router-link to="/billsByMonth" class="navbar-item">
