@@ -3,26 +3,14 @@
     <nav class="navbar is-dark">
       <div class="navbar-brand">
         <router-link to="/" class="navbar-item"
-          ><strong>Gym-Adminify</strong></router-link
-        >
-
-        <a
-          class="navbar-burger"
-          aria-label="menu"
-          aria-expanded="false"
-          data-target="navbar-menu"
-          @click="showMobileMenu = !showMobileMenu"
-        >
+          ><strong>Gym-Adminify</strong></router-link>
+        <a class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbar-menu" @click="showMobileMenu = !showMobileMenu">
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
         </a>
       </div>
-      <div
-        class="navbar-menu"
-        id="navbar-menu"
-        v-bind:class="{ 'is-active': showMobileMenu }"
-      >
+      <div class="navbar-menu" id="navbar-menu" v-bind:class="{ 'is-active': showMobileMenu }">
         <div class="navbar-start">
           <template v-if="$store.state.isAuthenticated">
             <router-link to="/clientes" class="navbar-item">
@@ -55,7 +43,7 @@
             <template v-if="$store.state.isAuthenticated">
               
               <router-link v-if="canViewConfig" to="/gym_settings" class="button is-success">
-                <span class="icon"><i class="fas fa-cog"></i></span>
+                <span class="icon"><i class="fas fa-info"></i></span>
               </router-link>
               
               <button @click="logout()" class="button is-light">

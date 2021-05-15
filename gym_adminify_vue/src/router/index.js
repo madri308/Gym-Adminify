@@ -104,7 +104,7 @@ const hasAccess = function(name) {
     case "Home":
       return true;
     case "Settings":
-      return permissions.includes("gymSettings.view_gym")
+      return true;
     default:
       return true;
   }
