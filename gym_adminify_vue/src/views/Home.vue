@@ -123,22 +123,23 @@ export default {
                   this.errors.push('Something went wrong. Please try again')
               }
           })
+          await axios
+          .get("/api/v1/permissions/")
+          .then((response) => {
+            this.$store.commit('setPermissions', response.data);
+            // localStorage.setItem("userPermissions", response.data);
+          })
+          .catch((error) => {
+            toast({
+              message: "Ocurrio un problema con los datos de: Permisos", type: "is-danger",
+              dismissible: true, pauseOnHover: true,
+              duration: 2000, position: "bottom-right",
+            });
+          });
           this.$store.commit("setIsLoading", false);
       },
       getPermissions() {
-        axios
-        .get("/api/v1/permissions/")
-        .then((response) => {
-          this.$store.commit('setPermissions', response.data);
-          // localStorage.setItem("userPermissions", response.data);
-        })
-        .catch((error) => {
-          toast({
-            message: "Ocurrio un problema con los datos de: Permisos", type: "is-danger",
-            dismissible: true, pauseOnHover: true,
-            duration: 2000, position: "bottom-right",
-          });
-        });
+        
     },
   },
   computed: {

@@ -121,8 +121,13 @@ export default {
   },
   computed:{
     canAddTeacher() {
-      console.log(this.permissions.includes("gymTeachers.add_teacher"))
       return this.permissions.includes("gymTeachers.add_teacher")
+    },
+    canDeleteTeacher() {
+      return this.permissions.includes("gymTeachers.delete_teacher")
+    },
+    canChangeTeacher() {
+      return this.permissions.includes("gymTeachers.change_teacher")
     },
   },
   methods: {
@@ -237,6 +242,7 @@ export default {
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
+          this.changing =  ""
       })
       .catch(error => {
           toast({

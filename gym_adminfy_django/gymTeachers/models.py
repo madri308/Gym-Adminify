@@ -13,6 +13,8 @@ class Teacher(models.Model):
         
     def get_absolute_url(self):
         return f'/{self.person.id}/'
+    def __str__(self):
+        return self.person.name
 
 
 class Teachercategory(models.Model):

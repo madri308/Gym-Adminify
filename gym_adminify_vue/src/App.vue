@@ -119,8 +119,6 @@ export default {
   },
   computed:{
     canViewConfig(){
-      // console.log(this.permissions.includes("gymSettings.view_gym"))
-      // console.log(this.permissions)
       return this.$store.state.permissions.includes("gymSettings.view_gym");
     }
   },
