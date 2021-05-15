@@ -53,11 +53,11 @@
         <div class="navbar-item">
           <div class="buttons">
             <template v-if="$store.state.isAuthenticated">
-              
-              <router-link v-if="canViewConfig" to="/gym_settings" class="button is-success">
-                <span class="icon"><i class="fas fa-cog"></i></span>
-              </router-link>
-              
+              <div v-if="canViewConfig">
+                <router-link to="/gym_settings" class="button is-success">
+                  <span class="icon"><i class="fas fa-cog"></i></span>
+                </router-link>
+              </div>
               <button @click="logout()" class="button is-light">
                 Salir
               </button>
@@ -107,6 +107,8 @@
   </div>
 </template>
 
+
+
 <script>
 import { SpeakerphoneIcon, XIcon } from "@heroicons/vue/outline";
 import axios from 'axios'
@@ -129,6 +131,8 @@ export default {
   },
   computed:{
     canViewConfig(){
+      // console.log(this.permissions.includes("gymSettings.view_gym"))
+      // console.log(this.permissions)
       return this.$store.state.permissions.includes("gymSettings.view_gym");
     }
   },
@@ -142,7 +146,7 @@ export default {
         localStorage.removeItem("token")
         localStorage.removeItem("username")
         localStorage.removeItem("userid")
-        localStorage.removeItem("UP")
+        // localStorage.removeItem("userPermissions")
         this.$store.commit('removeToken')
         this.$store.commit('removePermissions')
         this.$router.push('/')

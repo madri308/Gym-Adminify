@@ -85,7 +85,6 @@ import Selector from "../components/Selector";
 import Disclosure from "../components/Disclosure";
 import { PlusIcon,CheckCircleIcon  } from "@heroicons/vue/outline";
 import Multiselect from '@vueform/multiselect'
-import { toast } from 'bulma-toast'
 
 export default {
   name: "Teachers",
@@ -122,13 +121,8 @@ export default {
   },
   computed:{
     canAddTeacher() {
+      console.log(this.permissions.includes("gymTeachers.add_teacher"))
       return this.permissions.includes("gymTeachers.add_teacher")
-    },
-    canDeleteTeacher() {
-      return this.permissions.includes("gymTeachers.delete_teacher")
-    },
-    canChangeTeacher() {
-      return this.permissions.includes("gymTeachers.change_teacher")
     },
   },
   methods: {
@@ -152,23 +146,20 @@ export default {
           this.teachers.splice(index, 1);
         };
       });
-      await axios
-        .delete("/api/v1/teachers/"+id)
-        .then((response) => {
-          toast({
-            message: "Instructor eliminado exitosamente", type: "is-success",
-            dismissible: true, pauseOnHover: true,
-            duration: 3000, position: "bottom-right",
-          });
-        })
-        .catch((error) => {
-          toast({
-            message: "Ocurrio un problema con los datos de: Instructores", type: "is-danger",
-            dismissible: true, pauseOnHover: true,
-            duration: 3000, position: "bottom-right",
-          });
-        });
-      this.$store.commit("setIsLoading", false);
+      // this.$store.commit("setIsLoading", true);
+      // await axios
+      //   .get("/api/v1/teachers/")
+      //   .then((response) => {
+      //     this.teachers = response.data;
+      //   })
+      //   .catch((error) => {
+      //     toast({
+      //       message: "Ocurrio un problema con los datos de: Instructores", type: "is-danger",
+      //       dismissible: true, pauseOnHover: true,
+      //       duration: 3000, position: "bottom-right",
+      //     });
+      //   });
+      // this.$store.commit("setIsLoading", false);
     },
     async getTeachers() {
       this.$store.commit("setIsLoading", true);
