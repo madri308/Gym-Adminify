@@ -1,16 +1,18 @@
 from rest_framework import serializers
 from .models import Teacher,Teachercategory
 from gymPersons.serializers import PersonSerializer
+from gymServices.serializers import ServiceSerializer,NameServiceSerializer
 
 class TeacherSerializer(serializers.ModelSerializer):
     person = PersonSerializer(many=False)
-    # category_name = serializers.CharField(source='teachercategory.id',read_only=True)
+    services = NameServiceSerializer(many=True)
     class Meta:
         model = Teacher
         fields = (
             "person",
             "teachercategory",
-            "get_absolute_url"
+            "get_absolute_url",
+            "services"
         )
 
 class NewTeacherSerializer(serializers.ModelSerializer):
@@ -19,6 +21,7 @@ class NewTeacherSerializer(serializers.ModelSerializer):
         fields = (
             "person",
             "teachercategory",
+            "services"
         )
 
 class TeachercategorySerializer(serializers.ModelSerializer):

@@ -91,7 +91,7 @@ export default {
     };
   },
   mounted() {
-      document.title = 'Log In | Djackets'
+      document.title = 'Log In | Gym-Adminify'
   },
   methods: {
     async submitForm() {

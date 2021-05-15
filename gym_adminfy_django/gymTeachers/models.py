@@ -1,9 +1,11 @@
 from django.db import models
 from gymPersons.models import Person
+from gymServices.models import Service
 
 class Teacher(models.Model):
     person = models.OneToOneField(Person, on_delete=models.CASCADE, db_column='ID', primary_key=True)  
     teachercategory = models.ForeignKey('Teachercategory', on_delete=models.CASCADE, db_column='TeacherCategory_ID') 
+    services = models.ManyToManyField(Service)
 
     class Meta:
         managed = False

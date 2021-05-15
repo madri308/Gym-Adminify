@@ -48,12 +48,12 @@
                 </div>
                 <div class="mt-4">
                   <span class="font-extrabold height: 100% width:0% float:left">Servicios: </span>
-                  <Multiselect :disabled="!(changing === teacher.get_absolute_url)" class="object-left md:w-52 sm:w-36" label="label" mode="tags" v-model="teacherServices" :options="servicesOption"/>
+                  <Multiselect :disabled="!(changing === teacher.get_absolute_url)" class="object-left md:w-52 sm:w-36" label="label" mode="tags" v-model="teacher.services" :options="servicesOption"/>
                 </div>
               </div>
             </Disclosure>
           </div>
-          <Disclosure v-bind:title="'Nuevo Instructor'" v-if="newOne">
+          <Disclosure v-bind:title="this.name" v-if="newOne">
             <div class="relative">
               <form class="w-full max-w-sm">
                 <div class="flex items-center border-b border-teal-500 py-2">
@@ -67,7 +67,7 @@
                 </div>
               </form>
               <Multiselect class="mt-3"  mode="single" v-model="teacherType" placeholder="Tipo de instructor" :options="categoriesOption"/>
-              <Multiselect class="mt-3" mode="tags" v-model="teacherServices" placeholder="Seleccione los servicios que brindara" :options="servicesOption"/>
+              <Multiselect class="mt-3" mode="tags" v-model="teacherServices" placeholder="Servicios que brindara" :options="servicesOption"/>
               <button type="button" v-on:click ="addTeacher" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                 <i class="far fa-save fa-lg"></i>
               </button>   
@@ -101,7 +101,7 @@ export default {
       categories: [],
       categoriesOption:[],
       
-      services:[],
+      // services:[],
       servicesOption:[],
     
       teacherServices:[],
@@ -132,29 +132,36 @@ export default {
     },
   },
   methods: {
-    createJson(original, newOne){
+    createCategoriesJson(original, newOne){
       original.forEach(element => {
         newOne.push({value: element['id'],label:element['name']});
       });
     },
     isBeingChange(id){
-      if(id == this.changing){
-        return true
-      }else{
-        return false
-      }
+      if(id == this.changing) return true
+      return false
+    
+    },
+    changeServicesFormat(){
+      this.teachers.forEach(teacher =>{
+        var newServices = []
+        teacher.services.forEach(service =>{
+          newServices.push(service.id)
+        })
+        teacher.services = newServices
+      })
     },
     async deleteTeacher(id) {
       this.$store.commit("setIsLoading", true);
-      this.teachers.forEach(element => {
-        if(element['person']['id'] == id){
-          const index = this.teachers.indexOf(element);
-          this.teachers.splice(index, 1);
-        };
-      });
       await axios
         .delete("/api/v1/teachers/"+id)
         .then((response) => {
+          this.teachers.forEach(element => {
+            if(element['person']['id'] == id){
+              const index = this.teachers.indexOf(element);
+              this.teachers.splice(index, 1);
+            };
+          });
           toast({
             message: "Instructor eliminado exitosamente", type: "is-success",
             dismissible: true, pauseOnHover: true,
@@ -176,6 +183,7 @@ export default {
         .get("/api/v1/teachers/")
         .then((response) => {
           this.teachers = response.data;
+          this.changeServicesFormat();
         })
         .catch((error) => {
           toast({
@@ -194,9 +202,8 @@ export default {
           phone: this.phone,
           mail: this.mail,
         },
-        teacher:{
-          teachercategory: this.teacherType,
-        }
+        teachercategory: this.teacherType,
+        services: this.teacherServices,
       }
       await axios
       .post("/api/v1/teachers/", formData)
@@ -206,10 +213,11 @@ export default {
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
+          location.reload();
       })
       .catch(error => {
           toast({
-            message: "Ocurrio un problema con los datos de: Categorias", type: "is-danger",
+            message: "Ocurrio un problema guardando el instructor", type: "is-danger",
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
@@ -217,7 +225,6 @@ export default {
       this.$store.commit("setIsLoading", false);
     },
     async modifyTeacher(newTeacher){
-      console.log(newTeacher)
       this.$store.commit("setIsLoading", true);
       const formData = {
         person:{
@@ -225,9 +232,8 @@ export default {
           phone: newTeacher.person.phone,
           mail: newTeacher.person.mail,
         },
-        teacher:{
-          teachercategory: newTeacher.teachercategory,
-        }
+        teachercategory: newTeacher.teachercategory,
+        services: newTeacher.services,
       }
       await axios
       .put("/api/v1/teachers"+newTeacher.get_absolute_url, formData)
@@ -255,7 +261,7 @@ export default {
           this.categories = response.data;
           this.options = this.categories.slice();
           this.options.push({name: "Todos",get_absolute_url:"/-1/"});
-          this.createJson(this.categories,this.categoriesOption);
+          this.createCategoriesJson(this.categories,this.categoriesOption);
         })
         .catch((error) => {
           toast({
@@ -271,8 +277,8 @@ export default {
       await axios
         .get("/api/v1/services/")
         .then((response) => {
-          this.services = response.data;
-          this.createJson(this.services,this.servicesOption);
+          // this.services = ;
+          this.createCategoriesJson(response.data,this.servicesOption);
         })
         .catch((error) => {
           toast({

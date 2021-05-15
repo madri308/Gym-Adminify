@@ -11,10 +11,10 @@ export default createStore({
   mutations: {
     initializeStore(state){
       if (localStorage.getItem('token')) {
-        state.permissions = localStorage.getItem('UP')
-        state.permsLoaded = true
         state.token = localStorage.getItem('token')
         state.isAuthenticated = true
+        state.permissions = localStorage.getItem('UP')
+        state.permsLoaded = true
       } else {
         state.token = ''
         state.isAuthenticated = false

@@ -30,13 +30,14 @@ class AllTeachers(ListCreateAPIView):
         ##CREA EL INSTRUCTOR
         serializer = NewTeacherSerializer(data={
                                             'person':personObject.pk,
-                                            'teachercategory':request.data["teacher"]["teachercategory"]
+                                            'teachercategory':request.data["teachercategory"],
+                                            "services":request.data["services"],
                                         })
         if not serializer.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
         
-        return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
             
 class AllCategories(ListCreateAPIView):
     queryset = Teachercategory.objects.all()
@@ -79,7 +80,8 @@ class TeacherDetail(RetrieveUpdateDestroyAPIView):
         #Update the teacher
         teacher_ser = NewTeacherSerializer(instance = teacher, data={
                                                                 'person':teacher.person.pk,
-                                                                'teachercategory':request.data["teacher"]["teachercategory"]
+                                                                'teachercategory':request.data["teachercategory"],
+                                                                'services':request.data["services"]
                                                                 })
         if not teacher_ser.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST)
