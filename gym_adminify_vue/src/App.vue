@@ -13,7 +13,7 @@
       <div class="navbar-menu" id="navbar-menu" v-bind:class="{ 'is-active': showMobileMenu }">
         <div class="navbar-start">
           <template v-if="$store.state.isAuthenticated">
-            <router-link to="/clientes" class="navbar-item">
+            <router-link to="/clients" class="navbar-item">
               Clientes
             </router-link>
             <router-link to="/billsByMonth" class="navbar-item">
@@ -95,6 +95,8 @@
   </div>
 </template>
 
+
+
 <script>
 import { SpeakerphoneIcon, XIcon } from "@heroicons/vue/outline";
 import axios from 'axios'
@@ -117,6 +119,8 @@ export default {
   },
   computed:{
     canViewConfig(){
+      // console.log(this.permissions.includes("gymSettings.view_gym"))
+      // console.log(this.permissions)
       return this.$store.state.permissions.includes("gymSettings.view_gym");
     }
   },
@@ -130,7 +134,7 @@ export default {
         localStorage.removeItem("token")
         localStorage.removeItem("username")
         localStorage.removeItem("userid")
-        localStorage.removeItem("UP")
+        // localStorage.removeItem("userPermissions")
         this.$store.commit('removeToken')
         this.$store.commit('removePermissions')
         this.$router.push('/')

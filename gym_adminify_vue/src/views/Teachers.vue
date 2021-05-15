@@ -85,7 +85,6 @@ import Selector from "../components/Selector";
 import Disclosure from "../components/Disclosure";
 import { PlusIcon,CheckCircleIcon  } from "@heroicons/vue/outline";
 import Multiselect from '@vueform/multiselect'
-import { toast } from 'bulma-toast'
 
 export default {
   name: "Teachers",
@@ -122,13 +121,8 @@ export default {
   },
   computed:{
     canAddTeacher() {
+      console.log(this.permissions.includes("gymTeachers.add_teacher"))
       return this.permissions.includes("gymTeachers.add_teacher")
-    },
-    canDeleteTeacher() {
-      return this.permissions.includes("gymTeachers.delete_teacher")
-    },
-    canChangeTeacher() {
-      return this.permissions.includes("gymTeachers.change_teacher")
     },
   },
   methods: {
