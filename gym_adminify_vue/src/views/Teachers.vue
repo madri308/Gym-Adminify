@@ -14,7 +14,7 @@
               <div class="grid relative md:grid-cols-2 sm:grid-cols-1">
                 <div>
                   <span class="font-extrabold">Nombre: </span>
-                  <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(teacher.get_absolute_url)" type="int" v-model="teacher.person.name" placeholder="Telefono" aria-label="Full name">
+                  <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(teacher.get_absolute_url)" type="int" v-model="teacher.person.name" placeholder="Nombre" aria-label="Full name">
                 </div>
                 <div>
                   <button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
@@ -134,7 +134,7 @@ export default {
     isBeingChange(id){
       if(id == this.changing) return true
       return false
-    
+      
     },
     changeServicesFormat(){
       this.teachers.forEach(teacher =>{
