@@ -7,7 +7,7 @@ from .models import Teacher,Teachercategory
 from gymPersons.models import Person
 from .serializers import TeacherSerializer, TeachercategorySerializer, NewTeacherSerializer
 from gymPersons.serializers import PersonSerializer
-
+from rest_framework import status
 
 class AllTeachers(ListCreateAPIView):
     model = Teacher

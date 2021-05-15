@@ -94,39 +94,36 @@ export default {
       document.title = 'Log In | Gym-Adminify'
   },
   methods: {
-      async submitForm() {
-          this.$store.commit("setIsLoading", true);
-          axios.defaults.headers.common["Authorization"] = ""
-          localStorage.removeItem("token")
-          const formData = {
-              username: this.username,
-              password: this.password
-          }
-          await axios
-          .post("/api/v1/token/login/", formData)
-          .then(response => {
-              const token = response.data.auth_token
-              this.$store.commit('setToken', token)
-              axios.defaults.headers.common["Authorization"] = "Token " + token
-              localStorage.setItem("token", token)
-              const toPath = this.$route.query.to || '/'
-              this.$router.push(toPath)
+    async submitForm() {
+        this.$store.commit("setIsLoading", true);
+        axios.defaults.headers.common["Authorization"] = ""
+        localStorage.removeItem("token")
+        const formData = {
+            username: this.username,
+            password: this.password
+        }
+        await axios
+        .post("/api/v1/token/login/", formData)
+        .then(response => {
+            const token = response.data.auth_token
+            this.$store.commit('setToken', token)
+            axios.defaults.headers.common["Authorization"] = "Token " + token
+            localStorage.setItem("token", token)
+            const toPath = this.$route.query.to || '/'
+            this.$router.push(toPath)
 
-              this.getPermissions();
-          })
-          .catch(error => {
-              if (error.response) {
-                  for (const property in error.response.data) {
-                      this.errors.push(`${property}: ${error.response.data[property]}`)
-                  }
-              } else {
-                  this.errors.push('Something went wrong. Please try again')
-              }
-          })
-          this.$store.commit("setIsLoading", false);
-      },
-      getPermissions() {
-        axios
+            this.getPermissions();
+        })
+        .catch(error => {
+            if (error.response) {
+                for (const property in error.response.data) {
+                    this.errors.push(`${property}: ${error.response.data[property]}`)
+                }
+            } else {
+                this.errors.push('Something went wrong. Please try again')
+            }
+        })
+        await axios
         .get("/api/v1/permissions/")
         .then((response) => {
           this.$store.commit('setPermissions', response.data);
@@ -139,6 +136,7 @@ export default {
             duration: 2000, position: "bottom-right",
           });
         });
+        this.$store.commit("setIsLoading", false);
     },
   },
   computed: {

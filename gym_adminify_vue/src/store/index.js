@@ -16,8 +16,12 @@ export default createStore({
         state.permissions = localStorage.getItem('UP')
         state.permsLoaded = true
       } else {
-          state.token = ''
-          state.isAuthenticated = false
+        state.token = ''
+        state.isAuthenticated = false
+        state.permsLoaded = false
+        state.permissions = []
+        state.token = ''
+        state.isAuthenticated = false
       } 
     },
     setIsLoading(state,status){
@@ -32,10 +36,12 @@ export default createStore({
       state.permsLoaded = false
     },
     removeToken(state) {
+      localStorage.removeItem('UP')
       state.token = ''
       state.isAuthenticated = false
     },
     setPermissions(state,permissions) {
+      localStorage.setItem('UP',permissions)
       state.permissions = permissions
       state.permsLoaded = true
     }, 
