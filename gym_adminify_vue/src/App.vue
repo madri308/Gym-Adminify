@@ -132,6 +132,7 @@ export default {
         localStorage.removeItem("token")
         localStorage.removeItem("username")
         localStorage.removeItem("userid")
+        localStorage.removeItem("UP")
         // localStorage.removeItem("userPermissions")
         this.$store.commit('removeToken')
         this.$store.commit('removePermissions')

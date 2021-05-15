@@ -85,6 +85,7 @@ import Selector from "../components/Selector";
 import Disclosure from "../components/Disclosure";
 import { PlusIcon,CheckCircleIcon  } from "@heroicons/vue/outline";
 import Multiselect from '@vueform/multiselect'
+import { toast } from 'bulma-toast'
 
 export default {
   name: "Teachers",
