@@ -1,7 +1,7 @@
 <template>
   <div class="home">
-    <div class="grid grid-cols-2 gap-4 space-x-40">
-      <div class="bg-gray-800 h-72 bg-opacity-50">
+    <div class="grid md:grid-cols-2 sm:grid-cols-1 gap-4 space-x-40">
+      <div class="bg-gray-800 h-72 md:w-auto sm:w-20 bg-opacity-50">
         <div class="hero-body has-text-centered">
           <p class="text-white text-7xl align-middle ">EL MEJOR GIMNASIO</p>
           <p class="text-white subtitle align-middle ">Ahora desde tu ordenador</p>
@@ -10,15 +10,6 @@
       <div>
         <template v-if="$store.state.isAuthenticated">
           <Calendar :attributes="attributes">
-            <template #day-popover>
-              <div>
-                Using my own content now
-                <!-- {{ format(day.date, masks.dayPopover) }} -->
-              </div>
-              <div slot="add-todo" slot-scope="{ day }" class="add-todo">
-                <a @click="addTodo(day)"> + Add Todo </a>
-              </div>
-            </template>
           </Calendar>
         </template>
         <template v-else>
@@ -83,7 +74,6 @@ export default {
 
     return {
       incId: todos.length,
-      editId: 0,
       todos,
       username: '',
       password: '',
@@ -145,38 +135,22 @@ export default {
         {
           contentStyle: {
             fontWeight: "700",
-            color: "#66b3cc",
+            fontSize: '.9rem',
           },
           dates: new Date(),
         },
         // Attributes for todos
         ...this.todos.map((todo) => ({
-          key: todo.id,
           dates: todo.dates,
-          customData: todo,
           dot: {
-            color: todo.color,
-            class: todo.isComplete ? "opacity-75" : "",
+            backgroundColor: todo.color,
+            opacity: todo.isComplete ? 0.3 : 1,
           },
           popover: {
             label: todo.description,
             visibility: "click",
           },
-          popover: true,
-          customData: todo,
         })),
-        {
-          contentHoverStyle: {
-            backgroundColor: "rgba(0, 0, 0, 0.1)",
-            cursor: "pointer",
-          },
-          dates: {}, // All dates
-          popover: {
-            slot: "add-todo",
-            visibility: "focus",
-            hideIndicator: true,
-          },
-        },
       ];
     },
   },
