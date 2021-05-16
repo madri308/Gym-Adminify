@@ -77,31 +77,49 @@
           <Disclosure :title="key">
             <div v-for="bill in billType" :key="bill" class="relative">
             <Disclosure v-bind:title="bill.issuedate">
+              <div class="grid relative md:grid-cols-2 sm:grid-cols-1">
+                <div class="mt-3">
               <span class="font-extrabold height: 100% width:25% float:left"
-                >Fecha por Pagar:
+                >Fecha por pagar:
               </span>
               <span>{{ bill.issuedate }}</span>
-              <br />
+                </div>
+              <div v-if="canPay">
+                <button v-if="!(changing === bill.id)" @click="changing = bill.id" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <i class="fas fa-pencil-alt fa-lg"></i>
+                </button> 
+                <div v-else>
+                  <button  type="button"  v-on:click ="modifyTeacher(bill)"  class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <i class="fas fa-save fa-lg"></i>
+                  </button>
+                  <button v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <i class="fas fa-times-circle fa-lg"></i>
+                  </button>
+              </div>
+              </div>
+              </div>
+              <div class="mt-3">
               <span class="font-extrabold height: 100% width:25% float:left"
                 >Fecha de Pago:
               </span>
               <span>{{ bill.paymentday }}</span>
-              <br />
+              </div>
+              <div class="mt-3">
               <span class="font-extrabold height: 100% width:25% float:left"
                 >Cliente:
               </span>
               <span>{{ bill.clientname }}</span>
-              <br />
+              </div>
+              <div class="mt-3">
               <span class="font-extrabold height: 100% width:25% float:left"
                 >Costo:
               </span>
               <span>{{ bill.cost }}</span>
-              <br />
-              <span class="font-extrabold height: 100% width:25% float:left"
-                >Método de Pago:
-              </span>
-              <span>{{ bill.paymethod.name }}</span>
-              <br />
+              </div>
+              <div class="mt-4">
+                  <span class="font-extrabold height: 100% width:0% float:left">Método de Pago: </span>
+                  <Multiselect :disabled="!isBeingChange(bill.id)" class="object-left md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymentmethod" :options="billPaymentMethods"/>
+              </div>
             </Disclosure>
             </div>
           </Disclosure>
@@ -117,6 +135,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { ChevronDownIcon } from "@heroicons/vue/solid";
 import { ChevronUpIcon } from "@heroicons/vue/solid";
 import Disclosure from "../components/Disclosure";
+import Multiselect from '@vueform/multiselect';
 
 export default {
   name: "Bill",
@@ -126,6 +145,7 @@ export default {
     MenuItems,
     Disclosure,
     MenuButton,
+    Multiselect,  
     ChevronUpIcon,
     ChevronDownIcon,
   },
@@ -134,6 +154,10 @@ export default {
     return {
       bills: [],
       billsSorted:null,
+      canPay:true,
+      changing: String,
+      billPaymentMethods:["Sinpe", "Efectivo"],
+      permissions: this.$store.state.permissions,
       orderedMonths: {
         January: 1,
         February: 2,
@@ -150,13 +174,25 @@ export default {
       },
     };
   },
+  
   mounted() {
+    
     this.getBills().then(()=>{
         this.billsSorted = this.groupBy('clientname')
-        console.log(this.billsSorted);
     })
   },
+  computed:{
+    canPay() {
+      console.log(this.permissions.includes("AdmBills.change_bill"))
+      return this.permissions.includes("AdmBills.change_bill")
+    },
+  },
   methods: {
+    isBeingChange(id){
+      if(id == this.changing) console.log(true)
+      if(id == this.changing) return true
+      return false
+    },
     async getBills() {
       this.$store.commit("setIsLoading", true);
       await axios
@@ -184,5 +220,6 @@ export default {
       }, {});
     },
   },
+  
 };
 </script>
