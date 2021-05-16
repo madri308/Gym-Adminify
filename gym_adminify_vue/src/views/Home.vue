@@ -9,7 +9,7 @@
       </div>
       <div>
         <template v-if="$store.state.isAuthenticated">
-          <Calendar :attributes="attributes">
+          <Calendar ref="calendar" locale="es" :min-page="firstPage" mode="range" :attributes="attributes" :update:to-page="printPage()">
           </Calendar>
         </template>
         <template v-else>
@@ -62,28 +62,31 @@ export default {
   },
 
   data() {
-    const todos = [
-      {
-        id: 1,
-        description: "Take Noah to basketball practice.",
-        isComplete: false,
-        dates: { weekdays: 6 }, // Every Friday
-        color: "blue",
-      },
-    ];
-
+    var todos = [];
     return {
       incId: todos.length,
       todos,
       username: '',
       password: '',
       errors: [],
+      currentDate: new Date(),
+      firstPage:null,
     };
   },
   mounted() {
-      document.title = 'Log In | Gym-Adminify'
+      document.title = 'Home | Gym-Adminify';
+    
+      const month = this.currentDate.getMonth()+1;
+      const year = this.currentDate.getFullYear();
+      this.firstPage = { month, year }
+      this.getActivities()
   },
   methods: {
+    printPage(){
+      if(this.$refs.calendar != null){
+        console.log(this.$refs.calendar.pages[0].key);
+      }
+    },
     async submitForm() {
         this.$store.commit("setIsLoading", true);
         axios.defaults.headers.common["Authorization"] = ""
@@ -128,6 +131,22 @@ export default {
         });
         this.$store.commit("setIsLoading", false);
     },
+    async getActivities(){
+      this.$store.commit("setIsLoading", true);
+      await axios
+      .get("/api/v1/schedule-activities/")
+      .then((response) => {
+        this.todos = response.data;
+      })
+      .catch((error) => {
+        toast({
+          message: "Ocurrio un problema con los datos de: Actividades", type: "is-danger",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+      });
+      this.$store.commit("setIsLoading", false);
+    }
   },
   computed: {
     attributes() {
@@ -141,13 +160,13 @@ export default {
         },
         // Attributes for todos
         ...this.todos.map((todo) => ({
-          dates: todo.dates,
+          dates: new Date(todo.schedule.year,todo.schedule.month-1, todo.dayofweek),
+          // dates: {weekdays:6, months:todo.schedule.month , years:todo.schedule.year},
           dot: {
-            backgroundColor: todo.color,
-            opacity: todo.isComplete ? 0.3 : 1,
+            backgroundColor: "blue",
           },
           popover: {
-            label: todo.description,
+            label: todo.service_name+" - "+todo.teacher_name+ " - " +(todo.startime) + "-" + (todo.endtime),
             visibility: "click",
           },
         })),

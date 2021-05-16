@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 
     # Project Apps
     'AdmBills',
+    'AdmSchedule',
     'gymPersons',
     'gymClients',
     'gymSettings',

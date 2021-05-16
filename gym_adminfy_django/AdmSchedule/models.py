@@ -8,3 +8,6 @@ class Schedule(models.Model):
     class Meta:
         managed = False
         db_table = 'Schedule'
+    
+    def __str__(self):
+        return f'{self.month}-{self.year}'
