@@ -59,6 +59,10 @@ class AllSettings(APIView):
         if not config_ser.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+        # if not room_ser.is_valid():
+        #     print(room_ser.errors)
+        #     return Response(status=status.HTTP_400_BAD_REQUEST)
+
         config_ser.save()
         gym_ser.save()
         # room_ser.save()
