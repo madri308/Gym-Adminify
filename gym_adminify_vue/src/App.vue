@@ -121,7 +121,7 @@ export default {
   },
   computed:{
     canViewConfig(){
-      return this.$store.state.permissions.includes("gymSettings.view_gym");
+      return this.$store.state.permissions.includes("gymSettings.view_config");
     }
   },
   components: {
