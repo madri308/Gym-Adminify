@@ -71,6 +71,7 @@ export default {
       errors: [],
       currentDate: new Date(),
       firstPage:null,
+      colors:["red","green","blue","teal"],
     };
   },
   mounted() {
@@ -160,10 +161,10 @@ export default {
         },
         // Attributes for todos
         ...this.todos.map((todo) => ({
-          dates: new Date(todo.schedule.year,todo.schedule.month-1, todo.dayofweek),
-          // dates: {weekdays:6, months:todo.schedule.month , years:todo.schedule.year},
+          // dates: new Date(todo.schedule.year,todo.schedule.month-1, todo.dayofweek),
+          dates: {weekdays:todo.dayofweek, months:todo.schedule.month , years:todo.schedule.year},
           dot: {
-            backgroundColor: "blue",
+            color: "red",
           },
           popover: {
             label: todo.service_name+" - "+todo.teacher_name+ " - " +(todo.startime) + "-" + (todo.endtime),

@@ -25,6 +25,7 @@ class Bill(models.Model):
     class Meta:
         managed = False
         db_table = 'Bill'
-
+    def __str__(self):
+        return f'{self.client.person.name} - {self.issuedate}'
     def get_absolute_url(self):
         return f'/{self.id}/'

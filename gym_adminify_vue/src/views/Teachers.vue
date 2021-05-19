@@ -112,7 +112,6 @@ export default {
       name: "",
       mail: "",
       phone: null,
-
     };
   },
   mounted() {
@@ -132,6 +131,13 @@ export default {
     },
   },
   methods: {
+    groupBy(key) {
+      return this.teachers.reduce((objectsByKeyValue, obj) => {
+        const value = obj[key];
+        objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
+        return objectsByKeyValue;
+      }, {});
+    },
     createCategoriesJson(original, newOne){
       original.forEach(element => {
         newOne.push({value: element['id'],label:element['name']});
