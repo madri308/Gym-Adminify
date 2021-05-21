@@ -21,6 +21,7 @@ class BillSerializer(serializers.ModelSerializer):
             "paymethod",
             "paymentday",
             #"description",
+            "get_month",
             "get_absolute_url"
         )
         depth = 2
