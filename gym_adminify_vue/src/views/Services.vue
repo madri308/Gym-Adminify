@@ -37,7 +37,6 @@
                   <span class="font-extrabold height: 100% width:25% float:left"> Monto por hora: </span>
                   <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(service.get_absolute_url)" type="numeric" v-model="service.hourfee" placeholder="Costo por hora..." aria-label="Full name">
                 </div>
-                  
               </div>
             </Disclosure>
           </div>
@@ -94,6 +93,7 @@ export default {
       // Objetos y Arrays
       services: [], 
 
+      // Permisos
       permissions: this.$store.state.permissions,
 
 
@@ -114,7 +114,6 @@ export default {
       .delete("/api/v1/services/"+service_id)
       .then((response) =>{
          this.services.forEach(element => {
-           console.log(element)
             if(element['id'] == service_id){
               const index = this.services.indexOf(element);
               this.services.splice(index, 1);
@@ -155,19 +154,15 @@ export default {
     async modifyService(newService){
       this.$store.commit("setIsLoading", true);
       const formData = {
-        person:{
-          name: newTeacher.person.name,
-          phone: newTeacher.person.phone,
-          mail: newTeacher.person.mail,
-        },
-        servicecategory: newTeacher.servicecategory,
-        services: newTeacher.services,
+        name: this.name,
+        description: this.description,
+        hourfee: this.hourfee,
       }
       await axios
-      .put("/api/v1/services"+newTeacher.get_absolute_url, formData)
+      .put("/api/v1/services"+newService.get_absolute_url, formData)
       .then(response => {
           toast({
-            message: "Instructor editado exitosamente", type: "is-success",
+            message: "Servicio editado exitosamente", type: "is-success",
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
@@ -194,7 +189,6 @@ export default {
         description: this.description,
         hourfee: this.hourfee,
       }
-      console.log(formData)
       await axios
       .post("/api/v1/services/", formData)
       .then(response => {
