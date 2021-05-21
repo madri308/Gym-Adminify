@@ -1,7 +1,7 @@
 <!-- This example requires Tailwind CSS v2.0+ -->
 <template>
   <div class="bg-white">
-   <Selector @clicked="groupBy" v-bind:options="options" /> 
+   <Selector @clicked="getOptions" v-bind:options="options" /> 
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <dl
         class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10"
@@ -216,6 +216,5 @@ export default {
       this.billsSorted = this.groupBy(id)
     }
   },
-  
 };
 </script>
