@@ -236,14 +236,15 @@ export default {
     },
     groupBy(id) {
       if (id == "All") return this.clientsSorted = this.clients
-      this.clientsSorted = this.clients
-      // Filter them 
-      this.clientsSorted.forEach(filterClient)
-      
+      this.clientsSorted = []
 
-      function filterClient(value, index, array){
-        //if(value.clientstate == id) push() a la lista
+      // Filter them 
+      for(let i=0; i <this.clients.length; i++ ){
+        let clientsAux = this.clients[i]
+        if(clientsAux.clientstate == id) this.clientsSorted.push(this.clients[i])
       }
+      
+      console.log(clientsAux)
     },
    
   },
