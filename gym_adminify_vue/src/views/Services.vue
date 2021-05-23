@@ -154,9 +154,9 @@ export default {
     async modifyService(newService){
       this.$store.commit("setIsLoading", true);
       const formData = {
-        name: this.name,
-        description: this.description,
-        hourfee: this.hourfee,
+        name: newService.name,
+        description: newService.description,
+        hourfee: newService.hourfee,
       }
       await axios
       .put("/api/v1/services"+newService.get_absolute_url, formData)

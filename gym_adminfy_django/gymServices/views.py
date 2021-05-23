@@ -39,9 +39,11 @@ class ServiceDetail(RetrieveUpdateDestroyAPIView):
         service.delete()
         return Response(status=status.HTTP_200_OK)
     
-    def update(self, request, *args, **kwargs):
-        service = Service.objects.get(person=kwargs['service_id'])
-        service_data = request.data.pop('service')
-        service_serializer = ServiceSerializer(instance=service, data=service_data)
+    def put(self, request , service_id,*args, **kwargs):
+        service = Service.objects.get(id=service_id)
+        service_data = request.data
+        service_serializer = ServiceSerializer(service, data=service_data)
+        if not service_serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         service_serializer.save()
         return Response(status=status.HTTP_200_OK)
