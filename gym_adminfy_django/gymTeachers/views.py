@@ -1,10 +1,7 @@
-from django.http import Http404
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import Teacher,Teachercategory
-from gymPersons.models import Person
 from .serializers import TeacherSerializer, TeachercategorySerializer, NewTeacherSerializer
 from gymPersons.serializers import PersonSerializer
 from rest_framework import status

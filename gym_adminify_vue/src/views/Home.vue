@@ -1,7 +1,7 @@
 <template>
   <div class="home">
-    <div class="grid grid-cols-2 gap-4 space-x-40">
-      <div class="bg-gray-800 h-72 bg-opacity-50">
+    <div class="grid md:grid-cols-2 sm:grid-cols-1 gap-4 space-x-40">
+      <div class="bg-gray-800 h-72 md:w-auto sm:w-20 bg-opacity-50">
         <div class="hero-body has-text-centered">
           <p class="text-white text-7xl align-middle ">EL MEJOR GIMNASIO</p>
           <p class="text-white subtitle align-middle ">Ahora desde tu ordenador</p>
@@ -9,16 +9,7 @@
       </div>
       <div>
         <template v-if="$store.state.isAuthenticated">
-          <Calendar :attributes="attributes">
-            <template #day-popover>
-              <div>
-                Using my own content now
-                <!-- {{ format(day.date, masks.dayPopover) }} -->
-              </div>
-              <div slot="add-todo" slot-scope="{ day }" class="add-todo">
-                <a @click="addTodo(day)"> + Add Todo </a>
-              </div>
-            </template>
+          <Calendar ref="calendar" locale="es" :min-page="firstPage" mode="range" :attributes="attributes" :update:to-page="printPage()">
           </Calendar>
         </template>
         <template v-else>
@@ -71,29 +62,32 @@ export default {
   },
 
   data() {
-    const todos = [
-      {
-        id: 1,
-        description: "Take Noah to basketball practice.",
-        isComplete: false,
-        dates: { weekdays: 6 }, // Every Friday
-        color: "blue",
-      },
-    ];
-
+    var todos = [];
     return {
       incId: todos.length,
-      editId: 0,
       todos,
       username: '',
       password: '',
       errors: [],
+      currentDate: new Date(),
+      firstPage:null,
+      colors:["red","green","blue","teal"],
     };
   },
   mounted() {
-      document.title = 'Log In | Gym-Adminify'
+      document.title = 'Home | Gym-Adminify';
+    
+      const month = this.currentDate.getMonth()+1;
+      const year = this.currentDate.getFullYear();
+      this.firstPage = { month, year }
+      this.getActivities()
   },
   methods: {
+    printPage(){
+      if(this.$refs.calendar != null){
+        console.log(this.$refs.calendar.pages[0].key);
+      }
+    },
     async submitForm() {
         this.$store.commit("setIsLoading", true);
         axios.defaults.headers.common["Authorization"] = ""
@@ -138,6 +132,22 @@ export default {
         });
         this.$store.commit("setIsLoading", false);
     },
+    async getActivities(){
+      this.$store.commit("setIsLoading", true);
+      await axios
+      .get("/api/v1/schedule-activities/")
+      .then((response) => {
+        this.todos = response.data;
+      })
+      .catch((error) => {
+        toast({
+          message: "Ocurrio un problema con los datos de: Actividades", type: "is-danger",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+      });
+      this.$store.commit("setIsLoading", false);
+    }
   },
   computed: {
     attributes() {
@@ -145,38 +155,22 @@ export default {
         {
           contentStyle: {
             fontWeight: "700",
-            color: "#66b3cc",
+            fontSize: '.9rem',
           },
           dates: new Date(),
         },
         // Attributes for todos
         ...this.todos.map((todo) => ({
-          key: todo.id,
-          dates: todo.dates,
-          customData: todo,
+          // dates: new Date(todo.schedule.year,todo.schedule.month-1, todo.dayofweek),
+          dates: {weekdays:todo.dayofweek, months:todo.schedule.month , years:todo.schedule.year},
           dot: {
-            color: todo.color,
-            class: todo.isComplete ? "opacity-75" : "",
+            color: "red",
           },
           popover: {
-            label: todo.description,
+            label: todo.service_name+" - "+todo.teacher_name+ " - " +(todo.startime) + "-" + (todo.endtime),
             visibility: "click",
           },
-          popover: true,
-          customData: todo,
         })),
-        {
-          contentHoverStyle: {
-            backgroundColor: "rgba(0, 0, 0, 0.1)",
-            cursor: "pointer",
-          },
-          dates: {}, // All dates
-          popover: {
-            slot: "add-todo",
-            visibility: "focus",
-            hideIndicator: true,
-          },
-        },
       ];
     },
   },

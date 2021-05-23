@@ -45,12 +45,14 @@ INSTALLED_APPS = [
 
     # Project Apps
     'AdmBills',
+    'AdmSchedule',
     'gymPersons',
     'gymClients',
     'gymSettings',
     'gymServices',
     'gymTeachers',
     'gymPermissions',
+    'gymActivities',
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -101,8 +103,8 @@ DATABASES = {
     #     'PASSWORD': 'THwdZlvsMp',
     #     'HOST': 'remotemysql.com',
     #     'PORT': '3306',
-    #}
-     'default': {
+    # },
+    'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'GymAdminify',
         'USER': 'admin',

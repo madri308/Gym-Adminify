@@ -9,7 +9,8 @@ class Client(models.Model):
     class Meta:
         managed = False
         db_table = 'Client'
-
+    def __str__(self):
+        return self.person.name
     def get_absolute_url(self):
         return f'/{self.person.id}/'
 

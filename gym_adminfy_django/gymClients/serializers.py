@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Client,ClientState
-from gymPersons.serializers import PersonSerializer
+from gymPersons.serializers import PersonSerializer,PersonNameSerializer
 
 class ClientSerializer(serializers.ModelSerializer):
     person = PersonSerializer(many=False)
@@ -12,6 +12,14 @@ class ClientSerializer(serializers.ModelSerializer):
             "balance",
             "clientstate",
             "get_absolute_url"
+        )
+
+class ClientNameSerializer(serializers.ModelSerializer):
+    person = PersonNameSerializer(many=False)
+    class Meta:
+        model = Client
+        fields = (
+            "person",
         )
 
 class ClientStateSerializer(serializers.ModelSerializer):

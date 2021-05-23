@@ -112,7 +112,6 @@ export default {
       name: "",
       mail: "",
       phone: null,
-
     };
   },
   mounted() {
@@ -132,6 +131,13 @@ export default {
     },
   },
   methods: {
+    groupBy(key) {
+      return this.teachers.reduce((objectsByKeyValue, obj) => {
+        const value = obj[key];
+        objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
+        return objectsByKeyValue;
+      }, {});
+    },
     createCategoriesJson(original, newOne){
       original.forEach(element => {
         newOne.push({value: element['id'],label:element['name']});
@@ -180,18 +186,18 @@ export default {
     async getTeachers() {
       this.$store.commit("setIsLoading", true);
       await axios
-        .get("/api/v1/teachers/")
-        .then((response) => {
-          this.teachers = response.data;
-          this.changeServicesFormat();
-        })
-        .catch((error) => {
-          toast({
-            message: "Ocurrio un problema con los datos de: Instructores", type: "is-danger",
-            dismissible: true, pauseOnHover: true,
-            duration: 3000, position: "bottom-right",
-          });
+      .get("/api/v1/teachers/")
+      .then((response) => {
+        this.teachers = response.data;
+        this.changeServicesFormat();
+      })
+      .catch((error) => {
+        toast({
+          message: "Ocurrio un problema con los datos de: Instructores", type: "is-danger",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
         });
+      });
       this.$store.commit("setIsLoading", false);
     },
     async addTeacher(){
