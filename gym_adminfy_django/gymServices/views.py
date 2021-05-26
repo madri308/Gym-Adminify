@@ -1,9 +1,6 @@
-from django.shortcuts import render
-
 from .models import Service
-from .serializers import ServiceSerializer
-
 from rest_framework import status
+from .serializers import ServiceSerializer
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
 

@@ -15,15 +15,15 @@
               <span class="font-extrabold height: 100% width:25% float:left"
                 >Fecha por pagar:
               </span>
-              <span>{{ bill.issuedate }}</span>
+              <span>{{ bill.paymethod.name }}</span>
                 </div>
               <div v-if="canPay">
-                <button v-if="!(changing === bill.id)" @click="changing = bill.id" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                  <i class="fas fa-pencil-alt fa-lg"></i>
+                <button v-if="!(changing === bill.id) && (bill.paymethod != sinPagar)" @click="changing = bill.id" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <i class="fas fa-money-check scale-150"></i>
                 </button> 
                 <div v-else>
-                  <button  type="button"  v-on:click ="modifyTeacher(bill)"  class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="fas fa-save fa-lg"></i>
+                  <button  type="button"  v-on:click ="payBill(bill)"  class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <i class="fas fa-money-check"></i>
                   </button>
                   <button v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                     <i class="fas fa-times-circle fa-lg"></i>
@@ -51,7 +51,7 @@
               </div>
               <div class="mt-4">
                   <span class="font-extrabold height: 100% width:0% float:left">Método de Pago: </span>
-                  <Multiselect :disabled="!isBeingChange(bill.id)" class="object-left md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymentmethod" :options="billPaymentMethods"/>
+                  <Multiselect :disabled="!isBeingChange(bill.id)" class="object-left md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymentmethod.id" :options="billPaymentMethods"/>
               </div>
             </Disclosure>
             <Disclosure v-bind:title="bill.clientname+' - '+bill.issuedate" v-else>
@@ -63,12 +63,12 @@
               <span>{{ bill.issuedate }}</span>
                 </div>
               <div v-if="canPay">
-                <button v-if="!(changing === bill.id)" @click="changing = bill.id" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                  <i class="fas fa-pencil-alt fa-lg"></i>
+                <button v-if="!(changing === bill.id) && (bill.paymethod.name != sinPagar)" @click="changing = bill.id" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <i class="fas fa-money-check-alt"></i>
                 </button> 
                 <div v-else>
-                  <button  type="button"  v-on:click ="modifyTeacher(bill)"  class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="fas fa-save fa-lg"></i>
+                  <button  type="button"  v-on:click ="payBill(bill)"  class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <i class="fas fa-check-double"></i>
                   </button>
                   <button v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                     <i class="fas fa-times-circle fa-lg"></i>
@@ -96,7 +96,7 @@
               </div>
               <div class="mt-4">
                   <span class="font-extrabold height: 100% width:0% float:left">Método de Pago: </span>
-                  <Multiselect :disabled="!isBeingChange(bill.id)" class="object-left md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymentmethod" :options="billPaymentMethods"/>
+                  <Multiselect :disabled="!isBeingChange(bill.id)" class="object-left md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymethod.id" :options="billPaymentMethods"/>
               </div>
             </Disclosure>
             </div>
@@ -112,6 +112,7 @@
 import axios from "axios";
 import { ChevronDownIcon } from "@heroicons/vue/solid";
 import { ChevronUpIcon } from "@heroicons/vue/solid";
+import { toast } from 'bulma-toast'
 import Disclosure from "../components/Disclosure";
 import Multiselect from '@vueform/multiselect';
 import Selector from "../components/Selector";
@@ -133,7 +134,8 @@ export default {
       billsSorted:null,
       changing: String,
       typeSorted:String,
-      billPaymentMethods:["Sinpe", "Efectivo"],
+      sinPagar:"Sin Pagar",
+      billPaymentMethods:[],
       permissions: this.$store.state.permissions,
       orderedMonths: {
          1:"Enero",
@@ -169,8 +171,10 @@ export default {
   mounted() {
     
     this.getBills().then(()=>{
-        this.billsSorted = this.groupBy('clientname')
+        this.billsSorted = this.groupBy('get_month')
+        console.log(this.billsSorted)
     })
+    this.getPaymentMethods()
   },
   computed:{
     canPay() {
@@ -182,6 +186,30 @@ export default {
       if(id == this.changing) console.log(true)
       if(id == this.changing) return true
       return false
+    },
+    async getPaymentMethods(){
+      this.$store.commit("setIsLoading", true);
+
+      await axios
+        .get("/api/v1/billsPaymentMethods/")
+        .then((response) => {
+          console.log(response)
+          let sorting;
+          sorting = response.data.map(function(obj) {
+            return {value:obj.id, label:obj.name}
+          });
+          console.log(this.billPaymentMethods)
+          this.billPaymentMethods = Object.values(sorting)
+        })
+
+        .catch((error) => {
+          toast({
+            message: "Ocurrio un problema con los datos de: Categorias", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+        });
+      this.$store.commit("setIsLoading", false);    
     },
     async getBills() {
       this.$store.commit("setIsLoading", true);
@@ -200,6 +228,43 @@ export default {
             position: "bottom-right",
           });
         });
+      this.$store.commit("setIsLoading", false);
+    },
+    async payBill(bill){
+      this.$store.commit("setIsLoading", true);
+      //GET Today's date
+      var paymentDate = new Date();
+      var month = paymentDate.getUTCMonth() + 1; //months from 1-12
+      var day = paymentDate.getUTCDate();
+      var year = paymentDate.getUTCFullYear();
+      let paymentDay = year +"-"+ month +"-"+ day
+
+      const formData = {
+        paid:1,
+        cost:bill.cost,
+        paymentday: paymentDay,
+        issuedate:bill.issuedate,
+        clientname:bill.clientname,
+        paymethod: bill.paymethod.id,
+      }
+      console.log(formData)
+      await axios
+      .put("/api/v1/billsByMonth"+bill.get_absolute_url, formData)
+      .then(response => {
+          toast({
+            message: "Factura Pagada!", type: "is-success",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+          this.changing =  ""
+      })
+      .catch(error => {
+          toast({
+            message: "Ocurrio un problema al pagar ", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+      })
       this.$store.commit("setIsLoading", false);
     },
     groupBy(key) {
