@@ -4,6 +4,6 @@ from gymActivities import views
 
 urlpatterns = [
     path('activities/', views.AllActivities.as_view()),
-    #path('activities/', views.AllActivities.as_view()),
-    #path('clientsPerActivity/<int:activity_id>', views.AllClientsByActivity.as_view()),
+    path('activities/<int:activity_id>/', views.ActivityDetail.as_view()),
+    path('update-activities/', views.ActivityDetail.as_view()),
 ]
