@@ -19,7 +19,8 @@ class ActivitiesSerializer(serializers.ModelSerializer):
             "endtime",
             "service",
             "teacher", 
-            "client"
+            "client", 
+            "get_absolute_url"
             #,"schedule"
         )
 

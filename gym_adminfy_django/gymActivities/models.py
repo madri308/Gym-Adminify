@@ -18,13 +18,11 @@ class Activity(models.Model):
     class Meta:
         managed = False
         db_table = 'Activity'
-
-# class ActivityHasClient(models.Model):
-#     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-#     activity = models.ForeignKey(Activity, models.DO_NOTHING, db_column='Activity_ID')  # Field name made lowercase.
-#     client = models.ForeignKey('gymClients.Client', models.DO_NOTHING, db_column='Client_ID')  # Field name made lowercase.
     
-#     class Meta:
-#         managed = False
-#         db_table = 'Activity_has_Client'
+    def get_absolute_url(self):
+        return f'/{self.id}/'
+
+    def __str__(self):
+        return self.activity.service
+
 

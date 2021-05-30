@@ -13,9 +13,8 @@ from gymSettings.serializers import ConfigSerializer
 
 from .models import Activity
 from gymServices.models import Service
-from gymTeachers.models import Teacher
+from gymTeachers.models import Teacher, Teachercategory
 from gymSettings.models import Config
-
 
 class AllActivities(generics.ListCreateAPIView):
     queryset = Activity.objects.all()
@@ -43,9 +42,14 @@ class ActivityDetail(APIView):
         activity.delete()
         return Response(status=status.HTTP_200_OK)
 
-
     def put(self, request, *args, **kwargs):
-        obj, created = Activity.objects.update_or_create(
-            defaults={'teacher': kwargs['teacher']},
-        )
+        activity = Activity.objects.get(id=kwargs['activity_id'])
+        teacher = Teacher.objects.get(person_id=request.data['teacher'])
+        teacherCat = Teachercategory.objects.get(name='Suplente')
+
+        activity.teacher = teacher
+        teacher.teachercategory = teacherCat
+
+        activity.save(update_fields=["teacher"])
+        teacher.save(update_fields=["teachercategory"])
         return Response(status=status.HTTP_202_ACCEPTED)
