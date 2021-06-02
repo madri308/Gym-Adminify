@@ -7,6 +7,7 @@ from .serializers import TeacherSerializer, TeachercategorySerializer, NewTeache
 from gymPersons.serializers import PersonSerializer,UserofpersonSerializer
 from gymPersons import views
 from rest_framework import status
+from django.db import transaction
 
 class AllTeachers(ListCreateAPIView):
     model = Teacher
@@ -19,6 +20,7 @@ class AllTeachers(ListCreateAPIView):
         return Teacher.objects.select_related()
         # return Teacher.objects.all().delete()
         
+    @transaction.atomic
     def create(self, request, pk=None):
         # CREATE THE PERSON
         personSerializer = PersonSerializer(data=request.data["person"])
