@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from .models import Teacher,Teachercategory
 from .serializers import TeacherSerializer, TeachercategorySerializer, NewTeacherSerializer
 from gymPersons.serializers import PersonSerializer,UserofpersonSerializer
-from gymPersons import views
 from rest_framework import status
 from django.db import transaction
 
@@ -18,7 +17,6 @@ class AllTeachers(ListCreateAPIView):
 
     def get_queryset(self):
         return Teacher.objects.select_related()
-        # return Teacher.objects.all().delete()
         
     @transaction.atomic
     def create(self, request, pk=None):

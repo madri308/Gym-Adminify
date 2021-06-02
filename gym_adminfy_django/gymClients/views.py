@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from .models import Client
 from .serializers import ClientSerializer, ClientStateSerializer, NewClientSerializer
 from gymPersons.serializers import PersonSerializer,UserofpersonSerializer
-from gymPersons import views
 from rest_framework import serializers, status
 from django.db import transaction
 
@@ -37,19 +36,14 @@ class AllClients(ListCreateAPIView):
                                         
         userofpersonSerializer.is_valid(raise_exception=True)
         userofpersonSerializer.save()
-        print(userofpersonSerializer.error_messages)
-        # CREATE THE INSTRUCTOR
-        print(request.data)
-        
+        # CREATE THE CLIENT
         serializer = NewClientSerializer(data={
-                                            'person':personObject.pk,
-                                            'clientstate':"4",
-                                            'balance':0.00,
+                                            "person":personObject.pk,
+                                            "clientstate": 4,
+                                            "balance":0.00,
                                         })
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        print(serializer.error_messages)
-        print("antes del user")
         return Response(serializer.data,status=status.HTTP_201_CREATED)
             
 

@@ -27,8 +27,6 @@ class ClientStateSerializer(serializers.ModelSerializer):
         model = ClientState
 
 class NewClientSerializer(serializers.ModelSerializer):
-    person = PersonSerializer(many=False)
-    clientstate = serializers.CharField(read_only=True)
     class Meta:
         model = Client
         fields = (
