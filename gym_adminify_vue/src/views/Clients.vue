@@ -52,13 +52,13 @@
             <div class="relative">
               <form class="w-full max-w-sm">
                 <div class="flex items-center border-b border-teal-500 py-2">
-                  <input v-model="name" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Nombre de Servicio" aria-label="Full name">
+                  <input v-model="name" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Nombre del cliente" aria-label="Full name">
                 </div>
                 <div class="flex items-center border-b border-teal-500 py-2">
-                  <input v-model="description" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Descripción" aria-label="Full name">
+                  <input v-model="phone" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Número telefónico" aria-label="Full name">
                 </div>
                 <div class="flex items-center border-b border-teal-500 py-2">
-                  <input v-model="hourfee" class="appearance-none bg-transparent border-none w-10/12 text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="number" placeholder="Monto por Hora" aria-label="Full name">
+                  <input v-model="mail" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Correo electrónico" aria-label="Full name">
                 </div>
               </form>
               <button type="button" v-on:click ="addClient" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
@@ -145,13 +145,14 @@ export default {
   methods: {
     async addClient(){
       this.$store.commit("setIsLoading", true);
+
       const formData = {
-      name: this.name,
-      mail: this.mail,
-      phone: this.phone,
-      balance: this.balance,
-      clientstate: this.clientstate,
+        name: this.name,
+        identification: "miko",
+        mail: this.mail,
+        phone: this.phone,
       }
+      console.log(formData)
       await axios
       .post("/api/v1/clients/", formData)
       .then(response => {
@@ -206,9 +207,6 @@ export default {
           });
         });
       this.$store.commit("setIsLoading", false);
-
-    },
-    async deleteClient(){
 
     },
     async modifyClient(){
