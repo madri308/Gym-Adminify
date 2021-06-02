@@ -19,12 +19,24 @@
                   <button  v-if="canDeleteService" v-on:click ='deleteService(service.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                     <i class="fa fa-trash fa-lg"></i>
                   </button> 
+                  <div v-if="canChangeService">
+                    <button v-if="!(changing === service.get_absolute_url)" @click="changing = service.get_absolute_url" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                      <i class="fas fa-pencil-alt fa-lg"></i>
+                    </button> 
+                    <div v-else>
+                      <button  type="button"  v-on:click ="modifyService(service)"  class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                        <i class="fas fa-save fa-lg"></i>
+                      </button>
+                      <button v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                        <i class="fas fa-times-circle fa-lg"></i>
+                      </button>
+                    </div>
+                  </div> 
                 </div>
                 <div> 
                   <span class="font-extrabold height: 100% width:25% float:left"> Monto por hora: </span>
                   <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(service.get_absolute_url)" type="numeric" v-model="service.hourfee" placeholder="Costo por hora..." aria-label="Full name">
                 </div>
-                  
               </div>
             </Disclosure>
           </div>
@@ -81,6 +93,7 @@ export default {
       // Objetos y Arrays
       services: [], 
 
+      // Permisos
       permissions: this.$store.state.permissions,
 
 
@@ -100,6 +113,12 @@ export default {
       await axios
       .delete("/api/v1/services/"+service_id)
       .then((response) =>{
+         this.services.forEach(element => {
+            if(element['id'] == service_id){
+              const index = this.services.indexOf(element);
+              this.services.splice(index, 1);
+            };
+        });
         toast({
             message: "Servicio eliminado exitosamente", type: "is-success",
             dismissible: true, pauseOnHover: true,
@@ -132,6 +151,32 @@ export default {
         });
       this.$store.commit("setIsLoading", false);
     },
+    async modifyService(newService){
+      this.$store.commit("setIsLoading", true);
+      const formData = {
+        name: newService.name,
+        description: newService.description,
+        hourfee: newService.hourfee,
+      }
+      await axios
+      .put("/api/v1/services"+newService.get_absolute_url, formData)
+      .then(response => {
+          toast({
+            message: "Servicio editado exitosamente", type: "is-success",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+          this.changing =  ""
+      })
+      .catch(error => {
+          toast({
+            message: "Ocurrio un problema al editar el instructor", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+      })
+      this.$store.commit("setIsLoading", false);
+    },
     isBeingChange(id){
       if(id == this.changing) return true
       return false
@@ -144,7 +189,6 @@ export default {
         description: this.description,
         hourfee: this.hourfee,
       }
-      console.log(formData)
       await axios
       .post("/api/v1/services/", formData)
       .then(response => {
@@ -161,6 +205,11 @@ export default {
             duration: 3000, position: "bottom-right",
           });
       })
+      this.services.push(formData);
+      this.name= ""
+      this.description= ""
+      this.hourfee = ""
+      this.newOne = false;
       this.$store.commit("setIsLoading", false);
     }
   },

@@ -1,5 +1,5 @@
+import datetime
 from django.db import models
-from gymPersons.models import Person
 from gymClients.models import Client
 #from gymActivity.models import Activity
 
@@ -29,3 +29,7 @@ class Bill(models.Model):
         return f'{self.client.person.name} - {self.issuedate}'
     def get_absolute_url(self):
         return f'/{self.id}/'
+
+    def get_month(self):
+        month = self.issuedate.month
+        return month
