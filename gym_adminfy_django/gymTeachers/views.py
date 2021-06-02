@@ -1,9 +1,11 @@
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
+from django.contrib.auth.models import User
 
 from .models import Teacher,Teachercategory
 from .serializers import TeacherSerializer, TeachercategorySerializer, NewTeacherSerializer
-from gymPersons.serializers import PersonSerializer
+from gymPersons.serializers import PersonSerializer,UserofpersonSerializer
+from gymPersons import views
 from rest_framework import status
 
 class AllTeachers(ListCreateAPIView):
@@ -15,22 +17,35 @@ class AllTeachers(ListCreateAPIView):
 
     def get_queryset(self):
         return Teacher.objects.select_related()
+        # return Teacher.objects.all().delete()
         
     def create(self, request, pk=None):
-        ##CREA LA PERSONA
-        person = PersonSerializer(data=request.data["person"])
-        if not person.is_valid():
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        personObject = person.save()
+        # CREATE THE PERSON
+        personSerializer = PersonSerializer(data=request.data["person"])
+        personSerializer.is_valid(raise_exception=True)
+        personObject = personSerializer.save()
 
-        ##CREA EL INSTRUCTOR
+        # CREATE THE USER
+        user = User.objects.create_user(request.data["person"]["mail"]
+                                        ,request.data["person"]["mail"]
+                                        ,request.data["person"]["identification"])
+        user.save()
+
+        # CREATE RELATION
+        userofpersonSerializer = UserofpersonSerializer(data={
+                                            'person':personObject.pk,
+                                            'user':user.pk })
+                                        
+        userofpersonSerializer.is_valid(raise_exception=True)
+        userofpersonSerializer.save()
+        
+        # CREATE THE INSTRUCTOR
         serializer = NewTeacherSerializer(data={
                                             'person':personObject.pk,
                                             'teachercategory':request.data["teachercategory"],
                                             "services":request.data["services"],
                                         })
-        if not serializer.is_valid():
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
         serializer.save()
         
         return Response(serializer.data,status=status.HTTP_201_CREATED)

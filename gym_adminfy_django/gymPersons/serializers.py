@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Person
+from .models import Person,Userofperson
 
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
@@ -9,7 +9,8 @@ class PersonSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "phone",
-            "mail"
+            "mail",
+            "identification"
         )
 
 class PersonNameSerializer(serializers.ModelSerializer):
@@ -18,4 +19,13 @@ class PersonNameSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "name"
+        )
+
+class UserofpersonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Userofperson
+        fields = (
+            "id",
+            "person",
+            "user"
         )

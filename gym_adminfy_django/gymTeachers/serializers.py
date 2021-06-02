@@ -21,7 +21,7 @@ class NewTeacherSerializer(serializers.ModelSerializer):
         fields = (
             "person",
             "teachercategory",
-            "services"
+            "services",
         )
 
 class TeachercategorySerializer(serializers.ModelSerializer):
