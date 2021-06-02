@@ -91,22 +91,43 @@
 
           <Disclosure v-bind:title="'Nueva Actividad'" v-if="newOne">
             <div class="relative">
-              <form class="w-full max-w-sm">
-                <div class="flex items-center border-b border-teal-500 py-2">
-                  <input class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Instructor" aria-label="Full name">
-                </div>
-                <div class="flex items-center border-b border-teal-500 py-2">
-                  <input class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Capacidad" aria-label="Full name">
-                </div>
-                <div class="flex items-center border-b border-teal-500 py-2">
-                  <input class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="int" placeholder="Telefono" aria-label="Full name">
-                </div>
-              </form>
-              <Multiselect class="mt-3" v-model="services" placeholder="Seleccione el servicio que se brindara" :options="this.servicesNames"/>
-              <Multiselect class="mt-3" v-model="teacher" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
-              <Multiselect class="mt-3" v-model="this.days" placeholder="Seleccione el día " :options="this.days"/>
+              <div>
+                <input style="width:100%;height:30px;font-size:12pt;" type="number" placeholder="   Capacidad" min="1" max="200">
+              </div>
+              <Multiselect class="mt-3" v-model="activityServices_new" placeholder="Seleccione el servicio que se brindara" :options="this.servicesNames"/>
+              <Multiselect class="mt-3" v-model="activityTeacher_new" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
+              <Multiselect class="mt-3" v-on:click ='selectedDay=true' v-model="activityDay_new" placeholder="Seleccione el día " :options="this.days"/>
+              <!-- <Multiselect v-if="selectedDay" class="mt-3" v-model="activityStart_new" placeholder="Seleccione la hora " :options="this.days"/> -->
+              
+              <div class="table-responsive">
+                <table class="table-hover" > <!--v-if="config.timeperday"> -->
+                <br />
+                  <tbody>
+                      <tr>
+                        <span class="px-2">Hora inicio</span>
+                        <td>
+                          <input :disabled="isChanging" v-model="jjfin" type="time"/>
+                        </td>
+                        <button v-if="isChanging" v-on:click="deleteDay(item)" type="button" class="rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                          <i class="far fa-times-circle fa-sm"></i>
+                        </button>
+                        <tl />
+                        <span class="px-2">Hora fin</span>
+                        <td>
+                          <input :disabled="isChanging" v-model="jjfin" type="time"/>
+                        </td>
+                        <button v-if="isChanging" v-on:click="deleteDay(item)" type="button" class="rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                          <i class="far fa-times-circle fa-sm"></i>
+                        </button>
+                      </tr>
+                      <br />
+                  </tbody>
+                </table>
+              </div>
             </div>
           </Disclosure>
+          
+            
 
         </dl>
       </div>
@@ -152,7 +173,7 @@ export default {
 
       newOne:false,
       changing: String,
-      isEditing:false,
+      selectedDay:false,
       is_loaded:false,
     };
   },
@@ -174,12 +195,13 @@ export default {
       });
     },
     createJsonSchedule(original, days, hourStart, hourEnd){
-      var i = 1
+      
       original.forEach(element => {
-        days.push({value: "/"+i+"/",label:element['dia']});
-        hourEnd.push({value: element['get_absolute_url'],label:element['fin']});
+        //days.push({value: "/"+i+"/",label:element['dia']});
+        days.push(element['dia']);
+        hourEnd.push({value: element['index'],label:element['fin']});
         hourStart.push({value: element['get_absolute_url'],label:element['inicio']});
-        i++;
+        // i++;
       });
     },
 
@@ -223,15 +245,25 @@ export default {
           this.services = response.data['service'];
           this.createJson(this.services,this.servicesNames);
           
-          this.teachers = response.data['teacher'];
-          this.createJsonTeacher(this.teachers,this.teachersNames);
-          
           this.schedule = response.data['config'].timeperday;
+          console.log(response.data['config'])
           this.createJsonSchedule(this.schedule, this.days, this.start, this.end);
+          //this.days = response.data['config'].timeperday.dia;
+
+          //var json = JSON.parse(this.config);
+
+          console.log("services")
           console.log(this.servicesNames)
-          console.log("services up")
+          console.log("schedule")
+          console.log(this.schedule)
+          //console.log("attempt")
+          //console.log(this.schedule.fin[3])
+          console.log("days")
           console.log(this.days)
-          console.log("days up")
+          console.log("start")
+          console.log(this.start)
+          console.log("end")
+          console.log(this.end)
           
 
           document.title = 'New_Activity';
