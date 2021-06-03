@@ -14,7 +14,10 @@
                 <div>
                   <span class="font-extrabold">Nombre: </span>
                   <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(client.get_absolute_url)" type="text" v-model="client.person.name" placeholder="Nombre..." aria-label="Full name">
+                  <span class="font-extrabold">Identificacion: </span>
+                  <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(client.get_absolute_url)" type="int" v-model="client.person.identification" placeholder="Nombre" aria-label="Full name">
                 </div>
+                
                 <div>
                   <span class="font-extrabold">Email : </span>
                   <input class="sm:w-10 md:w-44" :disabled="!isBeingChange(client.get_absolute_url)" type="text" v-model="client.person.mail" placeholder="Email" aria-label="Full name">
@@ -53,6 +56,9 @@
               <form class="w-full max-w-sm">
                 <div class="flex items-center border-b border-teal-500 py-2">
                   <input v-model="name" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Nombre del cliente" aria-label="Full name">
+                </div>
+                <div class="flex items-center border-b border-teal-500 py-2">
+                  <input v-model="identification" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Identificacion" aria-label="Full name">
                 </div>
                 <div class="flex items-center border-b border-teal-500 py-2">
                   <input v-model="phone" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Número telefónico" aria-label="Full name">
@@ -116,13 +122,13 @@ export default {
       // Permisos
       permissions: this.$store.state.permissions,
       
-
       // Parametros para AddClient
       name:"",
       mail:"",
       phone:"",
       balance:"",
       clientstate:"",
+      identification:"",
     };
   },
   mounted() {
@@ -148,11 +154,10 @@ export default {
 
       const formData = {
         name: this.name,
-        identification: "miko",
+        identification: this.identification,
         mail: this.mail,
         phone: this.phone,
       }
-      console.log(formData)
       await axios
       .post("/api/v1/clients/", formData)
       .then(response => {

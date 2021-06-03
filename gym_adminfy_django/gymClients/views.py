@@ -29,6 +29,7 @@ class AllClients(ListCreateAPIView):
                                         ,request.data["mail"]
                                         ,request.data["identification"])
         user.save()
+        user.groups.add(2)
         # CREATE RELATION
         userofpersonSerializer = UserofpersonSerializer(data={
                                             'person':personObject.pk,

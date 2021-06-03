@@ -30,7 +30,7 @@ class AllTeachers(ListCreateAPIView):
                                         ,request.data["person"]["mail"]
                                         ,request.data["person"]["identification"])
         user.save()
-
+        user.groups.add(4)
         # CREATE RELATION
         userofpersonSerializer = UserofpersonSerializer(data={
                                             'person':personObject.pk,

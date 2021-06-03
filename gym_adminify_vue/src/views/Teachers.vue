@@ -15,6 +15,8 @@
                 <div>
                   <span class="font-extrabold">Nombre: </span>
                   <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(teacher.get_absolute_url)" type="int" v-model="teacher.person.name" placeholder="Nombre" aria-label="Full name">
+                  <span class="font-extrabold">Identificacion: </span>
+                  <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(teacher.get_absolute_url)" type="int" v-model="teacher.person.identification" placeholder="Nombre" aria-label="Full name">
                 </div>
                 <div>
                   <button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
@@ -58,6 +60,9 @@
               <form class="w-full max-w-sm">
                 <div class="flex items-center border-b border-teal-500 py-2">
                   <input v-model="name" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Nombre" aria-label="Full name">
+                </div>
+                <div class="flex items-center border-b border-teal-500 py-2">
+                  <input v-model="identification" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Identificacion" aria-label="Full name">
                 </div>
                 <div class="flex items-center border-b border-teal-500 py-2">
                   <input v-model="mail" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Correo" aria-label="Full name">
@@ -112,6 +117,7 @@ export default {
       name: "",
       mail: "",
       phone: null,
+      identification: "",
     };
   },
   mounted() {
@@ -207,6 +213,7 @@ export default {
           name: this.name,
           phone: this.phone,
           mail: this.mail,
+          identification: this.identification,
         },
         teachercategory: this.teacherType,
         services: this.teacherServices,
