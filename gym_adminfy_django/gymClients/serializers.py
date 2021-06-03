@@ -26,3 +26,12 @@ class ClientStateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientState
 
+class NewClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = (
+            "person",
+            "balance",
+            "clientstate",
+        )
+

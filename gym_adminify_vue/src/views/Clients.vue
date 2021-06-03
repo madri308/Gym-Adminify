@@ -14,7 +14,10 @@
                 <div>
                   <span class="font-extrabold">Nombre: </span>
                   <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(client.get_absolute_url)" type="text" v-model="client.person.name" placeholder="Nombre..." aria-label="Full name">
+                  <span class="font-extrabold">Identificacion: </span>
+                  <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(client.get_absolute_url)" type="int" v-model="client.person.identification" placeholder="Nombre" aria-label="Full name">
                 </div>
+                
                 <div>
                   <span class="font-extrabold">Email : </span>
                   <input class="sm:w-10 md:w-44" :disabled="!isBeingChange(client.get_absolute_url)" type="text" v-model="client.person.mail" placeholder="Email" aria-label="Full name">
@@ -52,13 +55,16 @@
             <div class="relative">
               <form class="w-full max-w-sm">
                 <div class="flex items-center border-b border-teal-500 py-2">
-                  <input v-model="name" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Nombre de Servicio" aria-label="Full name">
+                  <input v-model="name" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Nombre del cliente" aria-label="Full name">
                 </div>
                 <div class="flex items-center border-b border-teal-500 py-2">
-                  <input v-model="description" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Descripción" aria-label="Full name">
+                  <input v-model="identification" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Identificacion" aria-label="Full name">
                 </div>
                 <div class="flex items-center border-b border-teal-500 py-2">
-                  <input v-model="hourfee" class="appearance-none bg-transparent border-none w-10/12 text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="number" placeholder="Monto por Hora" aria-label="Full name">
+                  <input v-model="phone" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Número telefónico" aria-label="Full name">
+                </div>
+                <div class="flex items-center border-b border-teal-500 py-2">
+                  <input v-model="mail" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Correo electrónico" aria-label="Full name">
                 </div>
               </form>
               <button type="button" v-on:click ="addClient" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
@@ -116,13 +122,13 @@ export default {
       // Permisos
       permissions: this.$store.state.permissions,
       
-
       // Parametros para AddClient
       name:"",
       mail:"",
       phone:"",
       balance:"",
       clientstate:"",
+      identification:"",
     };
   },
   mounted() {
@@ -145,12 +151,12 @@ export default {
   methods: {
     async addClient(){
       this.$store.commit("setIsLoading", true);
+
       const formData = {
-      name: this.name,
-      mail: this.mail,
-      phone: this.phone,
-      balance: this.balance,
-      clientstate: this.clientstate,
+        name: this.name,
+        identification: this.identification,
+        mail: this.mail,
+        phone: this.phone,
       }
       await axios
       .post("/api/v1/clients/", formData)
@@ -206,9 +212,6 @@ export default {
           });
         });
       this.$store.commit("setIsLoading", false);
-
-    },
-    async deleteClient(){
 
     },
     async modifyClient(){
