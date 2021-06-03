@@ -40,7 +40,6 @@
                     </div>
                 </div>
                 <hr>
-                <!-- Or <router-link to="/sign-up">click here</router-link> to sign up! -->
             </form>
           </div>
         </template>
