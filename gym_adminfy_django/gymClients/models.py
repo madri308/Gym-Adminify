@@ -3,7 +3,7 @@ from gymPersons.models import Person
 
 
 class Client(models.Model):
-    person = models.OneToOneField(Person, models.DO_NOTHING, db_column='ID', primary_key=True)  # Field name made lowercase.
+    person = models.OneToOneField(Person, on_delete=models.CASCADE, db_column='ID', primary_key=True)  # Field name made lowercase.
     balance = models.DecimalField(db_column='Balance', max_digits=15, decimal_places=2)  # Field name made lowercase.
     clientstate = models.ForeignKey('ClientState', models.DO_NOTHING, db_column='ClientState_ID')  # Field name made lowercase.
 
