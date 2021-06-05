@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,11 +44,14 @@ INSTALLED_APPS = [
     'corsheaders',
     'djoser',
 
+    # Project Apps
+    'AdmBills',
+    'AdmSchedule',
+    'gymPersons',
+    'gymClients',
     'gymSettings',
     'gymServices',
-    'gymPersons',
     'gymTeachers',
-    'gymClients',
     'gymPermissions',
     'gymActivities',
 ]
@@ -93,22 +97,22 @@ WSGI_APPLICATION = 'GymAdminify.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'sI9eL5baMe',
+    #     'USER': 'sI9eL5baMe',
+    #     'PASSWORD': 'THwdZlvsMp',
+    #     'HOST': 'remotemysql.com',
+    #     'PORT': '3306',
+    # },
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sI9eL5baMe',
-        'USER': 'sI9eL5baMe',
-        'PASSWORD': 'THwdZlvsMp',
-        'HOST': 'remotemysql.com',
+        'NAME': 'GymAdminify',
+        'USER': 'admin',
+        'PASSWORD': 'admin',
+        'HOST': '35.193.50.45',
         'PORT': '3306',
     },
-    #  'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'ga_db',
-    #     'USER': 'root',
-    #     'PASSWORD': 'root',
-    #     'HOST': 'localhost',
-    #     'PORT': '3308',
-    # }
     
 }
 

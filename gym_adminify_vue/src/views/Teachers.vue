@@ -1,47 +1,79 @@
 <template>
   <div class="bg-white">
-    <button v-on:click ='newOne = !newOne' class="fixed z-50 bottom-10 right-10 w-12 h-12 bg-red-600 rounded-full hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
-      <PlusIcon class="text-white" aria-hidden="true" />
-    </button>
+    <div v-if="canAddTeacher">
+      <button v-on:click ='newOne = !newOne' class="fixed z-50 bottom-10 right-10 w-12 h-12 bg-red-600 rounded-full hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
+        <PlusIcon class="text-white" aria-hidden="true" />
+      </button>
+    </div>
     <Selector @clicked="getByCategory" v-bind:options="options" />    
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <div class>
         <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
           <div v-for="teacher in teachers" :key="teacher" class="relative">
             <Disclosure v-bind:title="teacher.person.name">
-              <div class="relative">
-                <span class="font-extrabold height: 100% width:25% float:left">Telefono: </span>
-                <span>{{ teacher.person.phone }}</span>
-                <span class="font-extrabold height: 100% width:25% float:left"> | Correo: </span>
-                <span>{{ teacher.person.mail }}</span>
-                <br />
-                <span class="font-extrabold height: 100% width:25% float:left">Tipo: </span>
-                <span>{{ teacher.category_name }}</span>
-                <button v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                  <i class="fa fa-trash fa-lg"></i>
-                </button> 
-                <button type="button" class="absolute top-0 right-7 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                  <i class="fas fa-pencil-alt fa-lg"></i>
-                </button> 
+              <div class="grid relative md:grid-cols-2 sm:grid-cols-1">
+                <div>
+                  <span class="font-extrabold">Nombre: </span>
+                  <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(teacher.get_absolute_url)" type="int" v-model="teacher.person.name" placeholder="Nombre" aria-label="Full name">
+                  <span class="font-extrabold">Identificacion: </span>
+                  <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(teacher.get_absolute_url)" type="int" v-model="teacher.person.identification" placeholder="Nombre" aria-label="Full name">
+                </div>
+                <div>
+                  <button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <i class="fa fa-trash fa-lg"></i>
+                  </button> 
+                  <div v-if="canChangeTeacher">
+                    <button v-if="!(changing === teacher.get_absolute_url)" @click="changing = teacher.get_absolute_url" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                      <i class="fas fa-pencil-alt fa-lg"></i>
+                    </button> 
+                    <div v-else>
+                      <button  type="button"  v-on:click ="modifyTeacher(teacher)"  class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                        <i class="fas fa-save fa-lg"></i>
+                      </button>
+                      <button v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                        <i class="fas fa-times-circle fa-lg"></i>
+                      </button>
+                    </div>
+                  </div> 
+                </div>
+                <div class="mt-3">
+                  <span class="font-extrabold">Telefono: </span>
+                  <input :disabled="!isBeingChange(teacher.get_absolute_url)" type="int" v-model="teacher.person.phone" placeholder="Telefono" aria-label="Full name">
+                </div>
+                <div class="mt-3">
+                  <span class="font-extrabold">Correo: </span>
+                  <input :disabled="!isBeingChange(teacher.get_absolute_url)" type="int" v-model="teacher.person.mail" placeholder="Telefono" aria-label="Full name">
+                </div>
+                <div class="mt-4">
+                  <span class="font-extrabold height: 100% width:0% float:left">Tipo: </span>
+                  <Multiselect :disabled="!(changing === teacher.get_absolute_url)" class="object-left w-36" label="label" mode="single" v-model="teacher['teachercategory']" :options="categoriesOption"/>
+                </div>
+                <div class="mt-4">
+                  <span class="font-extrabold height: 100% width:0% float:left">Servicios: </span>
+                  <Multiselect :disabled="!(changing === teacher.get_absolute_url)" class="object-left md:w-52 sm:w-36" label="label" mode="tags" v-model="teacher.services" :options="servicesOption"/>
+                </div>
               </div>
             </Disclosure>
           </div>
-          <Disclosure v-bind:title="'Nuevo Instructor'" v-if="newOne">
+          <Disclosure v-bind:title="this.name" v-if="newOne">
             <div class="relative">
               <form class="w-full max-w-sm">
                 <div class="flex items-center border-b border-teal-500 py-2">
-                  <input class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Nombre" aria-label="Full name">
+                  <input v-model="name" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Nombre" aria-label="Full name">
                 </div>
                 <div class="flex items-center border-b border-teal-500 py-2">
-                  <input class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Correo" aria-label="Full name">
+                  <input v-model="identification" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Identificacion" aria-label="Full name">
                 </div>
                 <div class="flex items-center border-b border-teal-500 py-2">
-                  <input class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="int" placeholder="Telefono" aria-label="Full name">
+                  <input v-model="mail" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Correo" aria-label="Full name">
+                </div>
+                <div class="flex items-center border-b border-teal-500 py-2">
+                  <input v-model="phone" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="int" placeholder="Telefono" aria-label="Full name">
                 </div>
               </form>
-              <Multiselect class="mt-3" v-model="teacherServices" mode="tags" placeholder="Seleccione los servicios que brindara" :options="servicesOption"/>
-              <Multiselect class="mt-3" v-model="teacherType" placeholder="Seleccione el tipo" :options="categoriesOption"/>
-              <button type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+              <Multiselect class="mt-3"  mode="single" v-model="teacherType" placeholder="Tipo de instructor" :options="categoriesOption"/>
+              <Multiselect class="mt-3" mode="tags" v-model="teacherServices" placeholder="Servicios que brindara" :options="servicesOption"/>
+              <button type="button" v-on:click ="addTeacher" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                 <i class="far fa-save fa-lg"></i>
               </button>   
             </div>
@@ -58,7 +90,7 @@ import Selector from "../components/Selector";
 import Disclosure from "../components/Disclosure";
 import { PlusIcon,CheckCircleIcon  } from "@heroicons/vue/outline";
 import Multiselect from '@vueform/multiselect'
-
+import { toast } from 'bulma-toast'
 
 export default {
   name: "Teachers",
@@ -74,11 +106,18 @@ export default {
       categories: [],
       categoriesOption:[],
       
-      services:[],
+      // services:[],
       servicesOption:[],
     
       teacherServices:[],
-      teacherType: [],
+      teacherType: 0,
+      permissions: this.$store.state.permissions,
+      changing: String,
+
+      name: "",
+      mail: "",
+      phone: null,
+      identification: "",
     };
   },
   mounted() {
@@ -86,40 +125,60 @@ export default {
     this.getCategories();
     this.getServices();
   },
+  computed:{
+    canAddTeacher() {
+      return this.permissions.includes("gymTeachers.add_teacher")
+    },
+    canDeleteTeacher() {
+      return this.permissions.includes("gymTeachers.delete_teacher")
+    },
+    canChangeTeacher() {
+      return this.permissions.includes("gymTeachers.change_teacher")
+    },
+  },
   methods: {
-    createJson(original, newOne){
+    groupBy(key) {
+      return this.teachers.reduce((objectsByKeyValue, obj) => {
+        const value = obj[key];
+        objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
+        return objectsByKeyValue;
+      }, {});
+    },
+    createCategoriesJson(original, newOne){
       original.forEach(element => {
-        newOne.push({value: element['get_absolute_url'],label:element['name']});
+        newOne.push({value: element['id'],label:element['name']});
       });
     },
-    deleteTeacher(id) {
-      this.teachers.forEach(element => {
-        if(element['person']['id'] == id){
-          const index = this.teachers.indexOf(element);
-          this.teachers.splice(index, 1);
-        };
-      });
-      // this.$store.commit("setIsLoading", true);
-      // await axios
-      //   .get("/api/v1/teachers/")
-      //   .then((response) => {
-      //     this.teachers = response.data;
-      //   })
-      //   .catch((error) => {
-      //     toast({
-      //       message: "Ocurrio un problema con los datos de: Instructores", type: "is-danger",
-      //       dismissible: true, pauseOnHover: true,
-      //       duration: 3000, position: "bottom-right",
-      //     });
-      //   });
-      // this.$store.commit("setIsLoading", false);
+    isBeingChange(id){
+      if(id == this.changing) return true
+      return false
+      
     },
-    async getTeachers() {
+    changeServicesFormat(){
+      this.teachers.forEach(teacher =>{
+        var newServices = []
+        teacher.services.forEach(service =>{
+          newServices.push(service.id)
+        })
+        teacher.services = newServices
+      })
+    },
+    async deleteTeacher(id) {
       this.$store.commit("setIsLoading", true);
       await axios
-        .get("/api/v1/teachers/")
+        .delete("/api/v1/teachers/"+id)
         .then((response) => {
-          this.teachers = response.data;
+          this.teachers.forEach(element => {
+            if(element['person']['id'] == id){
+              const index = this.teachers.indexOf(element);
+              this.teachers.splice(index, 1);
+            };
+          });
+          toast({
+            message: "Instructor eliminado exitosamente", type: "is-success",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
         })
         .catch((error) => {
           toast({
@@ -130,6 +189,84 @@ export default {
         });
       this.$store.commit("setIsLoading", false);
     },
+    async getTeachers() {
+      this.$store.commit("setIsLoading", true);
+      await axios
+      .get("/api/v1/teachers/")
+      .then((response) => {
+        this.teachers = response.data;
+        this.changeServicesFormat();
+      })
+      .catch((error) => {
+        toast({
+          message: "Ocurrio un problema con los datos de: Instructores", type: "is-danger",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+      });
+      this.$store.commit("setIsLoading", false);
+    },
+    async addTeacher(){
+      this.$store.commit("setIsLoading", true);
+      const formData = {
+        person:{
+          name: this.name,
+          phone: this.phone,
+          mail: this.mail,
+          identification: this.identification,
+        },
+        teachercategory: this.teacherType,
+        services: this.teacherServices,
+      }
+      await axios
+      .post("/api/v1/teachers/", formData)
+      .then(response => {
+          toast({
+            message: "Instructor guardado exitosamente", type: "is-success",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+          location.reload();
+      })
+      .catch(error => {
+          toast({
+            message: "Ocurrio un problema guardando el instructor", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+      })
+      this.$store.commit("setIsLoading", false);
+    },
+    async modifyTeacher(newTeacher){
+      this.$store.commit("setIsLoading", true);
+      const formData = {
+        person:{
+          name: newTeacher.person.name,
+          phone: newTeacher.person.phone,
+          mail: newTeacher.person.mail,
+        },
+        teachercategory: newTeacher.teachercategory,
+        services: newTeacher.services,
+      }
+      await axios
+      .put("/api/v1/teachers"+newTeacher.get_absolute_url, formData)
+      .then(response => {
+          toast({
+            message: "Instructor editado exitosamente", type: "is-success",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+          this.changing =  ""
+      })
+      .catch(error => {
+          toast({
+            message: "Ocurrio un problema al editar el instructor", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+      })
+      this.$store.commit("setIsLoading", false);
+    },
     async getCategories() {
       this.$store.commit("setIsLoading", true);
       await axios
@@ -138,7 +275,7 @@ export default {
           this.categories = response.data;
           this.options = this.categories.slice();
           this.options.push({name: "Todos",get_absolute_url:"/-1/"});
-          this.createJson(this.categories,this.categoriesOption);
+          this.createCategoriesJson(this.categories,this.categoriesOption);
         })
         .catch((error) => {
           toast({
@@ -154,8 +291,8 @@ export default {
       await axios
         .get("/api/v1/services/")
         .then((response) => {
-          this.services = response.data;
-          this.createJson(this.services,this.servicesOption);
+          // this.services = ;
+          this.createCategoriesJson(response.data,this.servicesOption);
         })
         .catch((error) => {
           toast({

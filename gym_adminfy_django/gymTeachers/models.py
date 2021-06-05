@@ -1,9 +1,11 @@
 from django.db import models
 from gymPersons.models import Person
+from gymServices.models import Service
 
 class Teacher(models.Model):
-    person = models.OneToOneField(Person, models.DO_NOTHING, db_column='ID', primary_key=True)  
-    teachercategory = models.ForeignKey('Teachercategory', models.DO_NOTHING, db_column='TeacherCategory_ID') 
+    person = models.OneToOneField(Person, on_delete=models.CASCADE, db_column='ID', primary_key=True)  
+    teachercategory = models.ForeignKey('Teachercategory', on_delete=models.CASCADE, db_column='TeacherCategory_ID') 
+    services = models.ManyToManyField(Service)
 
     class Meta:
         managed = False
@@ -11,6 +13,8 @@ class Teacher(models.Model):
         
     def get_absolute_url(self):
         return f'/{self.person.id}/'
+    def __str__(self):
+        return self.person.name
 
 
 class Teachercategory(models.Model):

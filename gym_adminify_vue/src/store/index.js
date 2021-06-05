@@ -6,15 +6,22 @@ export default createStore({
     token: '',
     isLoading: false,
     permissions:[],
+    permsLoaded: false,
   },
   mutations: {
     initializeStore(state){
       if (localStorage.getItem('token')) {
         state.token = localStorage.getItem('token')
         state.isAuthenticated = true
+        state.permissions = localStorage.getItem('UP')
+        state.permsLoaded = true
       } else {
-          state.token = ''
-          state.isAuthenticated = false
+        state.token = ''
+        state.isAuthenticated = false
+        state.permsLoaded = false
+        state.permissions = []
+        state.token = ''
+        state.isAuthenticated = false
       } 
     },
     setIsLoading(state,status){
@@ -24,12 +31,19 @@ export default createStore({
       state.token = token
       state.isAuthenticated = true
     },  
+    removePermissions(state) {
+      state.permissions = []
+      state.permsLoaded = false
+    },
     removeToken(state) {
-        state.token = ''
-        state.isAuthenticated = false
+      localStorage.removeItem('UP')
+      state.token = ''
+      state.isAuthenticated = false
     },
     setPermissions(state,permissions) {
+      localStorage.setItem('UP',permissions)
       state.permissions = permissions
+      state.permsLoaded = true
     }, 
   },
   actions: {

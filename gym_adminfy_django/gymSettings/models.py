@@ -11,6 +11,8 @@ class Config(models.Model):
         db_table = 'Config'
     def get_absolute_url(self):
         return f'/{self.id}/'
+    def __str__(self):
+        return f'{self.id} - {self.effectivedate}'
 
 class Gym(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -22,6 +24,8 @@ class Gym(models.Model):
         db_table = 'Gym'
     def get_absolute_url(self):
         return f'/{self.id}/'
+    def __str__(self):
+        return f'{self.id} - {self.name}'
 
 class Room(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -35,3 +39,5 @@ class Room(models.Model):
         db_table = 'Room'
     def get_absolute_url(self):
         return f'/{self.id}/'
+    def __str__(self):
+        return f'{self.id} - {self.name}'

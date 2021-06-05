@@ -1,50 +1,58 @@
 <template>
-  <div id="wrapper">
+  <div id="wrapper" >
     <nav class="navbar is-dark">
       <div class="navbar-brand">
-        <router-link to="/" class="navbar-item"
-          ><strong>Gym-Adminify</strong></router-link
-        >
-
-        <a
-          class="navbar-burger"
-          aria-label="menu"
-          aria-expanded="false"
-          data-target="navbar-menu"
-          @click="showMobileMenu = !showMobileMenu"
-        >
+        <router-link @click="page=0" to="/" class="navbar-item" :class="page == 0? 'bg-black' : ''">
+          <strong>Gym-Adminify</strong>
+        </router-link>
+        <a class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbar-menu" @click="showMobileMenu = !showMobileMenu">
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
         </a>
       </div>
-      <div
-        class="navbar-menu"
-        id="navbar-menu"
-        v-bind:class="{ 'is-active': showMobileMenu }"
-      >
+      <div class="navbar-menu" id="navbar-menu" v-bind:class="{ 'is-active': showMobileMenu }">
         <div class="navbar-start">
           <template v-if="$store.state.isAuthenticated">
-            <router-link to="/clientes" class="navbar-item">
+            <router-link @click="page=1" v-if="canViewClient" to="/clients" class="navbar-item">
               Clientes
             </router-link>
-            <router-link to="/bills" class="navbar-item">
+            <nav :class="open ? 'navbar-open' : 'navbar-close'" class="navbar w-56 fixed bg-gray-700 top-0 left-0 h-64">
+              <div class="grid relative grid-cols-1 left-2">
+                <div class="mt-4 h-2">
+                  <strong class="text-white">Esteban Madrigal</strong>
+                </div>
+                <div class="mt-1 h-2">
+                  <span class="font-extrabold">Identificacion: </span>
+                  <small>85965895</small>
+                </div>
+                <div class="mt-1 h-2">
+                  <span class="font-extrabold">Telefono: </span>
+                  <small>857589654</small>
+                </div>
+                <div class="mt-1 h-2">
+                  <span class="font-extrabold">Correo: </span>
+                  <small>ememadrigal@hmail.com</small>
+                </div>
+              </div>
+            </nav>
+            <router-link @click="page=2" to="/billsByMonth" class="navbar-item" :class="page == 2? 'bg-black' : ''">
               Facturas
             </router-link>
-            <router-link to="/teachers" class="navbar-item">
+            <router-link @click="page=3" to="/teachers" class="navbar-item" :class="page == 3? 'bg-black' : ''">
               Instructores
             </router-link>
           </template>
 
           <template v-else>
-            <router-link to="/about" class="navbar-item">
+            <router-link @click="page=4" to="/about" class="navbar-item" :class="page == 4? 'bg-black' : ''">
               ¿Quienes somos?
             </router-link>
           </template>
-          <router-link to="/services" class="navbar-item">
+          <router-link @click="page=5" to="/services" class="navbar-item" :class="page == 5? 'bg-black' : ''">
             Servicios
           </router-link>
-          <router-link to="/activities" class="navbar-item">
+          <router-link @click="page=6" to="/activities" class="navbar-item" :class="page == 6? 'bg-black' : ''">
             Actividades
           </router-link>
         </div>
@@ -53,9 +61,15 @@
         <div class="navbar-item">
           <div class="buttons">
             <template v-if="$store.state.isAuthenticated">
-              <router-link  v-if="this.$store.state.permissions.indexOf('gymSettings.view_config') >= 0" to="/gym_settings" class="button is-success">
-                <span class="icon"><i class="fas fa-cog"></i></span>
+              
+              <router-link v-if="canViewConfig" to="/gym_settings" @click="page=7" class="button is-light" :class="page == 7? 'is-success' : ''">
+                <span class="icon"><i class="fas fa-info"></i></span>
               </router-link>
+
+              <button @click="tog()" class="button is-light" :class="open ? 'is-success' : ''">
+                <span class="icon"><i class="fas fa-user"></i></span>
+              </button>
+              
               <button @click="logout()" class="button is-light">
                 Salir
               </button>
@@ -65,7 +79,7 @@
       </div>
     </nav>
 
-    <div  v-show='toggle' id="messageCovid" class="bg-indigo-600" >
+    <div  v-show='messageToggle' id="messageCovid" class="bg-indigo-600" >
       <div class="max-w-7xl mx-auto py-3 px-3 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between flex-wrap">
           <div class="w-0 flex-1 flex items-center">
@@ -73,7 +87,7 @@
               <SpeakerphoneIcon class="h-6 w-6 text-white" aria-hidden="true" />
             </span>
             <p class="ml-3 font-medium text-white">
-              <span class="hidden md:inline">
+              <span class="md:inline sm:inline-flex">
                 Debido a la situación del COVID-19, el aforo en las
                 instalaciones varía dependiendo del tipo de actividad y de las
                 restricciones establecidas por el ministerio de Salud de Costa
@@ -82,7 +96,7 @@
             </p>
           </div>
           <div class="order-2 flex-shrink-0 sm:order-3 sm:ml-3">
-            <button @click='toggle = !toggle ' type="button" class="-mr-1 flex p-2 rounded-md transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+            <button @click='messageToggle = !messageToggle ' type="button" class="-mr-1 flex p-2 rounded-md transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
               <span class="sr-only">Dismiss</span>
               <XIcon class="h-6 w-6 text-white" aria-hidden="true" />
             </button>
@@ -110,20 +124,34 @@
 <script>
 import { SpeakerphoneIcon, XIcon } from "@heroicons/vue/outline";
 import axios from 'axios'
+
 export default {
+  name: "app",
   data() {
     return {
       showMobileMenu: false,
-      toggle: true,
+      messageToggle: true,
+      permissions: this.$store.state.permissions,
+      open: false,
+      page:0,
     };
   },
   beforeCreate() {
     this.$store.commit('initializeStore')
     const token = this.$store.state.token
+    this.page = 0
     if (token) {
         axios.defaults.headers.common['Authorization'] = "Token " + token
     } else {
         axios.defaults.headers.common['Authorization'] = ""
+    }
+  },
+  computed:{
+    canViewConfig(){
+      return this.$store.state.permissions.includes("gymSettings.view_config");
+    },
+    canViewClient(){
+      return this.$store.state.permissions.includes("gymClients.view_client");
     }
   },
   components: {
@@ -131,12 +159,19 @@ export default {
     XIcon,
   },
   methods:{
+    tog() {
+      this.open = !this.open;
+    },
     logout() {
+        this.page = -1
         axios.defaults.headers.common["Authorization"] = ""
         localStorage.removeItem("token")
         localStorage.removeItem("username")
         localStorage.removeItem("userid")
+        localStorage.removeItem("UP")
+        // localStorage.removeItem("userPermissions")
         this.$store.commit('removeToken')
+        this.$store.commit('removePermissions')
         this.$router.push('/')
     },
   }
@@ -160,6 +195,16 @@ export default {
   border: 6px solid #ccc;
   border-color: #ccc transparent #ccc transparent;
   animation: lds-dual-ring 1.2s linear infinite;
+}
+.navbar {
+  transition: all 330ms ease-out;
+}
+
+.navbar-open {
+  transform: translateX(0%);
+}
+.navbar-close {
+  transform: translateX(-100%);
 }
 @keyframes lds-dual-ring {
   0% {

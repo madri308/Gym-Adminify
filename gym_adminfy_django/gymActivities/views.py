@@ -3,8 +3,8 @@ from rest_framework import serializers
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import generics
-from rest_framework import status#, authentication, permissions
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework import status
 
 from .serializers import ActivitiesSerializer
 from gymServices.serializers import ServiceSerializer
@@ -15,7 +15,6 @@ from .models import Activity
 from gymServices.models import Service
 from gymTeachers.models import Teacher, Teachercategory
 from gymSettings.models import Config
-
 class AllActivities(generics.ListCreateAPIView):
     queryset = Activity.objects.all()
     serializer_class = ActivitiesSerializer
@@ -39,41 +38,11 @@ class AllActivities(generics.ListCreateAPIView):
         new_Act.save()    
         return Response(status=status.HTTP_202_ACCEPTED)
 
-    #     new_Act = Activity.objects.create_activityuser(request.data["person"]["mail"], request.data["person"]["mail"], request.data["person"]["identification"])
-    #     user.save()
-   
+class AllScheduleActivities(ListCreateAPIView):
+    queryset = Activity.objects.all()
+    serializer_class = ScheduleActivitiesSerializer
 
-    # # CREATE THE PERSON
-    # personSerializer = PersonSerializer(data=request.data["person"])
-    # personSerializer.is_valid(raise_exception=True)
-    # personObject = personSerializer.save()
-
-    # # CREATE THE USER
-    # user = User.objects.create_user(request.data["person"]["mail"]
-    #                                 ,request.data["person"]["mail"]
-    #                                 ,request.data["person"]["identification"])
-    # user.save()
-    # user.groups.add(4)
-    # # CREATE RELATION
-    # userofpersonSerializer = UserofpersonSerializer(data={
-    #                                     'person':personObject.pk,
-    #                                     'user':user.pk })
-                                    
-    # userofpersonSerializer.is_valid(raise_exception=True)
-    # userofpersonSerializer.save()
-    
-    # # CREATE THE INSTRUCTOR
-    # serializer = NewTeacherSerializer(data={
-    #                                     'person':personObject.pk,
-    #                                     'teachercategory':request.data["teachercategory"],
-    #                                     "services":request.data["services"],
-    #                                 })
-    # serializer.is_valid(raise_exception=True)
-    # serializer.save()
-    
-    # return Response(serializer.data,status=status.HTTP_201_CREATED)
-
-class ActivityDetail(APIView):
+class ActivityDetail(RetrieveUpdateDestroyAPIView):
     model = Activity
     def get_serializer_class(self):
         if self.request.method == 'PUT':
@@ -87,7 +56,6 @@ class ActivityDetail(APIView):
         service_ser = ServiceSerializer(self.services,many=True)
         teachers_ser = TeacherSerializer(self.teachers,many=True)
         config_ser = ConfigSerializer(self.config, many=False)
-        
         return Response({'service':service_ser.data, 'teacher':teachers_ser.data, "config":config_ser.data})
 
     def delete(self, request, activity_id, format=None):

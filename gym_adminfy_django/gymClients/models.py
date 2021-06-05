@@ -1,6 +1,7 @@
 from django.db import models
 from gymPersons.models import Person
 
+
 class Client(models.Model):
     person = models.OneToOneField(Person, models.DO_NOTHING, db_column='ID', primary_key=True)  # Field name made lowercase.
     balance = models.DecimalField(db_column='Balance', max_digits=15, decimal_places=2)  # Field name made lowercase.
@@ -9,6 +10,9 @@ class Client(models.Model):
     class Meta:
         managed = False
         db_table = 'Client'
+        
+    def __str__(self):
+        return self.person.name
 
     def get_absolute_url(self):
         return f'/{self.person.id}/'

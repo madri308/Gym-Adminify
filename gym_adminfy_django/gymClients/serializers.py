@@ -14,7 +14,6 @@ class ClientSerializer(serializers.ModelSerializer):
             "get_absolute_url"
         )
 
-
 class ClientNameSerializer(serializers.ModelSerializer):
     person = PersonNameSerializer(many=False)
     class Meta:
@@ -26,4 +25,13 @@ class ClientNameSerializer(serializers.ModelSerializer):
 class ClientStateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientState
+
+class NewClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = (
+            "person",
+            "balance",
+            "clientstate",
+        )
 
