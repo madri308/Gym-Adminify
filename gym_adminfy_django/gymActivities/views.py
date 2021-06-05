@@ -20,6 +20,59 @@ class AllActivities(generics.ListCreateAPIView):
     queryset = Activity.objects.all()
     serializer_class = ActivitiesSerializer
 
+    def create(self, request, pk=None):
+        selected_service = Service.objects.get(id=request.data['service'])
+        selected_teacher = Teacher.objects.get(person_id=request.data['teacher'])
+        #selected_schedule = Schedule.objects.last()
+
+        new_Act = Activity( capacity = request.data['service'], 
+                            dayofweek = request.data['day'],
+
+                            startime = request.data['startTime'], 
+                            endtime = request.data['endTime'],
+
+                            service = selected_service, 
+                            teacher = selected_teacher,
+                            schedule = 1                    
+                          )
+        
+        new_Act.save()    
+        return Response(status=status.HTTP_202_ACCEPTED)
+
+    #     new_Act = Activity.objects.create_activityuser(request.data["person"]["mail"], request.data["person"]["mail"], request.data["person"]["identification"])
+    #     user.save()
+   
+
+    # # CREATE THE PERSON
+    # personSerializer = PersonSerializer(data=request.data["person"])
+    # personSerializer.is_valid(raise_exception=True)
+    # personObject = personSerializer.save()
+
+    # # CREATE THE USER
+    # user = User.objects.create_user(request.data["person"]["mail"]
+    #                                 ,request.data["person"]["mail"]
+    #                                 ,request.data["person"]["identification"])
+    # user.save()
+    # user.groups.add(4)
+    # # CREATE RELATION
+    # userofpersonSerializer = UserofpersonSerializer(data={
+    #                                     'person':personObject.pk,
+    #                                     'user':user.pk })
+                                    
+    # userofpersonSerializer.is_valid(raise_exception=True)
+    # userofpersonSerializer.save()
+    
+    # # CREATE THE INSTRUCTOR
+    # serializer = NewTeacherSerializer(data={
+    #                                     'person':personObject.pk,
+    #                                     'teachercategory':request.data["teachercategory"],
+    #                                     "services":request.data["services"],
+    #                                 })
+    # serializer.is_valid(raise_exception=True)
+    # serializer.save()
+    
+    # return Response(serializer.data,status=status.HTTP_201_CREATED)
+
 class ActivityDetail(APIView):
     model = Activity
     def get_serializer_class(self):

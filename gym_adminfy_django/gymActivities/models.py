@@ -14,6 +14,7 @@ class Activity(models.Model):
     service = models.ForeignKey('gymServices.Service', models.DO_NOTHING, db_column='Service_ID')  # Field name made lowercase.
     teacher = models.ForeignKey('gymTeachers.Teacher', models.DO_NOTHING, db_column='Teacher_ID')  # Field name made lowercase.
     client = models.ManyToManyField(Client)
+    dayofmonth = models.IntegerField(db_column='dayOfMonth')  # Field name made lowercase.
 
     class Meta:
         managed = False

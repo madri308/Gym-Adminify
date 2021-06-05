@@ -3,11 +3,9 @@
     <button v-on:click ='newActivity' class="fixed z-50 bottom-10 right-10 w-12 h-12 bg-red-600 rounded-full hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
       <PlusIcon class="text-white" aria-hidden="true" />
     </button>
-    <!-- <Selector @clicked="getByCategory" v-bind:options="options" />     -->
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <div class>
         <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-          <!--<div v-for="activity in activities" :key="activity" class="relative">><!-->
           <div v-for="activity in activities" :key="activity" class="relative">
             <Disclosure v-bind:title="activity.service.name">
               <div class="relative">
@@ -39,24 +37,12 @@
                   <span>{{ activity.teacher.person.name }}</span>
                 </div>
                 <div v-else>
-                  <!-- <Multiselect :disabled="!(changing === activity.get_absolute_url)" class="object-left w-36" label="label" mode="single" v-model="ejemplo" :options="teachersNames"/> -->
-                  <!-- <Multiselect :disabled="(changing === activity.get_absolute_url)" class="mt-3" v-model="activity.teacher" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/> -->
                   <Multiselect class="mt-3" v-model="activityTeacher" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
-                  <!-- <Multiselect class="mt-3" v-model="teacher" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/> -->
                 </div>
-
-
-                <!-- <div v-if = isEditing> 
-                  <Multiselect :disabled="!(changing === activity.get_absolute_url)" class="mt-3" v-model="ejemplo" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
-                </div>
-
-                <div v-if = !isEditing>
-                  <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
-                  <span>{{ activity.teacher.person.name }}</span>
-                </div> -->
-
                 <span class="font-extrabold height: 100% width:25% float:left"> Horarios: </span>
+                
                 <!-- Hay que cambiar esto porque no son los d[ias de la semana si no la fecha-->
+                
                 <span v-if =  "activity.dayofweek == 1"> Lunes </span> 
                 <span v-if =  "activity.dayofweek == 2"> Martes </span> 
                 <span v-if =  "activity.dayofweek == 3"> Miercoles </span> 
@@ -66,20 +52,6 @@
                 <span v-if =  "activity.dayofweek == 7"> Domingo </span> 
                 <span>{{ activity.startime }} </span> <span> - </span> <span>{{ activity.endtime }} </span> 
                 <br />
-                <!-- <div>
-                  <button v-if = !isEditing @click="changing = activity.get_absolute_url" v-on:click ='editActivity' type="button" class="absolute top-0 right-7 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="fas fa-pencil-alt fa-lg"></i>
-                  </button> 
-                  <button v-if = !isEditing v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="fa fa-trash fa-lg"></i>
-                  </button>
-                  <button v-if = isEditing v-on:click ='saveModifyActivity(ejemplo)' type="button" class="absolute top-16 right-14 -mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="far fa-save fa-lg"></i>
-                  </button>
-                  <button v-if = isEditing  v-on:click ='isEditing = !isEditing' type="button" class="absolute top-16 right-6 -mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="far fa-window-close"></i>
-                  </button> 
-                </div> -->
               </div>
               <Disclosure v-bind:title="'Clientes'">
                 <li v-for="cli in activity.client" :key="cli.person.id">
@@ -92,12 +64,20 @@
           <Disclosure v-bind:title="'Nueva Actividad'" v-if="newOne">
             <div class="relative">
               <div>
-                <input style="width:100%;height:30px;font-size:12pt;" type="number" placeholder="   Capacidad" min="1" max="200">
+                <button type="button"  v-on:click ="saveNewActivity"  class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <i class="fas fa-save fa-lg"></i>
+                </button>
+                <button v-on:click ='newActivity' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <i class="fas fa-times-circle fa-lg"></i>
+                </button>
               </div>
-              <Multiselect class="mt-3" v-model="activityServices_new" placeholder="Seleccione el servicio que se brindara" :options="this.servicesNames"/>
+              <div>
+                <input v-model="activityCapacity_new" style="width:88%;height:30px;font-size:12pt;" type="number" placeholder="   Capacidad" min="1" max="200">
+              </div>
+              
+              <Multiselect class="mt-3" v-model="activityService_new" placeholder="Seleccione el servicio que se brindara" :options="this.servicesNames"/>
               <Multiselect class="mt-3" v-model="activityTeacher_new" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
-              <Multiselect class="mt-3" v-on:click ='selectedDay=true' v-model="activityDay_new" placeholder="Seleccione el día " :options="this.days"/>
-              <!-- <Multiselect v-if="selectedDay" class="mt-3" v-model="activityStart_new" placeholder="Seleccione la hora " :options="this.days"/> -->
+              <Multiselect class="mt-3" v-model="activityDay_new" placeholder="Seleccione el día " v-on:click ='selectedDay=true' :options="this.days"/>
               
               <div class="table-responsive">
                 <table class="table-hover" > <!--v-if="config.timeperday"> -->
@@ -106,17 +86,17 @@
                       <tr>
                         <span class="px-2">Hora inicio</span>
                         <td>
-                          <input :disabled="isChanging" v-model="jjfin" type="time"/>
+                          <input :disabled="isChanging" v-model="activityStartTime_new" type="time"/>
                         </td>
-                        <button v-if="isChanging" v-on:click="deleteDay(item)" type="button" class="rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                        <button v-if="isChanging" type="button" class="rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                           <i class="far fa-times-circle fa-sm"></i>
                         </button>
                         <tl />
                         <span class="px-2">Hora fin</span>
                         <td>
-                          <input :disabled="isChanging" v-model="jjfin" type="time"/>
+                          <input :disabled="isChanging" v-model="activityEndTime_new" type="time"/>
                         </td>
-                        <button v-if="isChanging" v-on:click="deleteDay(item)" type="button" class="rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                        <button v-if="isChanging" type="button" class="rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                           <i class="far fa-times-circle fa-sm"></i>
                         </button>
                       </tr>
@@ -126,9 +106,6 @@
               </div>
             </div>
           </Disclosure>
-          
-            
-
         </dl>
       </div>
     </div>
@@ -208,7 +185,43 @@ export default {
     isBeingChange(id){
       if(id == changing) return true
       return false
-      
+    },
+    getDay(){
+      var day = -1;
+      switch (this.activityDay_new) {
+        case this.days[0]:
+          day = 0;
+          console.log('Dia 0 lunes');
+          break;
+        case this.days[1]:
+          day = 1;
+          console.log('Dia 1');
+          break;
+        case this.days[2]:
+          day = 2;
+          console.log('Dia 2');
+          break;
+        case this.days[3]:
+          day = 3;
+          console.log('Dia 3');
+          break;
+        case this.days[4]:
+          day = 4;
+          console.log('Dia 4');
+          break;
+        case this.days[5]:
+          day = 5;
+          console.log('Dia 5');
+          break;
+        case this.days[6]:
+          day = 6;
+          console.log('Dia 6');
+          break;
+        default:
+          day = 0;
+      }
+      console.log("day" + day);
+      return day;
     },
 
     async getActivities() {
@@ -229,90 +242,6 @@ export default {
         });
       this.$store.commit("setIsLoading", false);
       this.changing = "";
-      // this.changing = "2";
-      // console.log("with doble "+this.changing)
-      // this.changing = '2';
-      // console.log("with simple "+this.changing)
-    },
-    async newActivity(){
-      this.newOne = !this.newOne
-      this.$store.commit("setIsLoading", true);
-      await axios
-        .get("/api/v1/update-activities/")
-        .then((response) => {
-          console.log(response.data)
-
-          this.services = response.data['service'];
-          this.createJson(this.services,this.servicesNames);
-          
-          this.schedule = response.data['config'].timeperday;
-          console.log(response.data['config'])
-          this.createJsonSchedule(this.schedule, this.days, this.start, this.end);
-          //this.days = response.data['config'].timeperday.dia;
-
-          //var json = JSON.parse(this.config);
-
-          console.log("services")
-          console.log(this.servicesNames)
-          console.log("schedule")
-          console.log(this.schedule)
-          //console.log("attempt")
-          //console.log(this.schedule.fin[3])
-          console.log("days")
-          console.log(this.days)
-          console.log("start")
-          console.log(this.start)
-          console.log("end")
-          console.log(this.end)
-          
-
-          document.title = 'New_Activity';
-        })
-        .catch((error) => {
-          console.log(error);
-          toast({
-            message: "Ocurrio un problema recuperando la información", type: "is-danger",
-            dismissible: true, pauseOnHover: true,
-            duration: 2000, position: "bottom-right",
-          });
-        });
-      this.$store.commit("setIsLoading", false);
-    },
-    async saveNewActivity(){
-      this.$store.commit("setIsLoading", true);
-      const formData = {
-        services: this.services,
-        teachers: this.teachers,
-        config:this.config,
-      }
-      // {
-      //   capacity : newCapacity_Create,
-      //   dayOfWeek : newDayOfWeek_Create,
-      //   startTime : newStartTime_Create,
-      //   endTime : newEndTime_Create,
-      //   Service_ID : service_Create,
-      //   Teacher_ID : teacher_Create,
-      //   dayOfMonth : newDayOfMonth_Create,
-        
-      // }
-      await axios
-        .put("/api/v1/update-activities/",formData)
-        .then((response) => {
-          toast({
-            message: "Configuracion editada exitosamente", type: "is-success",
-            dismissible: true, pauseOnHover: true,
-            duration: 3000, position: "bottom-right",
-          });
-          this.isChanging = !this.isChanging
-        })
-        .catch((error) => {
-          toast({
-            message: "Ocurrio un problema al editar la configuracion", type: "is-danger",
-            dismissible: true, pauseOnHover: true,
-            duration: 3000, position: "bottom-right",
-          });
-        });
-      this.$store.commit("setIsLoading", false);
     },
     async getServices() {
       this.$store.commit("setIsLoading", true);
@@ -351,12 +280,81 @@ export default {
         });
       this.$store.commit("setIsLoading", false);
     },
+    async newActivity(){
+      this.newOne = !this.newOne
+      this.$store.commit("setIsLoading", true);
+      await axios
+        .get("/api/v1/update-activities/")
+        .then((response) => {
+          console.log(response.data)
+
+          this.services = response.data['service'];
+          this.createJson(this.services,this.servicesNames);
+          
+          this.schedule = response.data['config'].timeperday;
+          console.log(response.data['config'])
+          this.createJsonSchedule(this.schedule, this.days, this.start, this.end);
+
+          console.log("services")
+          console.log(this.servicesNames)
+          console.log("schedule")
+          console.log(this.schedule)
+          console.log("days")
+          console.log(this.days)
+          console.log("start")
+          console.log(this.start)
+          console.log("end")
+          console.log(this.end)
+
+          document.title = 'New_Activity';
+        })
+        .catch((error) => {
+          console.log(error);
+          toast({
+            message: "Ocurrio un problema recuperando la información", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 2000, position: "bottom-right",
+          });
+        });
+      this.$store.commit("setIsLoading", false);
+    },
+    async saveNewActivity(){
+      this.$store.commit("setIsLoading", true);
+      const formData = {
+        capacity: this.activityCapacity_new,
+        service: (this.activityService_new.replace("/", "")).replace("/", ""),
+        teacher: (this.activityService_new.replace("/", "")).replace("/", ""),
+        day: this.getDay(),
+        startTime: this.activityStartTime_new,
+        endTime: this.activityEndTime_new,
+      }
+      console.log(formData);
+        
+      await axios
+      .post("/api/v1/activities/",formData)
+      .then((response) => {
+        toast({
+          message: "Actividad creada exitosamente", type: "is-success",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+        location.reload();
+      })
+      .catch((error) => {
+        toast({
+          message: "Ocurrio un problema al crear la actividad", type: "is-danger",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+      });
+    this.$store.commit("setIsLoading", false);
+    },
     async saveModifyActivity(){
       this.$store.commit("setIsLoading", true);
       var str = this.activityTeacher.replace("/", "");
       str = str.replace("/", "");
       const formData = {
-        teacher : str,
+        teacher : (this.activityTeacher.replace("/", "")).replace("/", ""),
       }
       await axios
       .put("/api/v1/activities"+this.changing, formData)
@@ -367,6 +365,7 @@ export default {
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
+          location.reload();
           this.changing =  ""
       })
       .catch(error => {

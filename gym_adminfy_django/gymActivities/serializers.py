@@ -20,8 +20,9 @@ class ActivitiesSerializer(serializers.ModelSerializer):
             "service",
             "teacher", 
             "client", 
+            "dayofmonth",
+            #"schedule",
             "get_absolute_url"
-            #,"schedule"
         )
 
 # class ActivityHasClientSerializer(serializers.ModelSerializer):
