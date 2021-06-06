@@ -31,7 +31,7 @@
                   <input class="sm:w-10 md:w-40" :disabled="!isBeingChange(client.get_absolute_url)" type="number" v-model="client.balance" placeholder="Balance" aria-label="Full name">
                 </div>
                 <div> 
-                  <button  v-if="canDeleteClient" v-on:click ='deleteClient(client.person .id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <button  v-if="canDeleteClient" v-on:click ='deleteClient(client.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                     <i class="fa fa-trash fa-lg"></i>
                   </button> 
                   <div v-if="canChangeClient">
@@ -134,7 +134,6 @@ export default {
   mounted() {
     this.getClients().then(()=>{
         this.clientsSorted = this.clients
-        //this.clientsSorted = this.groupBy('Activo')
     });
   },
   computed:{
@@ -153,13 +152,15 @@ export default {
       this.$store.commit("setIsLoading", true);
       let formAux ={
         person:{
+        id:0,
         name: this.name,
         identification: this.identification,
         mail: this.mail,
         phone: this.phone
         },
         balance:0,
-        clientstate:"Activo"
+        clientstate:"Activo",
+        get_absolute_url: ""
       }
       const formData = {
         name: this.name,
@@ -170,6 +171,8 @@ export default {
       await axios
       .post("/api/v1/clients/", formData)
       .then(response => {
+          formAux.get_absolute_url = "/"+response.data.toString()+ "/"
+          formAux.person.id = response.data
           this.clients.push(formAux);
           toast({
             message: "Cliente matriculado exitosamente. Para modificar refresque la página", type: "is-success",
@@ -236,7 +239,6 @@ export default {
         balance:client.balance,
         clientstate:client.clientstate
       }
-      console.log(formData)
       await axios
       .put("/api/v1/clients"+client.get_absolute_url, formData)
       .then(response => {
