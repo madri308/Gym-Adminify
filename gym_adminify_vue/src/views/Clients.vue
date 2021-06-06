@@ -162,6 +162,7 @@ export default {
         clientstate:"Activo",
         get_absolute_url: ""
       }
+
       const formData = {
         name: this.name,
         identification: this.identification,
@@ -232,9 +233,9 @@ export default {
       const  formData ={
         person:{
           name: client.person.name,
-          identification: parseInt(client.person.identification),
+          identification: client.person.identification,
           mail: client.person.mail,
-          phone: parseInt(client.person.phone)
+          phone: client.person.phone
         },
         balance:client.balance,
         clientstate:client.clientstate

@@ -3,7 +3,7 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.response import Response
 from django.forms.models import model_to_dict
 from .models import Client
-from .serializers import ClientSerializer, ClientStateSerializer, NewClientSerializer
+from .serializers import ClientSerializer, ModifyClientSerializer, NewClientSerializer
 from gymPersons.serializers import PersonSerializer,UserofpersonSerializer
 from rest_framework import serializers, status
 from django.db import transaction
@@ -81,16 +81,15 @@ class ClientDetail(RetrieveUpdateDestroyAPIView):
         person_ser = PersonSerializer(instance=client.person ,data=person_data)
         if not person_ser.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        person_ser.save()
+        person = person_ser.save()
 
         #Update the client
-        client_ser = NewClientSerializer(instance = client, data={
-                                            "person":client.person.pk,
+        client_ser = ModifyClientSerializer(instance = client, data={
+                                            "person":person.pk,
                                             "clientstate": request.data["clientstate"],
                                             "balance":request.data["balance"],
                                         })
         if not client_ser.is_valid():
-            print(client_ser['person'])
             return Response(status=status.HTTP_400_BAD_REQUEST)
         client_ser.save()           
         return Response(status=status.HTTP_200_OK)
