@@ -221,11 +221,13 @@ export default {
       await axios
       .post("/api/v1/teachers/", formData)
       .then(response => {
+          // this.teachers.push(response.data)
           toast({
             message: "Instructor guardado exitosamente", type: "is-success",
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
+          this.newOne = false
           location.reload();
       })
       .catch(error => {
@@ -244,6 +246,7 @@ export default {
           name: newTeacher.person.name,
           phone: newTeacher.person.phone,
           mail: newTeacher.person.mail,
+          identification : newTeacher.person.identification,
         },
         teachercategory: newTeacher.teachercategory,
         services: newTeacher.services,

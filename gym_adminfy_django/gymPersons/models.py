@@ -15,9 +15,11 @@ class Person(models.Model):
 
 class Userofperson(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    person = models.OneToOneField('Person', models.DO_NOTHING, db_column='Person_ID')  # Field name made lowercase.
-    user = models.ForeignKey(User, models.DO_NOTHING)
+    person = models.OneToOneField('Person',  on_delete=models.CASCADE, db_column='Person_ID')  # Field name made lowercase.
+    user = models.ForeignKey(User,  on_delete=models.CASCADE)
 
     class Meta:
         managed = False
         db_table = 'UserOfPerson'
+    def __str__(self):
+        return self.person.name+" - "+self.user.username

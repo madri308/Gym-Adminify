@@ -15,7 +15,7 @@
                   <span class="font-extrabold">Nombre: </span>
                   <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(client.get_absolute_url)" type="text" v-model="client.person.name" placeholder="Nombre..." aria-label="Full name">
                   <span class="font-extrabold">Identificacion: </span>
-                  <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(client.get_absolute_url)" type="int" v-model="client.person.identification" placeholder="Nombre" aria-label="Full name">
+                  <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(client.get_absolute_url)" type="number" v-model="client.person.identification" placeholder="Identificacion" aria-label="Full name">
                 </div>
                 
                 <div>
@@ -24,14 +24,14 @@
                 </div>
                 <div>
                   <span class="font-extrabold">Telefono: </span>
-                  <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(client.get_absolute_url)" type="text" v-model="client.person.phone" placeholder="Telefono" aria-label="Full name">
+                  <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(client.get_absolute_url)" type="number" v-model="client.person.phone" placeholder="Telefono" aria-label="Full name">
                 </div>
                 <div>
                   <span class="font-extrabold">Balance: </span>
-                  <input class="sm:w-10 md:w-40" :disabled="!isBeingChange(client.get_absolute_url)" type="text" v-model="client.balance" placeholder="Balance" aria-label="Full name">
+                  <input class="sm:w-10 md:w-40" :disabled="!isBeingChange(client.get_absolute_url)" type="number" v-model="client.balance" placeholder="Balance" aria-label="Full name">
                 </div>
                 <div> 
-                  <button  v-if="canDeleteClient" v-on:click ='deleteClient(client.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <button  v-if="canDeleteClient" v-on:click ='deleteClient(client.person .id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                     <i class="fa fa-trash fa-lg"></i>
                   </button> 
                   <div v-if="canChangeClient">
@@ -58,10 +58,10 @@
                   <input v-model="name" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Nombre del cliente" aria-label="Full name">
                 </div>
                 <div class="flex items-center border-b border-teal-500 py-2">
-                  <input v-model="identification" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Identificacion" aria-label="Full name">
+                  <input v-model="identification" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="number" placeholder="Identificacion" aria-label="Full name">
                 </div>
                 <div class="flex items-center border-b border-teal-500 py-2">
-                  <input v-model="phone" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Número telefónico" aria-label="Full name">
+                  <input v-model="phone" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="number" placeholder="Número telefónico" aria-label="Full name">
                 </div>
                 <div class="flex items-center border-b border-teal-500 py-2">
                   <input v-model="mail" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Correo electrónico" aria-label="Full name">
@@ -151,7 +151,16 @@ export default {
   methods: {
     async addClient(){
       this.$store.commit("setIsLoading", true);
-
+      let formAux ={
+        person:{
+        name: this.name,
+        identification: this.identification,
+        mail: this.mail,
+        phone: this.phone
+        },
+        balance:0,
+        clientstate:"Activo"
+      }
       const formData = {
         name: this.name,
         identification: this.identification,
@@ -161,8 +170,9 @@ export default {
       await axios
       .post("/api/v1/clients/", formData)
       .then(response => {
+          this.clients.push(formAux);
           toast({
-            message: "Cliente matriculado exitosamente", type: "is-success",
+            message: "Cliente matriculado exitosamente. Para modificar refresque la página", type: "is-success",
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
@@ -174,7 +184,7 @@ export default {
             duration: 3000, position: "bottom-right",
           });
       })
-      this.clients.push(formData);
+
       this.name="",
       this.mail="",
       this.phone="",
@@ -193,10 +203,10 @@ export default {
       .delete("/api/v1/clients/"+client_id)
       .then((response) =>{
          this.clients.forEach(element => {
-            if(element['id'] == client_id){
+            if(element.person.id == client_id){
               const index = this.clients.indexOf(element);
               this.clients.splice(index, 1);
-            };
+            }
         });
         toast({
             message: "Cliente eliminado exitosamente", type: "is-success",
@@ -214,8 +224,37 @@ export default {
       this.$store.commit("setIsLoading", false);
 
     },
-    async modifyClient(){
-
+    async modifyClient(client){
+      this.$store.commit("setIsLoading", true);
+      const  formData ={
+        person:{
+          name: client.person.name,
+          identification: parseInt(client.person.identification),
+          mail: client.person.mail,
+          phone: parseInt(client.person.phone)
+        },
+        balance:client.balance,
+        clientstate:client.clientstate
+      }
+      console.log(formData)
+      await axios
+      .put("/api/v1/clients"+client.get_absolute_url, formData)
+      .then(response => {
+          toast({
+            message: "Servicio editado exitosamente", type: "is-success",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+          this.changing =  ""
+      })
+      .catch(error => {
+          toast({
+            message: "Ocurrio un problema al editar el instructor", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+      })
+      this.$store.commit("setIsLoading", false);
     },
     async getClients() {
       this.$store.commit("setIsLoading", true);
@@ -242,12 +281,11 @@ export default {
       this.clientsSorted = []
 
       // Filter them 
+      let clientsAux 
       for(let i=0; i <this.clients.length; i++ ){
-        let clientsAux = this.clients[i]
+        clientsAux = this.clients[i]
         if(clientsAux.clientstate == id) this.clientsSorted.push(this.clients[i])
       }
-      
-      console.log(clientsAux)
     },
    
   },

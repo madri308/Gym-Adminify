@@ -63,6 +63,7 @@ export default {
   data() {
     var todos = [];
     return {
+      userInfo:[],
       incId: todos.length,
       todos,
       username: '',
@@ -87,10 +88,23 @@ export default {
         console.log(this.$refs.calendar.pages[0].key);
       }
     },
+    normalizeInfo(data){
+      for (var key in data) {
+        if(key != 'id' && typeof key != 'number'){
+          if(typeof data[key] == 'object'){
+            // this.userInfo.push({"key":key, "value":null})
+            this.normalizeInfo(data[key])
+          }else{
+            this.userInfo.push({"key":key, "value":data[key]})
+          }
+        }
+      }
+    },
     async submitForm() {
         this.$store.commit("setIsLoading", true);
         axios.defaults.headers.common["Authorization"] = ""
         localStorage.removeItem("token")
+
         const formData = {
             username: this.username,
             password: this.password
@@ -102,10 +116,6 @@ export default {
             this.$store.commit('setToken', token)
             axios.defaults.headers.common["Authorization"] = "Token " + token
             localStorage.setItem("token", token)
-            const toPath = this.$route.query.to || '/'
-            this.$router.push(toPath)
-
-            this.getPermissions();
         })
         .catch(error => {
             if (error.response) {
@@ -116,19 +126,34 @@ export default {
                 this.errors.push('Something went wrong. Please try again')
             }
         })
+        localStorage.removeItem("userInfo")
+        await axios
+        .get("/api/v1/personInfo/")
+        .then((response) => {
+          this.normalizeInfo(response.data)
+          this.$store.commit('setInfo', this.userInfo);
+          // const toPath = this.$route.query.to || '/'
+          // this.$router.push(toPath)
+        })
+        .catch((error) => {
+          toast({
+            message: "Ocurrio un problema con los datos del usuario actual", type: "is-danger",
+            dismissible: true, pauseOnHover: true,duration: 2000, position: "bottom-right",
+          });
+        });
+        localStorage.removeItem("UP")
         await axios
         .get("/api/v1/permissions/")
         .then((response) => {
           this.$store.commit('setPermissions', response.data);
-          // localStorage.setItem("userPermissions", response.data);
         })
         .catch((error) => {
           toast({
             message: "Ocurrio un problema con los datos de: Permisos", type: "is-danger",
-            dismissible: true, pauseOnHover: true,
-            duration: 2000, position: "bottom-right",
+            dismissible: true, pauseOnHover: true,duration: 2000, position: "bottom-right",
           });
         });
+        location.reload();
         this.$store.commit("setIsLoading", false);
     },
     async getActivities(){

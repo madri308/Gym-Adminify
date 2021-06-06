@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
-
+from django.forms.models import model_to_dict
 from .models import Client
 from .serializers import ClientSerializer, ClientStateSerializer, NewClientSerializer
 from gymPersons.serializers import PersonSerializer,UserofpersonSerializer
@@ -16,7 +16,7 @@ class AllClients(ListCreateAPIView):
         return ClientSerializer
 
     def get_queryset(self):
-        return Client.objects.select_related()
+        return Client.objects.all()
         
     @transaction.atomic
     def create(self, request, pk=None):
@@ -62,37 +62,34 @@ class ClientDetail(RetrieveUpdateDestroyAPIView):
         return ClientSerializer
 
     def get(self, request, *args, **kwargs):
-        teacher = Client.objects.get(person=kwargs['teacher_id'])
+        teacher = Client.objects.get(person=kwargs['client_id'])
         serializer = ClientSerializer(teacher)
         return Response(serializer.data)
 
-    def delete(self, request, teacher_id, format=None):
-        teacher = Client.objects.get(person=teacher_id)
+    def delete(self, request, client_id, format=None):
+        teacher = Client.objects.get(person=client_id)
         teacher.delete()
         return Response(status=status.HTTP_200_OK)
 
-    def update(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         #Get the teacher to change
-        teacher = Client.objects.get(person=kwargs['teacher_id'])
+        client = Client.objects.get(person=kwargs['client_id'])
 
         #Update the person
-        person_data = request.data.pop('person')
-        person_ser = PersonSerializer(instance=teacher.person ,data=person_data)
+        person_data = request.data["person"]
+        person_ser = PersonSerializer(instance=client.person ,data=person_data)
         if not person_ser.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST)
         person_ser.save()
 
-        #Update the teacher
-        teacher_ser = NewClientSerializer(instance = teacher, data={
-                                                                'person':teacher.person.pk,
-                                                                'teachercategory':request.data["teachercategory"],
-                                                                'services':request.data["services"]
-                                                                })
-        if not teacher_ser.is_valid():
+        #Update the client
+        client_ser = NewClientSerializer(instance = client, data={
+                                            "person":client.person.pk,
+                                            "clientstate": request.data["clientstate"],
+                                            "balance":request.data["balance"],
+                                        })
+        if not client_ser.is_valid():
+            print(client_ser['person'])
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        teacher_ser.save()           
-                                                     
+        client_ser.save()           
         return Response(status=status.HTTP_200_OK)
-    
-
-    

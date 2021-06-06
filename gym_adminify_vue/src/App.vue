@@ -13,28 +13,18 @@
       </div>
       <div class="navbar-menu" id="navbar-menu" v-bind:class="{ 'is-active': showMobileMenu }">
         <div class="navbar-start">
+          <!-- SI ESTA AUTENTIFICADO ES DECIR LOGEADO -->
           <template v-if="$store.state.isAuthenticated">
             <router-link @click="page=1" v-if="canViewClient" to="/clients" class="navbar-item">
               Clientes
             </router-link>
-            <nav :class="open ? 'navbar-open' : 'navbar-close'" class="navbar w-56 fixed bg-gray-700 top-0 left-0 h-64">
-              <div class="grid relative grid-cols-1 left-2">
-                <div class="mt-4 h-2">
-                  <strong class="text-white">Esteban Madrigal</strong>
+            <nav :class="open ? 'navbar-open' : 'navbar-close'" class="navbar w-56 fixed bg-gray-900 top-20 left-0 h-auto">
+              <ul>
+                <div v-for="info in userInfo" :key="info" class="relative mt-2 mb-2 left-3">
+                  <!-- <b>{{info.key}}: </b> -->
+                  <li>‣ {{info.value}}</li>
                 </div>
-                <div class="mt-1 h-2">
-                  <span class="font-extrabold">Identificacion: </span>
-                  <small>85965895</small>
-                </div>
-                <div class="mt-1 h-2">
-                  <span class="font-extrabold">Telefono: </span>
-                  <small>857589654</small>
-                </div>
-                <div class="mt-1 h-2">
-                  <span class="font-extrabold">Correo: </span>
-                  <small>ememadrigal@hmail.com</small>
-                </div>
-              </div>
+              </ul>
             </nav>
             <router-link @click="page=2" to="/billsByMonth" class="navbar-item" :class="page == 2? 'bg-black' : ''">
               Facturas
@@ -43,12 +33,13 @@
               Instructores
             </router-link>
           </template>
-
+          <!-- SI NO ESTA LOGEADO -->
           <template v-else>
             <router-link @click="page=4" to="/about" class="navbar-item" :class="page == 4? 'bg-black' : ''">
               ¿Quienes somos?
             </router-link>
           </template>
+          <!-- SIEMPRE SE PUEDEN VER -->
           <router-link @click="page=5" to="/services" class="navbar-item" :class="page == 5? 'bg-black' : ''">
             Servicios
           </router-link>
@@ -60,16 +51,14 @@
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
+            <!-- SI ESTA AUTENTIFICADO ES DECIR LOGEADO -->
             <template v-if="$store.state.isAuthenticated">
-              
               <router-link v-if="canViewConfig" to="/gym_settings" @click="page=7" class="button is-light" :class="page == 7? 'is-success' : ''">
                 <span class="icon"><i class="fas fa-info"></i></span>
               </router-link>
-
-              <button @click="tog()" class="button is-light" :class="open ? 'is-success' : ''">
+              <button @click='open = !open ' class="button is-light" :class="open ? 'is-success' : ''">
                 <span class="icon"><i class="fas fa-user"></i></span>
               </button>
-              
               <button @click="logout()" class="button is-light">
                 Salir
               </button>
@@ -88,10 +77,8 @@
             </span>
             <p class="ml-3 font-medium text-white">
               <span class="md:inline sm:inline-flex">
-                Debido a la situación del COVID-19, el aforo en las
-                instalaciones varía dependiendo del tipo de actividad y de las
-                restricciones establecidas por el ministerio de Salud de Costa
-                Rica.
+                Debido a la situación del COVID-19, el aforo en las instalaciones varía dependiendo del tipo 
+                de actividad y de las restricciones establecidas por el ministerio de Salud de Costa Rica.
               </span>
             </p>
           </div>
@@ -124,11 +111,13 @@
 <script>
 import { SpeakerphoneIcon, XIcon } from "@heroicons/vue/outline";
 import axios from 'axios'
+import Disclosure from './components/Disclosure.vue';
 
 export default {
   name: "app",
   data() {
     return {
+      userInfo : this.$store.state.info,
       showMobileMenu: false,
       messageToggle: true,
       permissions: this.$store.state.permissions,
@@ -157,19 +146,18 @@ export default {
   components: {
     SpeakerphoneIcon,
     XIcon,
+    Disclosure,
   },
   methods:{
-    tog() {
-      this.open = !this.open;
-    },
     logout() {
         this.page = -1
+        this.userInfo = []
+        localStorage.removeItem('userInfo')
         axios.defaults.headers.common["Authorization"] = ""
         localStorage.removeItem("token")
         localStorage.removeItem("username")
         localStorage.removeItem("userid")
         localStorage.removeItem("UP")
-        // localStorage.removeItem("userPermissions")
         this.$store.commit('removeToken')
         this.$store.commit('removePermissions')
         this.$router.push('/')
