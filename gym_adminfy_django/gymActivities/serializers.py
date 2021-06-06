@@ -22,6 +22,7 @@ class ActivitiesSerializer(serializers.ModelSerializer):
             "teacher", 
             "client",
             "schedule",
+            "dayofmonth",
         )
 class ScheduleActivitiesSerializer(serializers.ModelSerializer):
     service_name = serializers.CharField(source='service.name',read_only=True)
@@ -38,15 +39,5 @@ class ScheduleActivitiesSerializer(serializers.ModelSerializer):
             "service_name",
             "teacher_name", 
             "schedule",
+            "dayofmonth",
         )
-
-# class ActivityHasClientSerializer(serializers.ModelSerializer):
-#     client = ClientSerializer(many=False)
-#     activity = ActivitiesSerializer(many=False)
-#     class Meta:
-#         model = ActivityHasClient
-#         fields = (
-#             "id",
-#             "activity",
-#             "client"
-#         )
