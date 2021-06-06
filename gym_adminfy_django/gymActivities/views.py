@@ -1,5 +1,6 @@
 import calendar
-import datetime
+from datetime import datetime
+from collections import namedtuple
 
 from django.shortcuts import render
 from rest_framework import serializers
@@ -24,6 +25,8 @@ class AllActivities(ListCreateAPIView):
     queryset = Activity.objects.all()
     serializer_class = ActivitiesSerializer
 
+    Range = namedtuple('Range', ['start', 'end'])
+
     def getDatesByDay(self, numberDay,month,year):
         c = calendar.Calendar(firstweekday=calendar.SUNDAY)
         monthcal = c.monthdatescalendar(year,month)
@@ -32,18 +35,21 @@ class AllActivities(ListCreateAPIView):
                     day.month == month]
         return dates
 
-
-    # print(getDatesByDay(2,6,2021))
-
+    def checkOverlap(self,startTime,endTime, day):
+        activities = Activity.objects.filter(dayofweek = day)
+        for activity in activities:
+            if activity.startime <= datetime.strptime(endTime, '%H:%M').time() and datetime.strptime(startTime, '%H:%M').time() <= activity.endtime:
+                return True
+        return False
 
     def create(self, request, pk=None):
-        print(request.data)
+        if self.checkOverlap(request.data['startTime'],request.data['endTime'], request.data['day']):
+            return Response(status=status.HTTP_409_CONFLICT)
         selected_service = Service.objects.get(id=request.data['service'])
         selected_teacher = Teacher.objects.get(person_id=request.data['teacher'])
         selected_schedule = Schedule.objects.last()
         
         for element in self.getDatesByDay(request.data['day'],selected_schedule.month,selected_schedule.year):
-    #print (element.day)
             new_Act = Activity( capacity = request.data['service'], 
                                 dayofweek = request.data['day'],
                                 dayofmonth = element.day,
