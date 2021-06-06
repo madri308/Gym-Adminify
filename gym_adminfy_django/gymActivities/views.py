@@ -1,3 +1,6 @@
+import calendar
+import datetime
+
 from django.shortcuts import render
 from rest_framework import serializers
 
@@ -6,36 +9,54 @@ from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework import status
 
-from .serializers import ActivitiesSerializer
+from .serializers import ActivitiesSerializer, ScheduleActivitiesSerializer
 from gymServices.serializers import ServiceSerializer
 from gymTeachers.serializers import TeacherSerializer
 from gymSettings.serializers import ConfigSerializer
 
 from .models import Activity
 from gymServices.models import Service
-from gymTeachers.models import Teacher, Teachercategory
+from gymTeachers.models import Teacher
 from gymSettings.models import Config
-class AllActivities(generics.ListCreateAPIView):
+from AdmSchedule.models import Schedule
+
+class AllActivities(ListCreateAPIView):
     queryset = Activity.objects.all()
     serializer_class = ActivitiesSerializer
 
+    def getDatesByDay(self, numberDay,month,year):
+        c = calendar.Calendar(firstweekday=calendar.SUNDAY)
+        monthcal = c.monthdatescalendar(year,month)
+        dates = [day for week in monthcal for day in week if \
+                    day.weekday() == numberDay-1 and \
+                    day.month == month]
+        return dates
+
+
+    # print(getDatesByDay(2,6,2021))
+
+
     def create(self, request, pk=None):
+        print(request.data)
         selected_service = Service.objects.get(id=request.data['service'])
         selected_teacher = Teacher.objects.get(person_id=request.data['teacher'])
-        #selected_schedule = Schedule.objects.last()
-
-        new_Act = Activity( capacity = request.data['service'], 
-                            dayofweek = request.data['day'],
-
-                            startime = request.data['startTime'], 
-                            endtime = request.data['endTime'],
-
-                            service = selected_service, 
-                            teacher = selected_teacher,
-                            schedule = 1                    
-                          )
+        selected_schedule = Schedule.objects.last()
         
-        new_Act.save()    
+        for element in self.getDatesByDay(request.data['day'],selected_schedule.month,selected_schedule.year):
+    #print (element.day)
+            new_Act = Activity( capacity = request.data['service'], 
+                                dayofweek = request.data['day'],
+                                dayofmonth = element.day,
+
+                                startime = request.data['startTime'], 
+                                endtime = request.data['endTime'],
+
+                                service = selected_service, 
+                                teacher = selected_teacher,
+                                schedule = selected_schedule                    
+                            )
+            
+            new_Act.save()    
         return Response(status=status.HTTP_202_ACCEPTED)
 
 class AllScheduleActivities(ListCreateAPIView):
@@ -66,11 +87,8 @@ class ActivityDetail(RetrieveUpdateDestroyAPIView):
     def put(self, request, *args, **kwargs):
         activity = Activity.objects.get(id=kwargs['activity_id'])
         teacher = Teacher.objects.get(person_id=request.data['teacher'])
-        teacherCat = Teachercategory.objects.get(name='Suplente')
 
         activity.teacher = teacher
-        teacher.teachercategory = teacherCat
 
         activity.save(update_fields=["teacher"])
-        teacher.save(update_fields=["teachercategory"])
         return Response(status=status.HTTP_202_ACCEPTED)

@@ -14,7 +14,7 @@
                     <i class="fa fa-trash fa-lg"></i>
                   </button> 
                   <div > <!-- <div v-if="canChangeTeacher"> -->
-                    <button v-if="!(changing === activity.get_absolute_url)" @click="changing = activity.get_absolute_url" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                       <i class="fas fa-pencil-alt fa-lg"></i>
                     </button> 
                     <div v-else>
@@ -43,13 +43,14 @@
                 
                 <!-- Hay que cambiar esto porque no son los d[ias de la semana si no la fecha-->
                 
-                <span v-if =  "activity.dayofweek == 1"> Lunes </span> 
-                <span v-if =  "activity.dayofweek == 2"> Martes </span> 
-                <span v-if =  "activity.dayofweek == 3"> Miercoles </span> 
-                <span v-if =  "activity.dayofweek == 4"> Jueves </span> 
-                <span v-if =  "activity.dayofweek == 5"> Viernes </span> 
-                <span v-if =  "activity.dayofweek == 6"> Sabado </span> 
-                <span v-if =  "activity.dayofweek == 7"> Domingo </span> 
+                <span v-if =  "activity.dayofweek == 1"> Domingo </span> 
+                <span v-if =  "activity.dayofweek == 2"> Lunes </span> 
+                <span v-if =  "activity.dayofweek == 3"> Martes </span> 
+                <span v-if =  "activity.dayofweek == 4"> Miercoles </span> 
+                <span v-if =  "activity.dayofweek == 5"> Jueves </span> 
+                <span v-if =  "activity.dayofweek == 6"> Viernes </span> 
+                <span v-if =  "activity.dayofweek == 7"> Sabado </span> 
+                
                 <span>{{ activity.startime }} </span> <span> - </span> <span>{{ activity.endtime }} </span> 
                 <br />
               </div>
@@ -72,7 +73,9 @@
                 </button>
               </div>
               <div>
-                <input v-model="activityCapacity_new" style="width:88%;height:30px;font-size:12pt;" type="number" placeholder="   Capacidad" min="1" max="200">
+                <input v-model="activityCapacity_new" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" style="width:88%;height:30px;" type="number" placeholder="Capacidad" aria-label="Full name" min="1" >
+                <!-- <input v-model="activityCapacity_new" style="width:88%;height:30px;font-size:12pt;" type="number" placeholder="   Capacidad"  max="200"> -->
+                <!-- Calcular max de capacidad con el aforo -->
               </div>
               
               <Multiselect class="mt-3" v-model="activityService_new" placeholder="Seleccione el servicio que se brindara" :options="this.servicesNames"/>
@@ -167,7 +170,6 @@ export default {
     },
     createJsonTeacher(original, newOne){
       original.forEach(element => {
-        
         newOne.push({value: element['get_absolute_url'],label:element.person['name']});
       });
     },
@@ -190,37 +192,29 @@ export default {
       var day = -1;
       switch (this.activityDay_new) {
         case this.days[0]:
-          day = 0;
-          console.log('Dia 0 lunes');
+          day = 1; //Lunes
           break;
         case this.days[1]:
-          day = 1;
-          console.log('Dia 1');
+          day = 2; //Martes
           break;
         case this.days[2]:
-          day = 2;
-          console.log('Dia 2');
+          day = 3;
           break;
         case this.days[3]:
-          day = 3;
-          console.log('Dia 3');
+          day = 4;
           break;
         case this.days[4]:
-          day = 4;
-          console.log('Dia 4');
+          day = 5;
           break;
         case this.days[5]:
-          day = 5;
-          console.log('Dia 5');
+          day = 6;
           break;
         case this.days[6]:
-          day = 6;
-          console.log('Dia 6');
+          day = 7;
           break;
         default:
           day = 0;
       }
-      console.log("day" + day);
       return day;
     },
 
@@ -323,7 +317,7 @@ export default {
       const formData = {
         capacity: this.activityCapacity_new,
         service: (this.activityService_new.replace("/", "")).replace("/", ""),
-        teacher: (this.activityService_new.replace("/", "")).replace("/", ""),
+        teacher: (this.activityTeacher_new.replace("/", "")).replace("/", ""),
         day: this.getDay(),
         startTime: this.activityStartTime_new,
         endTime: this.activityEndTime_new,
