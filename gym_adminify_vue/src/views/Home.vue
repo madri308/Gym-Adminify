@@ -185,8 +185,8 @@ export default {
         },
         // Attributes for todos
         ...this.todos.map((todo) => ({
-          // dates: new Date(todo.schedule.year,todo.schedule.month-1, todo.dayofweek),
-          dates: {weekdays:todo.dayofweek, months:todo.schedule.month , years:todo.schedule.year},
+          dates: new Date(todo.schedule.year,todo.schedule.month-1, todo.dayofmonth),
+          // dates: {weekdays:todo.dayofweek, months:todo.schedule.month , years:todo.schedule.year},
           dot: {
             color: "red",
           },

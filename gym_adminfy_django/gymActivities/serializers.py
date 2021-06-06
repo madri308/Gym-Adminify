@@ -32,6 +32,7 @@ class ScheduleActivitiesSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "dayofweek",
+            "dayofmonth",
             "startime",
             "endtime",
             "service_name",
