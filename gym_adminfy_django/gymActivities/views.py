@@ -14,12 +14,14 @@ from .serializers import ActivitiesSerializer, ScheduleActivitiesSerializer
 from gymServices.serializers import ServiceSerializer
 from gymTeachers.serializers import TeacherSerializer
 from gymSettings.serializers import ConfigSerializer
+from gymClients.serializers import ClientNameSerializer
 
 from .models import Activity
 from gymServices.models import Service
 from gymTeachers.models import Teacher
 from gymSettings.models import Config
 from AdmSchedule.models import Schedule
+from gymClients.models import Client
 
 class AllActivities(ListCreateAPIView):
     queryset = Activity.objects.all()
@@ -27,6 +29,15 @@ class AllActivities(ListCreateAPIView):
 
     Range = namedtuple('Range', ['start', 'end'])
 
+    def get(self, request, *args, **kwargs):
+        activities = Activity.objects.all()
+        act_ser = ActivitiesSerializer(activities,many=True)
+        for act in act_ser.data:
+            noMatriculados = Client.objects.exclude(pk__in=[o['person']['id'] for o in act['client']])
+            noMat_ser = ClientNameSerializer(noMatriculados,many=True)
+            act['unrolled_clients'] = noMat_ser.data
+        return Response(act_ser.data,status=status.HTTP_202_ACCEPTED)
+    
     def getDatesByDay(self, numberDay,month,year):
         c = calendar.Calendar(firstweekday=calendar.SUNDAY)
         monthcal = c.monthdatescalendar(year,month)
