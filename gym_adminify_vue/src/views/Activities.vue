@@ -36,7 +36,7 @@
                   
                   <div v-if="changing === ''">
                     <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
-                    <span>{{ activity.teacher.person.name }}</span>
+                    <span>{{ activity.teacher.name }}</span>
                   </div>
                   <div v-else>
                     <Multiselect class="mt-3" v-model="activityTeacher" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
@@ -180,11 +180,9 @@ export default {
     createJsonSchedule(original, days, hourStart, hourEnd){
       
       original.forEach(element => {
-        //days.push({value: "/"+i+"/",label:element['dia']});
         days.push(element['dia']);
         hourEnd.push({value: element['index'],label:element['fin']});
         hourStart.push({value: element['get_absolute_url'],label:element['inicio']});
-        // i++;
       });
     },
 

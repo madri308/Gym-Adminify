@@ -33,7 +33,7 @@ class AllActivities(ListCreateAPIView):
         activities = Activity.objects.all()
         act_ser = ActivitiesSerializer(activities,many=True)
         for act in act_ser.data:
-            noMatriculados = Client.objects.exclude(pk__in=[o['person']['id'] for o in act['client']])
+            noMatriculados = Client.objects.exclude(pk__in=[o['person'] for o in act['client']])
             noMat_ser = ClientNameSerializer(noMatriculados,many=True)
             act['unrolled_clients'] = noMat_ser.data
         return Response(act_ser.data,status=status.HTTP_202_ACCEPTED)
