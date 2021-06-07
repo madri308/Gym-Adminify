@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from .models import Activity, Service, Teacher, Client #, Schedule, ActivityHasClient
 
-from gymClients.serializers import ClientSerializer, ClientNameSerializer
-from gymServices.serializers import ServiceSerializer,NameServiceSerializer
+from gymClients.serializers import ClientNameSerializer
+from gymServices.serializers import NameServiceSerializer
 from gymTeachers.serializers import TeacherNamesSerializer
 from AdmSchedule.serializers import ScheduleSerializer
 

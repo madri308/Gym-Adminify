@@ -51,7 +51,7 @@
                 </div>
                 <Disclosure v-bind:title="'Clientes'">
                   <li v-for="cli in activity.client" :key="cli.person.id">
-                    {{ cli.person.name }}
+                    {{ cli.name }}
                   </li>
                 </Disclosure>
               </Disclosure>
@@ -156,7 +156,6 @@ export default {
   },
   mounted() {
     this.getActivities();
-    //this.getServices();
     this.getTeachers();
   },
   methods: {
@@ -178,7 +177,6 @@ export default {
       });
     },
     createJsonSchedule(original, days, hourStart, hourEnd){
-      
       original.forEach(element => {
         days.push(element['dia']);
         hourEnd.push({value: element['index'],label:element['fin']});
