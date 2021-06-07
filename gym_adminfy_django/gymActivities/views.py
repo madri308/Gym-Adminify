@@ -83,11 +83,27 @@ class ActivityEnrollClients(ListCreateAPIView):
     def put(self, request, *args, **kwargs):
         activity = Activity.objects.get(id=kwargs['activity_id'])
         clients = request.data['clients']
+        noMatriculados = Client.objects.exclude(pk__in=[o['person'] for o in act['client']])
         activities_related = Activity.objects.all().filter(dayofweek = activity.dayofweek, startime = activity.startime) 
         for act in activities_related:
             for element in clients:
                 client = Client.objects.get(person_id=element)
                 act.client.add(client)
+            act.save()
+        return Response(status=status.HTTP_202_ACCEPTED)
+
+class ActivityUnenrollClients(ListCreateAPIView):
+    queryset = Activity.objects.all()
+    serializer_class = ActivitiesSerializer
+
+    def put(self, request, *args, **kwargs):
+        activity = Activity.objects.get(id=kwargs['activity_id'])
+        clients = request.data['clients']
+        activities_related = Activity.objects.all().filter(dayofweek = activity.dayofweek, startime = activity.startime) 
+        for act in activities_related:
+            for element in clients:
+                client = Client.objects.get(person_id=element)
+                act.client.remove(client)
             act.save()
         return Response(status=status.HTTP_202_ACCEPTED)
 

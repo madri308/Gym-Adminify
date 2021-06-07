@@ -1,8 +1,10 @@
 <template>
   <div class="bg-white">
-    <button v-on:click ='newActivity' class="fixed z-50 bottom-10 right-10 w-12 h-12 bg-red-600 rounded-full hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
-      <PlusIcon class="text-white" aria-hidden="true" />
-    </button>
+    <!-- <div v-if="canAddActivity"> -->
+      <button v-on:click ='newActivity' class="fixed z-50 bottom-10 right-10 w-12 h-12 bg-red-600 rounded-full hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
+        <PlusIcon class="text-white" aria-hidden="true" />
+      </button>
+    <!-- </div> -->
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <div class>
         <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
@@ -11,26 +13,22 @@
             <div v-for="activity in dayOfWeek" :key="activity" class="relative">
               <Disclosure v-bind:title="activity.dayofmonth+'/'+activity.schedule.month+'/'+activity.schedule.year">
                 <div class="relative">
-                  <div id='Permissions'> <!-- le faltan los ifs de canDoThis -->
-                    <div > <!-- <div v-if="canChangeTeacher"> -->
-                      <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                        <i class="fas fa-pencil-alt fa-lg"></i>
-                      </button> 
-                      <div v-else>
-                        <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity"  class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                          <i class="fas fa-save fa-lg"></i>
-                        </button>
-                        <button v-if="!(changing === '')" v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                          <i class="fas fa-times-circle fa-lg"></i>
-                        </button>
-                      </div>
-                    </div> 
-                  </div>
-
+                  <!-- <div v-if="canChangeActivity">  -->
+                    <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                      <i class="fas fa-pencil-alt fa-lg"></i>
+                    </button> 
+                    <div v-else>
+                      <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity"  class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                        <i class="fas fa-save fa-lg"></i>
+                      </button>
+                      <button v-if="!(changing === '')" v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                        <i class="fas fa-times-circle fa-lg"></i>
+                      </button>
+                    </div>
+                  <!-- </div> -->
                   <span class="font-extrabold height: 100% width:25% float:left"> Capacidad: </span>
                   <span>{{ activity.capacity }}</span>
                   <br />
-                  
                   <div v-if="changing === ''">
                     <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
                     <span>{{ activity.teacher.name }}</span>
@@ -40,41 +38,40 @@
                   </div>
                   <span class="font-extrabold height: 100% width:25% float:left"> Dia: </span>
                   
-                  <!-- Hay que cambiar esto porque no son los d[ias de la semana si no la fecha-->
                   <span>{{daysOfWeek[activity.dayofweek-1]}} {{activity.dayofmonth}}  </span>
                   <span class="font-extrabold height: 100% width:25% float:left">  Hora: </span>
                   <span>{{ activity.startime }} </span> <span> - </span> <span>{{ activity.endtime }} </span> 
                   <br />
+                  <span class="font-extrabold height: 100% width:25% float:left">  Cupo disponible: </span>
+                  <span>{{ activity.capacity - (activity.client).length }} </span> 
+                  <br />
                 </div>
-              <span class="font-extrabold height: 100% width:25% float:left"> Clientes: </span>
-                <button v-if="(this.enrolling !== '/'+activity.id+'/') " @click="this.enrolling = '/'+activity.id+'/', isHidden = true" type="button" v-on:click ='this.clientsNames = createJsonClients(activity.unrolled_clients)' class="absolute top-29 right-4 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                  <i class="fas fa-user-plus"></i>
-                </button>
-                <button v-if="(this.unenrolling !== '/'+activity.id+'/')" @click="this.unenrolling = '/'+activity.id+'/', isHidden = true" type="button" v-on:click ='this.clientsEnrolled = createJsonClients(activity.client)' class="absolute top-29 right-14 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                  <i class="fas fa-user-minus"></i>
-                </button>
-                <!-- <button v-if ="(this.enrolling !== '')" type="button" v-on:click ='enrollClient' class="absolute top-29.5 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                  <i class="fa fa-save fa-lg"></i>
-                </button>
-                <button v-if ="(this.unenrolling !== '')" type="button" v-on:click ='unenrollClient' class="absolute top-29.5 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                  <i class="fa fa-save fa-lg"></i>
-                </button> -->
-                <button v-if="(this.enrolling !== '' || this.unenrolling !== '')" v-on:click ='enrolling = "",unenrolling = "",isHidden = !isHidden' type="button" class="absolute top-29 right-20 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                  <i class="fas fa-times-circle fa-lg"></i>
-                </button>
-                <br />
-                <Multiselect v-if='(this.enrolling) !== ""' :searchable="true" mode="tags" class="mt-3" v-model="activityClients_enroll" placeholder="Seleccione los clientes que quiera matricular " :options="this.clientsNames"/>
-                <Multiselect v-if='(this.unenrolling) !== ""' :searchable="true" mode="tags" class="mt-3" v-model="activityClients_unenroll" placeholder="Seleccione los clientes que quiera desmatricular " :options="this.clientsEnrolled"/>
-                <!-- <Multiselect v-if='(this.enrolling) !== ""' :searchable="true" mode="tags" class="mt-3" v-model="activityClients_unenroll" placeholder="Seleccione los clientes que quiera desmatricular " :options="this.activity.client"/> -->
-                <div>
-                  <li v-for="cli in activity.client" :key="cli.person.id">
-                    {{ cli.person.name }}
-                  </li>
-                </div>
-                <span>los no matriculaditoss</span>
-                <li v-for="cli in activity.unrolled_clients" :key="cli.person.id">
-                  {{ cli.person.name }} 
-                </li>
+                <!-- <div v-if="canChangeActivity"> -->
+                  <span class="font-extrabold height: 100% width:25% float:left"> Clientes: </span>
+                  <button v-if="(this.enrolling !== '/'+activity.id+'/') " @click="this.enrolling = '/'+activity.id+'/', isHidden = true" type="button" v-on:click ='this.clientsNames = createJsonClients(activity.unrolled_clients)' class="absolute top-29 right-4 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <i class="fas fa-user-plus"></i>
+                  </button>
+                  <button v-if="(this.unenrolling !== '/'+activity.id+'/')" @click="this.unenrolling = '/'+activity.id+'/', isHidden = true" type="button" v-on:click ='this.clientsEnrolled = createJsonClients(activity.client)' class="absolute top-29 right-14 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <i class="fas fa-user-minus"></i>
+                  </button>
+                  <button v-if="(this.enrolling !== '' || this.unenrolling !== '')" v-on:click ='enrolling = "",unenrolling = "",isHidden = !isHidden' type="button" class="absolute top-29 right-20 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <i class="fas fa-times-circle fa-lg"></i>
+                  </button>
+                  <br />
+                  <Multiselect v-if='(this.enrolling) !== ""' :searchable="true" mode="tags" class="mt-3" v-model="activityClients_enroll" placeholder="Seleccione los clientes que quiera matricular " :options="this.activity.client"/>
+                  <Multiselect v-if='(this.unenrolling) !== ""' :searchable="true" mode="tags" class="mt-3" v-model="activityClients_unenroll" placeholder="Seleccione los clientes que quiera desmatricular " :options="this.activity.unrolled_clients"/>
+                  <!-- <div>
+                    <li v-for="cli in activity.client" :key="cli.person.id">
+                      {{ cli.person.name }}
+                    </li>
+                  </div>
+                  <span>los no matriculaditoss</span>
+                  <li v-for="cli in activity.unrolled_clients" :key="cli.person.id">
+                    {{ cli.person.name }} 
+                  </li> -->
+                <!-- </div> -->
+              </Disclosure>
+            </div>
             </Disclosure>
           </div>
 
@@ -105,15 +102,15 @@
                       <tr>
                         <span class="px-2">Hora inicio</span>
                         <td>
-                          <input :disabled="isChanging" v-model="activityStartTime_new" type="time"/>
+                          <input v-model="activityStartTime_new" type="time" min=this.start[getDay(activityDay_new)]/>
                         </td>
-                        <button v-if="isChanging" type="button" class="rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                        <button type="button" class="rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                           <i class="far fa-times-circle fa-sm"></i>
                         </button>
                         <tl />
                         <span class="px-2">Hora fin</span>
                         <td>
-                          <input :disabled="isChanging" v-model="activityEndTime_new" type="time"/>
+                          <input v-model="activityEndTime_new" type="time" max=this.end[getDay(activityDay_new)]/>
                         </td>
                         <button v-if="isChanging" type="button" class="rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                           <i class="far fa-times-circle fa-sm"></i>
@@ -155,17 +152,18 @@ export default {
     return {
       activities: [], 
       activitiesPerWeek:{},
-      services:[],
+      // services:[],
       servicesNames:[],
-      teachers:[],
+      // teachers:[],
       teachersNames:[],
       schedule:[],
-      clients:[],
-      clientsNames:[],
+      // clients:[],
+      clientsUnenrolled:[],
       clientsEnrolled:[],
 
       days:[],
       start:[],
+      end:[],
 
       daysOfWeek:['Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo'],
 
@@ -175,11 +173,21 @@ export default {
       changing: String,
       selectedDay:false,
       is_loaded:false,
+      
+      permissions: this.$store.state.permissions,
     };
   },
   mounted() {
     this.getActivities();
     this.getTeachers();
+  },
+  computed: {
+    canAddActivity() { //admin
+      return this.permissions.includes("gymTeachers.add_activity")
+    },
+    canChangeActivity() { //change teacher and enroll clients
+      return this.permissions.includes("gymTeachers.change_activity")
+    },
   },
   methods: {
     groupBy() {
@@ -230,12 +238,26 @@ export default {
       console.log(newArray);
       return newArray;
     },
+    validateHours(){
+      console.log("hours");
+      var splitS = this.activityStartTime_new.split(":"); 
+      var splitE = this.activityEndTime_new.split(":"); 
+      if (splitE[0]-splitS[0] < 0 ){
+        return false;
+      } 
+      return true;
+
+    },
     async getActivities() {
       this.$store.commit("setIsLoading", true);
       await axios
         .get("/api/v1/activities/")
         .then((response) => {
+          console.log("aqui estan las actividadesss ");
+          console.log(response.data);
           this.activities = response.data;
+          // this.unenrollClient = response.data.unrolled_clients;
+          // this.enrollClient = response.data.client;
           this.activitiesPerWeek = this.groupBy();
         })
         .catch((error) => {
@@ -248,30 +270,32 @@ export default {
       this.$store.commit("setIsLoading", false);
       this.changing = "";
     },
-    async getServices() {
-      this.$store.commit("setIsLoading", true);
-      await axios
-        .get("/api/v1/services/")
-        .then((response) => {
-          this.services = response.data;
-          this.createJson(this.services,this.servicesNames);
-        })
-        .catch((error) => {
-          toast({
-            message: "Ocurrio un problema con los datos de servicios", type: "is-danger",
-            dismissible: true, pauseOnHover: true,
-            duration: 3000, position: "bottom-right",
-          });
-        });
-      this.$store.commit("setIsLoading", false);
-    },
+    // async getServices() {
+    //   this.$store.commit("setIsLoading", true);
+    //   await axios
+    //     .get("/api/v1/services/")
+    //     .then((response) => {
+    //       //this.services = response.data;
+    //       this.createJson(response.data,this.servicesNames);
+    //       // this.createJson(this.services,this.servicesNames);
+    //     })
+    //     .catch((error) => {
+    //       toast({
+    //         message: "Ocurrio un problema con los datos de servicios", type: "is-danger",
+    //         dismissible: true, pauseOnHover: true,
+    //         duration: 3000, position: "bottom-right",
+    //       });
+    //     });
+    //   this.$store.commit("setIsLoading", false);
+    // },
     async getTeachers() {
       this.$store.commit("setIsLoading", true);
       await axios
         .get("/api/v1/teachers/")
         .then((response) => {
-          this.teachers = response.data;
-          this.createJsonTeacher(this.teachers,this.teachersNames);
+          // this.teachers = response.data;
+          this.createJsonTeacher(response.data,this.teachersNames);
+          // this.createJsonTeacher(this.teachers,this.teachersNames);
         })
         .catch((error) => {
           toast({
@@ -289,8 +313,8 @@ export default {
         .get("/api/v1/activeClients"+this.enrolling)
         .then((response) => {
           console.log(response.data);
-          this.clients = response.data;
-          this.createJsonClients(this.clients,this.clientsNames);
+          // this.clients = response.data;
+          this.createJsonClients(response.data,this.clientsNames);
           console.log(this.clientsNames);
         })
         .catch((error) => {
@@ -308,16 +332,18 @@ export default {
       await axios
         .get("/api/v1/update-activities/")
         .then((response) => {
-
-          this.services = response.data['service'];
-          this.createJson(this.services,this.servicesNames);
+          console.log(response.data);
+          //this.services = response.data['service'];
+          this.createJson(response.data['service'],this.servicesNames);
           
-          this.schedule = response.data['config'].timeperday;
-          this.createJsonSchedule(this.schedule, this.days, this.start, this.end);
+          //this.schedule = response.data['config'].timeperday;
+          this.createJsonSchedule(response.data['config'].timeperday, this.days, this.start, this.end);
+          console.log(response.data['config'].timeperday);
 
           document.title = 'New_Activity';
         })
         .catch((error) => {
+          console.log(error);
           toast({
             message: "Ocurrio un problema recuperando la información", type: "is-danger",
             dismissible: true, pauseOnHover: true,
@@ -328,6 +354,7 @@ export default {
     },
     async saveNewActivity(){
       this.$store.commit("setIsLoading", true);
+      console.log(this.validateHours());
       const formData = {
         capacity: this.activityCapacity_new,
         service: (this.activityService_new.replace("/", "")).replace("/", ""),
@@ -336,24 +363,31 @@ export default {
         startTime: this.activityStartTime_new,
         endTime: this.activityEndTime_new,
       }
-        
-      await axios
-      .post("/api/v1/activities/",formData)
-      .then((response) => {
+      if (this.validateHours()) {
+        await axios
+        .post("/api/v1/activities/",formData)
+        .then((response) => {
+          toast({
+            message: "Actividad creada exitosamente", type: "is-success",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+          location.reload();
+        })
+        .catch((error) => {
+          toast({
+            message: "Ocurrio un problema al crear la actividad", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+        });
+      }else{
         toast({
-          message: "Actividad creada exitosamente", type: "is-success",
+          message: "Las horas no son validas", type: "is-danger",
           dismissible: true, pauseOnHover: true,
           duration: 3000, position: "bottom-right",
         });
-        location.reload();
-      })
-      .catch((error) => {
-        toast({
-          message: "Ocurrio un problema al crear la actividad", type: "is-danger",
-          dismissible: true, pauseOnHover: true,
-          duration: 3000, position: "bottom-right",
-        });
-      });
+      }
     this.$store.commit("setIsLoading", false);
     },
     async saveModifyActivity(){
