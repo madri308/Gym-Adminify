@@ -55,6 +55,16 @@
                 <br />
               </div>
               <Disclosure v-bind:title="'Clientes'">
+                <!-- V-IF PERMISION <button v-if="!(changing === activity.get_absolute_url)" v-on:click ='deleteTeacher(activity.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"><button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"> -->
+                <button v-if="!(this.enrolling === '/'+activity.id+'/')" @click="this.enrolling = '/'+activity.id+'/'" type="button" v-on:click ='getClients()' class="absolute top-29 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"><!-- <button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"> -->
+                  <i class="fa fa-plus fa-lg"></i>
+                </button>
+                <button v-if ='(this.enrolling) !== ""' type="button" v-on:click ='enrollClient' class="absolute top-29 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"><!-- <button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"> -->
+                  <i class="fa fa-save fa-lg"></i>
+                </button>  
+                <br />
+                <br />
+                <Multiselect v-if='(this.enrolling) !== ""' mode="tags" class="mt-3" v-model="activityClients_enroll" placeholder="Seleccione los clientes que quiera matricular " :options="this.clientsNames"/>
                 <li v-for="cli in activity.client" :key="cli.person.id">
                   {{ cli.person.name }}
                 </li>
@@ -143,15 +153,14 @@ export default {
       teachers:[],
       teachersNames:[],
       schedule:[],
+      clients:[],
+      clientsNames:[],
 
       days:[],
       start:[],
-      end:[],
-
-
-      dayOfWeek: ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sábado", "Domingo"],
 
       newOne:false,
+      enrolling: "",
       changing: String,
       selectedDay:false,
       is_loaded:false,
@@ -169,6 +178,11 @@ export default {
       });
     },
     createJsonTeacher(original, newOne){
+      original.forEach(element => {
+        newOne.push({value: element['get_absolute_url'],label:element.person['name']});
+      });
+    },
+    createJsonClients(original, newOne){
       original.forEach(element => {
         newOne.push({value: element['get_absolute_url'],label:element.person['name']});
       });
@@ -217,7 +231,14 @@ export default {
       }
       return day;
     },
-
+    getID(original){
+      var newArray = [];
+      original.forEach(element => {
+        newArray.push(parseInt((element.replace("/", "")).replace("/", "")));
+      });
+      console.log(newArray);
+      return newArray;
+    },
     async getActivities() {
       this.$store.commit("setIsLoading", true);
       await axios
@@ -268,6 +289,26 @@ export default {
         .catch((error) => {
           toast({
             message: "Ocurrio un problema con los datos de los instructores", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+        });
+      this.$store.commit("setIsLoading", false);
+    },
+    async getClients() {
+      this.$store.commit("setIsLoading", true);
+      // this.enrolling = true;
+      await axios
+        .get("/api/v1/activeClients/")
+        .then((response) => {
+          console.log(response.data);
+          this.clients = response.data;
+          this.createJsonClients(this.clients,this.clientsNames);
+          console.log(this.clientsNames);
+        })
+        .catch((error) => {
+          toast({
+            message: "Ocurrio un problema cargando los clientes", type: "is-danger",
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
@@ -372,6 +413,40 @@ export default {
       })
       this.$store.commit("setIsLoading", false);
       this.changing =  ""
+    },
+    async enrollClient(){
+      console.log(this.enrolling);
+      this.$store.commit("setIsLoading", true);
+      // var str = this.activityTeacher.replace("/", "");
+      // str = str.replace("/", "");
+      // console.log("este es el multiselect");
+      // console.log(this.activityClients_enroll);
+      // console.log("get id");
+      // this.getID(this.activityClients_enroll);
+      const formData = {
+        clients : this.getID(this.activityClients_enroll)
+      }
+      await axios
+      .put("/api/v1/activities-enroll"+this.enrolling, formData)
+      .then(response => {
+          console.log(response)
+          toast({
+            message: "Ha matriculado los clientes en la actividad exitosamente", type: "is-success",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+          location.reload();
+      })
+      .catch(error => {
+          console.log(error)
+          toast({
+            message: "Ocurrio un problema al editar el instructor", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+      })
+      this.$store.commit("setIsLoading", false);
+      this.enrolling = "";
     },
   },
 };

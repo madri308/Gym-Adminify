@@ -15,6 +15,7 @@ from gymTeachers.serializers import TeacherSerializer
 from gymSettings.serializers import ConfigSerializer
 
 from .models import Activity
+from gymClients.models import Client
 from gymServices.models import Service
 from gymTeachers.models import Teacher
 from gymSettings.models import Config
@@ -32,18 +33,12 @@ class AllActivities(ListCreateAPIView):
                     day.month == month]
         return dates
 
-
-    # print(getDatesByDay(2,6,2021))
-
-
     def create(self, request, pk=None):
-        print(request.data)
         selected_service = Service.objects.get(id=request.data['service'])
         selected_teacher = Teacher.objects.get(person_id=request.data['teacher'])
         selected_schedule = Schedule.objects.last()
         
         for element in self.getDatesByDay(request.data['day'],selected_schedule.month,selected_schedule.year):
-    #print (element.day)
             new_Act = Activity( capacity = request.data['service'], 
                                 dayofweek = request.data['day'],
                                 dayofmonth = element.day,
@@ -55,8 +50,22 @@ class AllActivities(ListCreateAPIView):
                                 teacher = selected_teacher,
                                 schedule = selected_schedule                    
                             )
-            
             new_Act.save()    
+        return Response(status=status.HTTP_202_ACCEPTED)
+
+class ActivityEnrollClients(ListCreateAPIView):
+    queryset = Activity.objects.all()
+    serializer_class = ActivitiesSerializer
+
+    def put(self, request, *args, **kwargs):
+        activity = Activity.objects.get(id=kwargs['activity_id'])
+        clients = request.data['clients']
+
+        for element in clients:
+            client = Client.objects.get(person_id=element)
+            activity.client.add(client)
+        activity.save()
+        #activity.save(update_fields=["client"])
         return Response(status=status.HTTP_202_ACCEPTED)
 
 class AllScheduleActivities(ListCreateAPIView):
