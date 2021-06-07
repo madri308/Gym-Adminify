@@ -12,9 +12,15 @@ class ServiceSerializer(serializers.ModelSerializer):
             "get_absolute_url",
         )
 
-class NameServiceSerializer(serializers.ModelSerializer):
+class IdServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
         fields = (
             "id",
+        )
+class NameServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = (
+            "name",
         )

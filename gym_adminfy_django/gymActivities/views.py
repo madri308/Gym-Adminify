@@ -1,5 +1,6 @@
 import calendar
-import datetime
+from datetime import datetime
+from collections import namedtuple
 
 from django.shortcuts import render
 from rest_framework import serializers
@@ -21,21 +22,23 @@ from gymServices.models import Service
 from gymTeachers.models import Teacher
 from gymSettings.models import Config
 from AdmSchedule.models import Schedule
+from gymClients.models import Client
 
 class AllActivities(ListCreateAPIView):
     queryset = Activity.objects.all()
     serializer_class = ActivitiesSerializer
 
+    Range = namedtuple('Range', ['start', 'end'])
+
     def get(self, request, *args, **kwargs):
         activities = Activity.objects.all()
         act_ser = ActivitiesSerializer(activities,many=True)
-        active_client = ClientState.objects.get(name='Activo')
         for act in act_ser.data:
-            noMatriculados = Client.objects.exclude(pk__in=[o['person']['id'] for o in act['client']], clientstate = active_client)
+            noMatriculados = Client.objects.exclude(pk__in=[o['person'] for o in act['client']])
             noMat_ser = ClientNameSerializer(noMatriculados,many=True)
             act['unrolled_clients'] = noMat_ser.data
         return Response(act_ser.data,status=status.HTTP_202_ACCEPTED)
-
+    
     def getDatesByDay(self, numberDay,month,year):
         c = calendar.Calendar(firstweekday=calendar.SUNDAY)
         monthcal = c.monthdatescalendar(year,month)
@@ -44,7 +47,16 @@ class AllActivities(ListCreateAPIView):
                     day.month == month]
         return dates
 
+    def checkOverlap(self,startTime,endTime, day):
+        activities = Activity.objects.filter(dayofweek = day)
+        for activity in activities:
+            if activity.startime <= datetime.strptime(endTime, '%H:%M').time() and datetime.strptime(startTime, '%H:%M').time() <= activity.endtime:
+                return True
+        return False
+
     def create(self, request, pk=None):
+        if self.checkOverlap(request.data['startTime'],request.data['endTime'], request.data['day']):
+            return Response(status=status.HTTP_409_CONFLICT)
         selected_service = Service.objects.get(id=request.data['service'])
         selected_teacher = Teacher.objects.get(person_id=request.data['teacher'])
         selected_schedule = Schedule.objects.last()

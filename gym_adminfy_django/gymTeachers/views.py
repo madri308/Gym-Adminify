@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from .models import Teacher,Teachercategory
 from .serializers import TeacherSerializer, TeachercategorySerializer, NewTeacherSerializer
 from gymPersons.serializers import PersonSerializer,UserofpersonSerializer
+from gymPersons.models import Person, Userofperson
 from rest_framework import status
 from django.db import transaction
 
@@ -47,7 +48,7 @@ class AllTeachers(ListCreateAPIView):
                                         })
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        
+        print(serializer.data)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
             
 class AllCategories(ListCreateAPIView):
@@ -73,8 +74,16 @@ class TeacherDetail(RetrieveUpdateDestroyAPIView):
         return Response(serializer.data)
 
     def delete(self, request, teacher_id, format=None):
-        teacher = Teacher.objects.get(person=teacher_id)
-        teacher.delete()
+        # OBTIENE LA RELACION USUARIO PERSONA
+        userofpersonRelation = Userofperson.objects.get(person=teacher_id)
+        # OBTIENE EL USUARIO Y LO ELIMINA SI EXISTE
+        user = User.objects.get(pk = userofpersonRelation.user.pk)
+        if user != None:
+            user.delete()
+        # OBTIENE LA PERSONA Y LA ELIMINA
+        person = Person.objects.get(pk=teacher_id)
+        person.delete()
+
         return Response(status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
@@ -85,6 +94,7 @@ class TeacherDetail(RetrieveUpdateDestroyAPIView):
         person_data = request.data.pop('person')
         person_ser = PersonSerializer(instance=teacher.person ,data=person_data)
         if not person_ser.is_valid():
+            print(person_ser.errors)
             return Response(status=status.HTTP_400_BAD_REQUEST)
         person_ser.save()
 
