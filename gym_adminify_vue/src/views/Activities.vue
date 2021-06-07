@@ -6,59 +6,56 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <div class>
         <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-          <div v-for="activity in activities" :key="activity" class="relative">
-            <Disclosure v-bind:title="activity.service.name">
-              <div class="relative">
-                <div id='Permissions'> <!-- le faltan los ifs de canDoThis -->
-                  <button v-if="!(changing === activity.get_absolute_url)" v-on:click ='deleteTeacher(activity.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"><!-- <button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"> -->
-                    <i class="fa fa-trash fa-lg"></i>
-                  </button> 
-                  <div > <!-- <div v-if="canChangeTeacher"> -->
-                    <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                      <i class="fas fa-pencil-alt fa-lg"></i>
+          <div v-for="(dayOfWeek,key) in activitiesPerWeek" :key="key" class="relative">
+            <Disclosure v-bind:title="key">
+            <div v-for="activity in dayOfWeek" :key="activity" class="relative">
+              <Disclosure v-bind:title="activity.service.name">
+                <div class="relative">
+                  <div id='Permissions'> <!-- le faltan los ifs de canDoThis -->
+                    <button v-if="!(changing === activity.get_absolute_url)" v-on:click ='deleteTeacher(activity.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"><!-- <button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"> -->
+                      <i class="fa fa-trash fa-lg"></i>
                     </button> 
-                    <div v-else>
-                      <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity"  class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                        <i class="fas fa-save fa-lg"></i>
-                      </button>
-                      <button v-if="!(changing === '')" v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                        <i class="fas fa-times-circle fa-lg"></i>
-                      </button>
-                    </div>
-                  </div> 
-                </div>
+                    <div > <!-- <div v-if="canChangeTeacher"> -->
+                      <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                        <i class="fas fa-pencil-alt fa-lg"></i>
+                      </button> 
+                      <div v-else>
+                        <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity"  class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                          <i class="fas fa-save fa-lg"></i>
+                        </button>
+                        <button v-if="!(changing === '')" v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                          <i class="fas fa-times-circle fa-lg"></i>
+                        </button>
+                      </div>
+                    </div> 
+                  </div>
 
-                <span class="font-extrabold height: 100% width:25% float:left"> Capacidad: </span>
-                <span>{{ activity.capacity }}</span>
-                <br />
-                
-                <div v-if="changing === ''">
-                  <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
-                  <span>{{ activity.teacher.person.name }}</span>
+                  <span class="font-extrabold height: 100% width:25% float:left"> Capacidad: </span>
+                  <span>{{ activity.capacity }}</span>
+                  <br />
+                  
+                  <div v-if="changing === ''">
+                    <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
+                    <span>{{ activity.teacher.person.name }}</span>
+                  </div>
+                  <div v-else>
+                    <Multiselect class="mt-3" v-model="activityTeacher" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
+                  </div>
+                  <span class="font-extrabold height: 100% width:25% float:left"> Dia: </span>
+                  
+                  <!-- Hay que cambiar esto porque no son los d[ias de la semana si no la fecha-->
+                  <span>{{daysOfWeek[activity.dayofweek-1]}} {{activity.dayofmonth}}  </span>
+                  <span class="font-extrabold height: 100% width:25% float:left">  Hora: </span>
+                  <span>{{ activity.startime }} </span> <span> - </span> <span>{{ activity.endtime }} </span> 
+                  <br />
                 </div>
-                <div v-else>
-                  <Multiselect class="mt-3" v-model="activityTeacher" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
-                </div>
-                <span class="font-extrabold height: 100% width:25% float:left"> Horarios: </span>
-                
-                <!-- Hay que cambiar esto porque no son los d[ias de la semana si no la fecha-->
-                
-                <span v-if =  "activity.dayofweek == 1"> Domingo </span> 
-                <span v-if =  "activity.dayofweek == 2"> Lunes </span> 
-                <span v-if =  "activity.dayofweek == 3"> Martes </span> 
-                <span v-if =  "activity.dayofweek == 4"> Miercoles </span> 
-                <span v-if =  "activity.dayofweek == 5"> Jueves </span> 
-                <span v-if =  "activity.dayofweek == 6"> Viernes </span> 
-                <span v-if =  "activity.dayofweek == 7"> Sabado </span> 
-                
-                <span>{{ activity.startime }} </span> <span> - </span> <span>{{ activity.endtime }} </span> 
-                <br />
-              </div>
-              <Disclosure v-bind:title="'Clientes'">
-                <li v-for="cli in activity.client" :key="cli.person.id">
-                  {{ cli.person.name }}
-                </li>
+                <Disclosure v-bind:title="'Clientes'">
+                  <li v-for="cli in activity.client" :key="cli.person.id">
+                    {{ cli.person.name }}
+                  </li>
+                </Disclosure>
               </Disclosure>
+            </div>
             </Disclosure>
           </div>
 
@@ -138,6 +135,7 @@ export default {
   data() {
     return {
       activities: [], 
+      activitiesPerWeek:{},
       services:[],
       servicesNames:[],
       teachers:[],
@@ -148,8 +146,7 @@ export default {
       start:[],
       end:[],
 
-
-      dayOfWeek: ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+      daysOfWeek:['Lunes','Martes','Miercoles','Jueves','Viernes','Sabado','Domingo'],
 
       newOne:false,
       changing: String,
@@ -163,6 +160,13 @@ export default {
     this.getTeachers();
   },
   methods: {
+    groupBy() {
+      return this.activities.reduce((objectsByKeyValue, obj) => {  
+        var value = this.daysOfWeek[obj["dayofweek"]-1] + '-' + obj["startime"];
+        objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
+        return objectsByKeyValue;
+      }, {});
+    },
     createJson(original, newOne){
       original.forEach(element => {
         newOne.push({value: element['get_absolute_url'],label:element['name']});
@@ -189,32 +193,7 @@ export default {
       return false
     },
     getDay(){
-      var day = -1;
-      switch (this.activityDay_new) {
-        case this.days[0]:
-          day = 1; //Lunes
-          break;
-        case this.days[1]:
-          day = 2; //Martes
-          break;
-        case this.days[2]:
-          day = 3;
-          break;
-        case this.days[3]:
-          day = 4;
-          break;
-        case this.days[4]:
-          day = 5;
-          break;
-        case this.days[5]:
-          day = 6;
-          break;
-        case this.days[6]:
-          day = 7;
-          break;
-        default:
-          day = 0;
-      }
+      var day = this.days.indexOf(this.activityDay_new)+1;
       return day;
     },
 
@@ -224,10 +203,9 @@ export default {
         .get("/api/v1/activities/")
         .then((response) => {
           this.activities = response.data;
-          console.log(this.activities);
+          this.activitiesPerWeek = this.groupBy();
         })
         .catch((error) => {
-          console.log(error);
           toast({
             message: "Ocurrio un problema con los datos de: Actividades", type: "is-danger",
             dismissible: true, pauseOnHover: true,
@@ -246,7 +224,6 @@ export default {
           this.createJson(this.services,this.servicesNames);
         })
         .catch((error) => {
-          console.log(error)
           toast({
             message: "Ocurrio un problema con los datos de servicios", type: "is-danger",
             dismissible: true, pauseOnHover: true,
@@ -262,8 +239,6 @@ export default {
         .then((response) => {
           this.teachers = response.data;
           this.createJsonTeacher(this.teachers,this.teachersNames);
-          console.log(this.teachers);
-          console.log(this.teachersNames);
         })
         .catch((error) => {
           toast({
@@ -280,30 +255,16 @@ export default {
       await axios
         .get("/api/v1/update-activities/")
         .then((response) => {
-          console.log(response.data)
 
           this.services = response.data['service'];
           this.createJson(this.services,this.servicesNames);
           
           this.schedule = response.data['config'].timeperday;
-          console.log(response.data['config'])
           this.createJsonSchedule(this.schedule, this.days, this.start, this.end);
-
-          console.log("services")
-          console.log(this.servicesNames)
-          console.log("schedule")
-          console.log(this.schedule)
-          console.log("days")
-          console.log(this.days)
-          console.log("start")
-          console.log(this.start)
-          console.log("end")
-          console.log(this.end)
 
           document.title = 'New_Activity';
         })
         .catch((error) => {
-          console.log(error);
           toast({
             message: "Ocurrio un problema recuperando la información", type: "is-danger",
             dismissible: true, pauseOnHover: true,
@@ -322,7 +283,6 @@ export default {
         startTime: this.activityStartTime_new,
         endTime: this.activityEndTime_new,
       }
-      console.log(formData);
         
       await axios
       .post("/api/v1/activities/",formData)
@@ -353,7 +313,6 @@ export default {
       await axios
       .put("/api/v1/activities"+this.changing, formData)
       .then(response => {
-          console.log(response)
           toast({
             message: "Ha cambiado el instructor de la actividad exitosamente", type: "is-success",
             dismissible: true, pauseOnHover: true,
@@ -363,7 +322,6 @@ export default {
           this.changing =  ""
       })
       .catch(error => {
-          console.log(error)
           toast({
             message: "Ocurrio un problema al editar el instructor", type: "is-danger",
             dismissible: true, pauseOnHover: true,
