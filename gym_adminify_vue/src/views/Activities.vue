@@ -9,7 +9,7 @@
           <div v-for="(dayOfWeek,key) in activitiesPerWeek" :key="key" class="relative">
             <Disclosure v-bind:title="key">
             <div v-for="activity in dayOfWeek" :key="activity" class="relative">
-              <Disclosure v-bind:title="activity.service.name">
+              <Disclosure v-bind:title="activity.dayofmonth+'/'+activity.schedule.month+'/'+activity.schedule.year">
                 <div class="relative">
                   <div id='Permissions'> <!-- le faltan los ifs de canDoThis -->
                     <button v-if="!(changing === activity.get_absolute_url)" v-on:click ='deleteTeacher(activity.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"><!-- <button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"> -->
@@ -162,7 +162,7 @@ export default {
   methods: {
     groupBy() {
       return this.activities.reduce((objectsByKeyValue, obj) => {  
-        var value = this.daysOfWeek[obj["dayofweek"]-1] + '-' + obj["startime"];
+        var value = obj["service"]["name"]+' - '+this.daysOfWeek[obj["dayofweek"]-1] + ' - ' + obj["startime"];
         objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
         return objectsByKeyValue;
       }, {});

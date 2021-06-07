@@ -10,6 +10,7 @@ class ActivitiesSerializer(serializers.ModelSerializer):
     service = ServiceSerializer(many=False)
     teacher = TeacherSerializer(many=False)
     client = ClientNameSerializer(many=True)
+    schedule = ScheduleSerializer(many=False)
     class Meta:
         model = Activity
         fields = (
