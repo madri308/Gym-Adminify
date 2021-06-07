@@ -1,10 +1,10 @@
 <template>
   <div class="bg-white">
-    <!-- <div v-if="canAddActivity"> -->
+    <div v-if="gymActivities.add_activity">
       <button v-on:click ='newActivity' class="fixed z-50 bottom-10 right-10 w-12 h-12 bg-red-600 rounded-full hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
         <PlusIcon class="text-white" aria-hidden="true" />
       </button>
-    <!-- </div> -->
+    </div>
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <div class>
         <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
@@ -13,7 +13,7 @@
             <div v-for="activity in dayOfWeek" :key="activity" class="relative">
               <Disclosure v-bind:title="activity.dayofmonth+'/'+activity.schedule.month+'/'+activity.schedule.year">
                 <div class="relative">
-                  <!-- <div v-if="canChangeActivity">  -->
+                  <div v-if="gymActivities.change_activity"> 
                     <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                       <i class="fas fa-pencil-alt fa-lg"></i>
                     </button> 
@@ -25,7 +25,7 @@
                         <i class="fas fa-times-circle fa-lg"></i>
                       </button>
                     </div>
-                  <!-- </div> -->
+                  </div>
                   <span class="font-extrabold height: 100% width:25% float:left"> Capacidad: </span>
                   <span>{{ activity.capacity }}</span>
                   <br />
@@ -46,7 +46,7 @@
                   <span>{{ activity.capacity - (activity.client).length }} </span> 
                   <br />
                 </div>
-                <!-- <div v-if="canChangeActivity"> -->
+                <div v-if="gymActivities.change_activity">
                   <span class="font-extrabold height: 100% width:25% float:left"> Clientes: </span>
                   <button v-if="(this.enrolling !== '/'+activity.id+'/') " @click="this.enrolling = '/'+activity.id+'/', isHidden = true" type="button" v-on:click ='this.clientsNames = createJsonClients(activity.unrolled_clients)' class="absolute top-29 right-4 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                     <i class="fas fa-user-plus"></i>
@@ -69,7 +69,7 @@
                   <li v-for="cli in activity.unrolled_clients" :key="cli.person.id">
                     {{ cli.person.name }} 
                   </li> -->
-                <!-- </div> -->
+                </div>
               </Disclosure>
             </div>
             </Disclosure>
