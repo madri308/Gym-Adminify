@@ -9,7 +9,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             "name",
             "description",
             "hourfee",
-            "get_absolute_url"
+            "get_absolute_url",
         )
 
 class IdServiceSerializer(serializers.ModelSerializer):
