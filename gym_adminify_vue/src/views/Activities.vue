@@ -10,9 +10,6 @@
             <Disclosure v-bind:title="activity.service.name">
               <div class="relative">
                 <div id='Permissions'> <!-- le faltan los ifs de canDoThis -->
-                  <button v-if="!(changing === activity.get_absolute_url)" v-on:click ='deleteTeacher(activity.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"><!-- <button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"> -->
-                    <i class="fa fa-trash fa-lg"></i>
-                  </button> 
                   <div > <!-- <div v-if="canChangeTeacher"> -->
                     <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                       <i class="fas fa-pencil-alt fa-lg"></i>
@@ -43,32 +40,47 @@
                 
                 <!-- Hay que cambiar esto porque no son los d[ias de la semana si no la fecha-->
                 
-                <span v-if =  "activity.dayofweek == 1"> Domingo </span> 
-                <span v-if =  "activity.dayofweek == 2"> Lunes </span> 
-                <span v-if =  "activity.dayofweek == 3"> Martes </span> 
-                <span v-if =  "activity.dayofweek == 4"> Miercoles </span> 
-                <span v-if =  "activity.dayofweek == 5"> Jueves </span> 
-                <span v-if =  "activity.dayofweek == 6"> Viernes </span> 
-                <span v-if =  "activity.dayofweek == 7"> Sabado </span> 
+                <span v-if =  "activity.dayofweek == 1"> Lunes </span> 
+                <span v-if =  "activity.dayofweek == 2"> Martes </span> 
+                <span v-if =  "activity.dayofweek == 3"> Miercoles </span> 
+                <span v-if =  "activity.dayofweek == 4"> Jueves </span> 
+                <span v-if =  "activity.dayofweek == 5"> Viernes </span> 
+                <span v-if =  "activity.dayofweek == 6"> Sabado </span> 
+                <span v-if =  "activity.dayofweek == 7"> Domingo </span> 
                 
                 <span>{{ activity.startime }} </span> <span> - </span> <span>{{ activity.endtime }} </span> 
                 <br />
               </div>
-              <Disclosure v-bind:title="'Clientes'">
-                <!-- V-IF PERMISION <button v-if="!(changing === activity.get_absolute_url)" v-on:click ='deleteTeacher(activity.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"><button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"> -->
-                <button v-if="!(this.enrolling === '/'+activity.id+'/')" @click="this.enrolling = '/'+activity.id+'/'" type="button" v-on:click ='getClients()' class="absolute top-29 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"><!-- <button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"> -->
-                  <i class="fa fa-plus fa-lg"></i>
+
+              <span class="font-extrabold height: 100% width:25% float:left"> Clientes: </span>
+                <button v-if="(this.enrolling !== '/'+activity.id+'/') " @click="this.enrolling = '/'+activity.id+'/', isHidden = true" type="button" v-on:click ='this.clientsNames = createJsonClients(activity.unrolled_clients)' class="absolute top-29 right-4 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <i class="fas fa-user-plus"></i>
                 </button>
-                <button v-if ='(this.enrolling) !== ""' type="button" v-on:click ='enrollClient' class="absolute top-29 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"><!-- <button  v-if="canDeleteTeacher" v-on:click ='deleteTeacher(teacher.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"> -->
+                <button v-if="(this.unenrolling !== '/'+activity.id+'/')" @click="this.unenrolling = '/'+activity.id+'/', isHidden = true" type="button" v-on:click ='this.clientsEnrolled = createJsonClients(activity.client)' class="absolute top-29 right-14 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <i class="fas fa-user-minus"></i>
+                </button>
+                <!-- <button v-if ="(this.enrolling !== '')" type="button" v-on:click ='enrollClient' class="absolute top-29.5 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                   <i class="fa fa-save fa-lg"></i>
-                </button>  
+                </button>
+                <button v-if ="(this.unenrolling !== '')" type="button" v-on:click ='unenrollClient' class="absolute top-29.5 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <i class="fa fa-save fa-lg"></i>
+                </button> -->
+                <button v-if="(this.enrolling !== '' || this.unenrolling !== '')" v-on:click ='enrolling = "",unenrolling = "",isHidden = !isHidden' type="button" class="absolute top-29 right-20 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <i class="fas fa-times-circle fa-lg"></i>
+                </button>
                 <br />
-                <br />
-                <Multiselect v-if='(this.enrolling) !== ""' mode="tags" class="mt-3" v-model="activityClients_enroll" placeholder="Seleccione los clientes que quiera matricular " :options="this.clientsNames"/>
-                <li v-for="cli in activity.client" :key="cli.person.id">
-                  {{ cli.person.name }}
+                <Multiselect v-if='(this.enrolling) !== ""' :searchable="true" mode="tags" class="mt-3" v-model="activityClients_enroll" placeholder="Seleccione los clientes que quiera matricular " :options="this.clientsNames"/>
+                <Multiselect v-if='(this.unenrolling) !== ""' :searchable="true" mode="tags" class="mt-3" v-model="activityClients_unenroll" placeholder="Seleccione los clientes que quiera desmatricular " :options="this.clientsEnrolled"/>
+                <!-- <Multiselect v-if='(this.enrolling) !== ""' :searchable="true" mode="tags" class="mt-3" v-model="activityClients_unenroll" placeholder="Seleccione los clientes que quiera desmatricular " :options="this.activity.client"/> -->
+                <div>
+                  <li v-for="cli in activity.client" :key="cli.person.id">
+                    {{ cli.person.name }}
+                  </li>
+                </div>
+                <span>los no matriculaditoss</span>
+                <li v-for="cli in activity.unrolled_clients" :key="cli.person.id">
+                  {{ cli.person.name }} 
                 </li>
-              </Disclosure>
             </Disclosure>
           </div>
 
@@ -155,12 +167,14 @@ export default {
       schedule:[],
       clients:[],
       clientsNames:[],
+      clientsEnrolled:[],
 
       days:[],
       start:[],
 
       newOne:false,
       enrolling: "",
+      unenrolling: "",
       changing: String,
       selectedDay:false,
       is_loaded:false,
@@ -182,10 +196,13 @@ export default {
         newOne.push({value: element['get_absolute_url'],label:element.person['name']});
       });
     },
-    createJsonClients(original, newOne){
+    createJsonClients(original, original2){
+      console.log(original)
+      var newArray = [];
       original.forEach(element => {
-        newOne.push({value: element['get_absolute_url'],label:element.person['name']});
+        newArray.push({value: element.person['id'],label:element.person['name']});
       });
+      return newArray;
     },
     createJsonSchedule(original, days, hourStart, hourEnd){
       
@@ -197,7 +214,6 @@ export default {
         // i++;
       });
     },
-
     isBeingChange(id){
       if(id == changing) return true
       return false
@@ -231,10 +247,10 @@ export default {
       }
       return day;
     },
-    getID(original){
+    parseToInt(original){
       var newArray = [];
       original.forEach(element => {
-        newArray.push(parseInt((element.replace("/", "")).replace("/", "")));
+        newArray.push(parseInt(element));
       });
       console.log(newArray);
       return newArray;
@@ -245,7 +261,7 @@ export default {
         .get("/api/v1/activities/")
         .then((response) => {
           this.activities = response.data;
-          console.log(this.activities);
+          //this.clientsNames = this.activities.unrolled_clients;
         })
         .catch((error) => {
           console.log(error);
@@ -297,9 +313,9 @@ export default {
     },
     async getClients() {
       this.$store.commit("setIsLoading", true);
-      // this.enrolling = true;
+      console.log(this.enrolling);
       await axios
-        .get("/api/v1/activeClients/")
+        .get("/api/v1/activeClients"+this.enrolling)
         .then((response) => {
           console.log(response.data);
           this.clients = response.data;
@@ -415,38 +431,61 @@ export default {
       this.changing =  ""
     },
     async enrollClient(){
-      console.log(this.enrolling);
-      this.$store.commit("setIsLoading", true);
-      // var str = this.activityTeacher.replace("/", "");
-      // str = str.replace("/", "");
-      // console.log("este es el multiselect");
-      // console.log(this.activityClients_enroll);
-      // console.log("get id");
-      // this.getID(this.activityClients_enroll);
-      const formData = {
-        clients : this.getID(this.activityClients_enroll)
-      }
-      await axios
-      .put("/api/v1/activities-enroll"+this.enrolling, formData)
-      .then(response => {
-          console.log(response)
-          toast({
-            message: "Ha matriculado los clientes en la actividad exitosamente", type: "is-success",
-            dismissible: true, pauseOnHover: true,
-            duration: 3000, position: "bottom-right",
-          });
-          location.reload();
-      })
-      .catch(error => {
-          console.log(error)
-          toast({
-            message: "Ocurrio un problema al editar el instructor", type: "is-danger",
-            dismissible: true, pauseOnHover: true,
-            duration: 3000, position: "bottom-right",
-          });
-      })
-      this.$store.commit("setIsLoading", false);
-      this.enrolling = "";
+      console.log("enrolling");
+      // this.$store.commit("setIsLoading", true);
+      // const formData = {
+      //   clients : this.parseToInt(this.activityClients_enroll)
+      // }
+      // await axios
+      // .put("/api/v1/activities-enroll"+this.enrolling, formData)
+      // .then(response => {
+      //     console.log(response)
+      //     toast({
+      //       message: "Ha matriculado los clientes en la actividad exitosamente", type: "is-success",
+      //       dismissible: true, pauseOnHover: true,
+      //       duration: 3000, position: "bottom-right",
+      //     });
+      //     location.reload();
+      // })
+      // .catch(error => {
+      //     console.log(error)
+      //     toast({
+      //       message: "Ocurrio un problema al editar el instructor", type: "is-danger",
+      //       dismissible: true, pauseOnHover: true,
+      //       duration: 3000, position: "bottom-right",
+      //     });
+      // })
+      // this.$store.commit("setIsLoading", false);
+       this.enrolling = "";
+    },
+    async unenrollClient(){
+      // console.log("unenrolling");
+      // console.log(this.enrolling);
+      // this.$store.commit("setIsLoading", true);
+      // const formData = {
+      //   clients : this.parseToInt(this.activityClients_enroll)
+      // }
+      // await axios
+      // .put("/api/v1/activities-enroll"+this.enrolling, formData)
+      // .then(response => {
+      //     console.log(response)
+      //     toast({
+      //       message: "Ha matriculado los clientes en la actividad exitosamente", type: "is-success",
+      //       dismissible: true, pauseOnHover: true,
+      //       duration: 3000, position: "bottom-right",
+      //     });
+      //     location.reload();
+      // })
+      // .catch(error => {
+      //     console.log(error)
+      //     toast({
+      //       message: "Ocurrio un problema al editar el instructor", type: "is-danger",
+      //       dismissible: true, pauseOnHover: true,
+      //       duration: 3000, position: "bottom-right",
+      //     });
+      // })
+      // this.$store.commit("setIsLoading", false);
+      this.unenrolling = "";
     },
   },
 };

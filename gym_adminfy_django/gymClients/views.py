@@ -3,6 +3,7 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.response import Response
 
 from .models import Client, ClientState
+from gymActivities.models import Activity
 from .serializers import ClientSerializer, ClientStateSerializer, NewClientSerializer
 from gymPersons.serializers import PersonSerializer,UserofpersonSerializer
 from rest_framework import serializers, status
@@ -51,13 +52,6 @@ class AllClients(ListCreateAPIView):
 class AllClientsByCategory(ListCreateAPIView):
     def get(self, request, category_id, format=None):
         clients = Client.objects.all().filter(teachercategory=category_id)
-        serializer = ClientSerializer(clients,many=True)
-        return Response(serializer.data)
-
-class AllActiveClients(ListCreateAPIView):
-    def get(self, request, format=None):
-        active_client = ClientState.objects.get(name='Activo')
-        clients = Client.objects.all().filter(clientstate = active_client)
         serializer = ClientSerializer(clients,many=True)
         return Response(serializer.data)
 

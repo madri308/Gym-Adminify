@@ -13,9 +13,10 @@ from .serializers import ActivitiesSerializer, ScheduleActivitiesSerializer
 from gymServices.serializers import ServiceSerializer
 from gymTeachers.serializers import TeacherSerializer
 from gymSettings.serializers import ConfigSerializer
+from gymClients.serializers import ClientNameSerializer
 
 from .models import Activity
-from gymClients.models import Client
+from gymClients.models import Client, ClientState
 from gymServices.models import Service
 from gymTeachers.models import Teacher
 from gymSettings.models import Config
@@ -24,6 +25,16 @@ from AdmSchedule.models import Schedule
 class AllActivities(ListCreateAPIView):
     queryset = Activity.objects.all()
     serializer_class = ActivitiesSerializer
+
+    def get(self, request, *args, **kwargs):
+        activities = Activity.objects.all()
+        act_ser = ActivitiesSerializer(activities,many=True)
+        active_client = ClientState.objects.get(name='Activo')
+        for act in act_ser.data:
+            noMatriculados = Client.objects.exclude(pk__in=[o['person']['id'] for o in act['client']], clientstate = active_client)
+            noMat_ser = ClientNameSerializer(noMatriculados,many=True)
+            act['unrolled_clients'] = noMat_ser.data
+        return Response(act_ser.data,status=status.HTTP_202_ACCEPTED)
 
     def getDatesByDay(self, numberDay,month,year):
         c = calendar.Calendar(firstweekday=calendar.SUNDAY)
@@ -60,12 +71,12 @@ class ActivityEnrollClients(ListCreateAPIView):
     def put(self, request, *args, **kwargs):
         activity = Activity.objects.get(id=kwargs['activity_id'])
         clients = request.data['clients']
-
-        for element in clients:
-            client = Client.objects.get(person_id=element)
-            activity.client.add(client)
-        activity.save()
-        #activity.save(update_fields=["client"])
+        activities_related = Activity.objects.all().filter(dayofweek = activity.dayofweek, startime = activity.startime) 
+        for act in activities_related:
+            for element in clients:
+                client = Client.objects.get(person_id=element)
+                act.client.add(client)
+            act.save()
         return Response(status=status.HTTP_202_ACCEPTED)
 
 class AllScheduleActivities(ListCreateAPIView):
