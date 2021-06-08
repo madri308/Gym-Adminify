@@ -6,7 +6,7 @@ from gymTeachers.serializers import TeacherSerializer
 from gymPersons.serializers import PersonSerializer
 
 class BillSerializer(serializers.ModelSerializer):
-    #activity = 
+    activity = serializers.CharField(source='activity.service',read_only=True)  
     #service = serializers.CharField(source='activity.service',read_only=True) 
     #description = serializers.CharField(source='service.description',read_only=True) 
     clientname = serializers.CharField(source='client.person.name',read_only=True)
@@ -16,7 +16,7 @@ class BillSerializer(serializers.ModelSerializer):
             "cost",
             "paid",
             "clientname",
-            #"activity",
+            "activity",
             "issuedate",
             "paymethod",
             "paymentday",
@@ -26,7 +26,7 @@ class BillSerializer(serializers.ModelSerializer):
         )
         depth = 2
 class BillPaymentSerializer(serializers.ModelSerializer):
-    #activity = 
+    activity = serializers.CharField(source='activity.service',read_only=True)  
     #service = serializers.CharField(source='activity.service',read_only=True) 
     #description = serializers.CharField(source='service.description',read_only=True) 
     clientname = serializers.CharField(source='client.person.name',read_only=True)
@@ -37,7 +37,7 @@ class BillPaymentSerializer(serializers.ModelSerializer):
             "paid",
             "clientname",
             "issuedate",
-            #"activity",
+            "activity",
             "paymentday",
             #"description",
             "paymethod",

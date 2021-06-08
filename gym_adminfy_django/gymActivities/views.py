@@ -1,5 +1,5 @@
 import calendar
-from datetime import datetime
+from datetime import date, datetime
 from collections import namedtuple
 
 from django.shortcuts import render
@@ -24,6 +24,7 @@ from gymTeachers.models import Teacher
 from gymSettings.models import Config
 from AdmSchedule.models import Schedule
 from gymClients.models import Client
+from AdmBills.models import Bill, PayMethod
 
 class AllActivities(ListCreateAPIView):
     queryset = Activity.objects.all()
@@ -86,33 +87,41 @@ class ActivityEnrollClients(ListCreateAPIView):
 
     def put(self, request, *args, **kwargs):
         activity = Activity.objects.get(id=kwargs['activity_id'])
+        service = Service.objects.get(name=activity.service)
         clients_enroll = request.data['clientsToEnroll']
         clients_unenroll = request.data['clientsToUnenroll']
-
+        today = datetime.today()
+        duration = (activity.endtime.hour - activity.startime.hour)
         activities_related = Activity.objects.all().filter(dayofweek = activity.dayofweek, startime = activity.startime) 
+        not_paid = PayMethod.objects.get(name = "Sin Pagar") 
+
         for act in activities_related:
             for element in clients_enroll:
                 client = Client.objects.get(person_id=element)
                 act.client.add(client)
-            act.save()
+                b = Bill(
+                    #id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+                    paid = 0,
+                    paymentday = None,
+                    issuedate = today.strftime("%Y-%m-%d"),
+                    cost = service.hourfee * duration,
+                    activity = act,
+                    paymethod = not_paid,
+                    client = client
+                )
+                b.save()
+                # se necesita crear la factura
             for element in clients_unenroll:
                 client = Client.objects.get(person_id=element)
                 act.client.remove(client)
-            act.save()
-        return Response(status=status.HTTP_202_ACCEPTED)
-
-class ActivityUnenrollClients(ListCreateAPIView):
-    queryset = Activity.objects.all()
-    serializer_class = ActivitiesSerializer
-
-    def put(self, request, *args, **kwargs):
-        activity = Activity.objects.get(id=kwargs['activity_id'])
-        clients = request.data['clients']
-        activities_related = Activity.objects.all().filter(dayofweek = activity.dayofweek, startime = activity.startime) 
-        for act in activities_related:
-            for element in clients:
-                client = Client.objects.get(person_id=element)
-                act.client.remove(client)
+                # borrar la actura
+                bill = Bill.objects.get(activity = act.id,client = client.person.id) 
+                if (act.dayofmonth - today.day) > 0 or (activity.startime.hour - today.hour) >= 8:
+                    # si tiene balance
+                    if (bill.paid == 1):
+                        client.balance += bill.cost
+                        client.save(update_fields=["balance"])
+                bill.delete()
             act.save()
         return Response(status=status.HTTP_202_ACCEPTED)
 

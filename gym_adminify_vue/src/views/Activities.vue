@@ -277,14 +277,6 @@ export default {
       var day = this.days.indexOf(this.activityDay_new)+1;
       return day;
     },
-    parseToInt(original){
-      var newArray = [];
-      original.forEach(element => {
-        newArray.push(parseInt(element));
-      });
-      console.log(newArray);
-      return newArray;
-    },
     validateHours(){
       console.log("hours");
       var splitS = this.activityStartTime_new.split(":"); 
@@ -293,23 +285,18 @@ export default {
         return false;
       } 
       return true;
-
     },
     async getActivities() {
       this.$store.commit("setIsLoading", true);
       await axios
         .get("/api/v1/activities/")
         .then((response) => {
-          console.log("aqui estan las actividadesss ");
-          console.log(response.data);
           this.activities = response.data;
-          // this.unenrollClient = response.data.unrolled_clients;
-          // this.enrollClient = response.data.client;
           this.activitiesPerWeek = this.groupBy();
         })
         .catch((error) => {
           toast({
-            message: "Ocurrio un problema con los datos de: Actividades", type: "is-danger",
+            message: "Ocurrio un problema con los datos de Actividades", type: "is-danger",
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
