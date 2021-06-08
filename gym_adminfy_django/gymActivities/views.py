@@ -33,10 +33,13 @@ class AllActivities(ListCreateAPIView):
     def get(self, request, *args, **kwargs):
         activities = Activity.objects.all()
         act_ser = ActivitiesSerializer(activities,many=True)
+        
         for act in act_ser.data:
             noMatriculados = Client.objects.exclude(pk__in=[o['person'] for o in act['client']])
             noMat_ser = ClientNameSerializer(noMatriculados,many=True)
             act['unrolled_clients'] = noMat_ser.data
+            act['newOnes'] = []
+            act['deletedOnes'] = []
         return Response(act_ser.data,status=status.HTTP_202_ACCEPTED)
     
     def getDatesByDay(self, numberDay,month,year):

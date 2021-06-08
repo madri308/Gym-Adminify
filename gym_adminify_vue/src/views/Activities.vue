@@ -7,71 +7,75 @@
     </div>
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <div class>
-        <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
+        <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
           <div v-for="(dayOfWeek,key) in activitiesPerWeek" :key="key" class="relative">
             <Disclosure v-bind:title="key">
-            <div v-for="activity in dayOfWeek" :key="activity" class="relative">
-              <Disclosure v-bind:title="activity.dayofmonth+'/'+activity.schedule.month+'/'+activity.schedule.year">
-                <div class="relative">
+              <dl class="md:grid md:grid-cols-2 md:gap-x-2">
+                <div v-for="activity in dayOfWeek" :key="activity" class="relative">
+                  <Disclosure v-bind:title="activity.dayofmonth+'/'+activity.schedule.month+'/'+activity.schedule.year">
+                    <div class="relative">
                   <div v-if="gymActivities.change_activity"> 
-                    <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                      <i class="fas fa-pencil-alt fa-lg"></i>
-                    </button> 
-                    <div v-else>
-                      <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity"  class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                        <i class="fas fa-save fa-lg"></i>
-                      </button>
-                      <button v-if="!(changing === '')" v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                        <i class="fas fa-times-circle fa-lg"></i>
-                      </button>
+                        <div > <!-- <div v-if="canChangeTeacher"> -->
+                          <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                            <i class="fas fa-pencil-alt fa-lg"></i>
+                          </button> 
+                          <div v-else>
+                            <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity"  class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                              <i class="fas fa-save fa-lg"></i>
+                            </button>
+                            <button v-if="!(changing === '')" v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                              <i class="fas fa-times-circle fa-lg"></i>
+                            </button>
+                          </div>
+                        </div> 
+                      </div>
+
+                      <span class="font-extrabold height: 100% width:25% float:left"> Capacidad: </span>
+                      <span>{{ activity.capacity }}</span>
+                      <br />
+                      
+                      <div v-if="changing === ''">
+                        <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
+                        <span>{{ activity.teacher.name }}</span>
+                      </div>
+                      <div v-else>
+                        <Multiselect class="mt-3" v-model="activityTeacher" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
+                      </div>
+                      <span class="font-extrabold height: 100% width:25% float:left"> Dia: </span>
+                      
+                      <span>{{daysOfWeek[activity.dayofweek-1]}} {{activity.dayofmonth}}  </span>
+                      <span class="font-extrabold height: 100% width:25% float:left">  Hora: </span>
+                      <span>{{ activity.startime }} </span> <span> - </span> <span>{{ activity.endtime }} </span> 
+                      <br />
+                    </div>
+                  </Disclosure>
+                </div>
+              </dl>
+              <Disclosure class="px-7" v-bind:title="'Clientes'">
+                <div class="grid relative py-3 md:grid-cols-2 sm:grid-cols-1">
+                  <div>
+                    <span class="font-extrabold height: 100% width:25% float:left">Matriculados: </span>
+                    <div v-for="cli in dayOfWeek[0].client" :key="cli.person.id">
+                        <input type="checkbox" class="mt-1 form-checkbox w-4 h-4 text-gray-600" checked> {{ cli.name }}
+                    </div>
+                    <div v-for="cli in dayOfWeek[0].newOnes" :key="cli.person.id">
+                        <input v-on:click ='unroll(dayOfWeek[0],cli.person)' type="checkbox" class="mt-1 form-checkbox w-4 h-4 text-gray-600" checked> {{ cli.name }}
                     </div>
                   </div>
-                  <span class="font-extrabold height: 100% width:25% float:left"> Capacidad: </span>
-                  <span>{{ activity.capacity }}</span>
-                  <br />
-                  <div v-if="changing === ''">
-                    <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
-                    <span>{{ activity.teacher.name }}</span>
+                  <div>
+                    <span class="font-extrabold height: 100% width:25% float:left">No matriculados: </span>
+                    <div v-for="cli in dayOfWeek[0].unrolled_clients" :key="cli.person.id">
+                        <input v-on:click ='roll(dayOfWeek[0],cli.person)' type="checkbox" class="mt-1 form-checkbox w-4 h-4 text-gray-600"> {{ cli.name }}
+                    </div>
                   </div>
-                  <div v-else>
-                    <Multiselect class="mt-3" v-model="activityTeacher" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
-                  </div>
-                  <span class="font-extrabold height: 100% width:25% float:left"> Dia: </span>
-                  
-                  <span>{{daysOfWeek[activity.dayofweek-1]}} {{activity.dayofmonth}}  </span>
-                  <span class="font-extrabold height: 100% width:25% float:left">  Hora: </span>
-                  <span>{{ activity.startime }} </span> <span> - </span> <span>{{ activity.endtime }} </span> 
-                  <br />
                   <span class="font-extrabold height: 100% width:25% float:left">  Cupo disponible: </span>
                   <span>{{ activity.capacity - (activity.client).length }} </span> 
                   <br />
                 </div>
-                <div v-if="gymActivities.change_activity">
-                  <span class="font-extrabold height: 100% width:25% float:left"> Clientes: </span>
-                  <button v-if="(this.enrolling !== '/'+activity.id+'/') " @click="this.enrolling = '/'+activity.id+'/', isHidden = true" type="button" v-on:click ='this.clientsNames = createJsonClients(activity.unrolled_clients)' class="absolute top-29 right-4 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="fas fa-user-plus"></i>
-                  </button>
-                  <button v-if="(this.unenrolling !== '/'+activity.id+'/')" @click="this.unenrolling = '/'+activity.id+'/', isHidden = true" type="button" v-on:click ='this.clientsEnrolled = createJsonClients(activity.client)' class="absolute top-29 right-14 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="fas fa-user-minus"></i>
-                  </button>
-                  <button v-if="(this.enrolling !== '' || this.unenrolling !== '')" v-on:click ='enrolling = "",unenrolling = "",isHidden = !isHidden' type="button" class="absolute top-29 right-20 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="fas fa-times-circle fa-lg"></i>
-                  </button>
-                  <br />
-                  <Multiselect v-if='(this.enrolling) !== ""' :searchable="true" mode="tags" class="mt-3" v-model="activityClients_enroll" placeholder="Seleccione los clientes que quiera matricular " :options="this.activity.client"/>
-                  <Multiselect v-if='(this.unenrolling) !== ""' :searchable="true" mode="tags" class="mt-3" v-model="activityClients_unenroll" placeholder="Seleccione los clientes que quiera desmatricular " :options="this.activity.unrolled_clients"/>
-                  <!-- <div>
-                    <li v-for="cli in activity.client" :key="cli.person.id">
-                      {{ cli.person.name }}
-                    </li>
-                  </div>
-                  <span>los no matriculaditoss</span>
-                  <li v-for="cli in activity.unrolled_clients" :key="cli.person.id">
-                    {{ cli.person.name }} 
-                  </li> -->
-                </div>
+                <button type="button" class="-mr-1 p-2 mt-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  Guardar
+                </button>
               </Disclosure>
-            </div>
             </Disclosure>
           </div>
 
@@ -131,12 +135,12 @@
 <script>
 import axios from "axios";
 
-import Disclosure from "../components/Disclosure";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/vue/solid";
 import Selector from "../components/Selector";
 import { PlusIcon,CheckCircleIcon  } from "@heroicons/vue/outline";
 import Multiselect from '@vueform/multiselect'
 import { toast } from 'bulma-toast'
+import Disclosure from '../components/Disclosure.vue';
 
 export default {
   name: "Activities",
@@ -149,7 +153,9 @@ export default {
     Multiselect,
   },
   data() {
+    Disclosure
     return {
+      tooltipShow: false,
       activities: [], 
       activitiesPerWeek:{},
       // services:[],
@@ -190,6 +196,39 @@ export default {
     },
   },
   methods: {
+    unroll(activity, id){
+      var uc = activity.unrolled_clients
+      var c = activity.client
+      var no = activity.newOnes
+      c.forEach(element => {
+        if(element.person == id){
+          uc.push(element);
+          var index = c.indexOf(element);
+          c.splice(index, 1);
+          return;
+        }
+      });
+      no.forEach(element => {
+        if(element.person == id){
+          uc.push(element);
+          var index = no.indexOf(element);
+          no.splice(index, 1);
+          return;
+        }
+      });
+    },
+    roll(activity, id){
+      // var c = activity.client
+      var uc = activity.unrolled_clients
+      uc.forEach(element => {
+        if(element.person == id){
+          activity.newOnes.push(element);
+          var index = uc.indexOf(element);
+          uc.splice(index, 1);
+          return
+        }
+      });
+    },
     groupBy() {
       return this.activities.reduce((objectsByKeyValue, obj) => {  
         var value = obj["service"]["name"]+' - '+this.daysOfWeek[obj["dayofweek"]-1] + ' - ' + obj["startime"];
