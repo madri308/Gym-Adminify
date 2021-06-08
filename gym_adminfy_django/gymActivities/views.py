@@ -14,7 +14,7 @@ from rest_framework import status, authentication, permissions
 from .serializers import ActivitiesSerializer, ScheduleActivitiesSerializer
 from gymServices.serializers import ServiceSerializer
 from gymTeachers.serializers import TeacherSerializer
-from gymSettings.serializers import ConfigSerializer
+from gymSettings.serializers import ConfigSerializer, ConfigSerializerCapacity
 from gymClients.serializers import ClientNameSerializer
 
 from .models import Activity
@@ -81,6 +81,25 @@ class AllActivities(ListCreateAPIView):
             new_Act.save()    
         return Response(status=status.HTTP_202_ACCEPTED)
 
+class ActivitiesWithSettings(RetrieveUpdateDestroyAPIView):
+    model = Activity
+    
+    def get(self, request, *args, **kwargs):
+        config = Config.objects.last()
+        config_ser = ConfigSerializerCapacity(config, many=False)
+
+        activities = Activity.objects.all()
+        act_ser = ActivitiesSerializer(activities,many=True)
+        
+        for act in act_ser.data:
+            noMatriculados = Client.objects.exclude(pk__in=[o['person'] for o in act['client']])
+            noMat_ser = ClientNameSerializer(noMatriculados,many=True)
+            act['unrolled_clients'] = noMat_ser.data
+            act['newOnes'] = []
+            act['deletedOnes'] = []
+
+        return Response({'config':config_ser.data, 'activities':act_ser.data})
+
 class ActivityEnrollClients(ListCreateAPIView):
     queryset = Activity.objects.all()
     serializer_class = ActivitiesSerializer
@@ -93,23 +112,23 @@ class ActivityEnrollClients(ListCreateAPIView):
         today = datetime.today()
         duration = (activity.endtime.hour - activity.startime.hour)
         activities_related = Activity.objects.all().filter(dayofweek = activity.dayofweek, startime = activity.startime) 
-        not_paid = PayMethod.objects.get(name = "Sin Pagar") 
+        not_paid = PayMethod.objects.get(name = "Sin Pagar")
 
         for act in activities_related:
             for element in clients_enroll:
                 client = Client.objects.get(person_id=element)
-                act.client.add(client)
-                b = Bill(
-                    #id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-                    paid = 0,
-                    paymentday = None,
-                    issuedate = today.strftime("%Y-%m-%d"),
-                    cost = service.hourfee * duration,
-                    activity = act,
-                    paymethod = not_paid,
-                    client = client
-                )
-                b.save()
+                if (client.clientstate.name == "Activo"):
+                    act.client.add(client)
+                    b = Bill(
+                        paid = 0,
+                        paymentday = None,
+                        issuedate = today.strftime("%Y-%m-%d"),
+                        cost = service.hourfee * duration,
+                        activity = act,
+                        paymethod = not_paid,
+                        client = client
+                    )
+                    b.save()
                 # se necesita crear la factura
             for element in clients_unenroll:
                 client = Client.objects.get(person_id=element)
@@ -138,7 +157,7 @@ class ActivityDetail(RetrieveUpdateDestroyAPIView):
 
     services = Service.objects.all()
     teachers = Teacher.objects.all()
-    config = Config.objects.first()
+    config = Config.objects.last()
     def get(self, request, *args, **kwargs):
         service_ser = ServiceSerializer(self.services,many=True)
         teachers_ser = TeacherSerializer(self.teachers,many=True)

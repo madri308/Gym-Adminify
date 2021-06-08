@@ -28,10 +28,6 @@
                         </div>
                       </div>
 
-                      <span class="font-extrabold height: 100% width:25% float:left"> Capacidad: </span>
-                      <span>{{ activity.capacity }}</span>
-                      <br />
-                      
                       <div v-if="changing === ''">
                         <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
                         <span>{{ activity.teacher.name }}</span>
@@ -45,9 +41,19 @@
                       <span class="font-extrabold height: 100% width:25% float:left">  Hora: </span>
                       <span>{{ activity.startime }} </span> <span> - </span> <span>{{ activity.endtime }} </span> 
                       <br />
-                      <span class="font-extrabold height: 100% width:25% float:left">  Cupo disponible: </span>
-                      <span>{{ activity.capacity-(activity.client).length }} </span> 
+
+                      <span class="font-extrabold height: 100% width:25% float:left"> Capacidad: </span>
+                      <span>{{ activity.capacity }}</span>
                       <br />
+                      
+                      <span class="font-extrabold height: 100% width:25% float:left">  Cupos disponibles: </span>
+                      <span>{{ (activity.capacity*this.capacityPercentage)-(activity.client).length > 0 ? parseInt((activity.capacity*this.capacityPercentage)-(activity.client).length) : "No hay cupos disponibles"}} </span> 
+                      <br />
+                      
+                      <span style="color:red" class="font-extrabold height: 100% width:25% float:left"> Aforo permitido: </span>
+                      <span style="color:red">{{ parseInt(activity.capacity * this.capacityPercentage) }}</span>
+                      <br />
+
                     </div>
                   </Disclosure>
                 </div>
@@ -72,7 +78,6 @@
                 </Disclosure>
             </Disclosure>
           </div>
-
           <Disclosure v-bind:title="'Nueva Actividad'" v-if="newOne">
             <div class="relative">
               <div>
@@ -85,8 +90,6 @@
               </div>
               <div>
                 <input v-model="activityCapacity_new" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" style="width:88%;height:30px;" type="number" placeholder="Capacidad" aria-label="Full name" min="1" >
-                <!-- <input v-model="activityCapacity_new" style="width:88%;height:30px;font-size:12pt;" type="number" placeholder="   Capacidad"  max="200"> -->
-                <!-- Calcular max de capacidad con el aforo -->
               </div>
               
               <Multiselect class="mt-3" v-model="activityService_new" placeholder="Seleccione el servicio que se brindara" :options="this.servicesNames"/>
@@ -94,7 +97,7 @@
               <Multiselect class="mt-3" v-model="activityDay_new" placeholder="Seleccione el día " v-on:click ='selectedDay=true' :options="this.days"/>
               
               <div class="table-responsive">
-                <table class="table-hover" > <!--v-if="config.timeperday"> -->
+                <table class="table-hover" >
                 <br />
                   <tbody>
                       <tr>
@@ -170,12 +173,13 @@ export default {
       changing: String,
       selectedDay:false,
       is_loaded:false,
+      capacityPercentage: "",
       
       permissions: this.$store.state.permissions,
     };
   },
   mounted() {
-    this.getActivities();
+    this.getActivities()
   },
   computed: {
     canAddActivity() { //admin
@@ -291,12 +295,16 @@ export default {
       await axios
         .get("/api/v1/activities/")
         .then((response) => {
-          this.activities = response.data;
+          this.capacityPercentage = response.data["config"].capacitypercentage;
+          this.activities = response.data["activities"];
           this.activitiesPerWeek = this.groupBy();
+          console.log(response.data);
+          console.log("this.capacityPercentage");
+          console.log(this.capacityPercentage);
         })
         .catch((error) => {
           toast({
-            message: "Ocurrio un problema con los datos de Actividades", type: "is-danger",
+            message: "Ocurrio un problema con los datos de Test Actividades", type: "is-danger",
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
@@ -304,48 +312,48 @@ export default {
       this.$store.commit("setIsLoading", false);
       this.changing = "";
     },
-    async getClients() {
-      this.$store.commit("setIsLoading", true);
-      console.log(this.enrolling);
-      await axios
-        .get("/api/v1/activeClients"+this.enrolling)
-        .then((response) => {
-          console.log(response.data);
-          // this.clients = response.data;
-          this.createJsonClients(response.data,this.clientsNames);
-          console.log(this.clientsNames);
-        })
-        .catch((error) => {
-          toast({
-            message: "Ocurrio un problema cargando los clientes", type: "is-danger",
-            dismissible: true, pauseOnHover: true,
-            duration: 3000, position: "bottom-right",
-          });
-        });
-      this.$store.commit("setIsLoading", false);
-    },
-    async getSettings() {
-      this.$store.commit("setIsLoading", true);
-      await axios
-        .get("/api/v1/update-settings/")
-        .then((response) => {
-          this.config = response.data["config"];
-          this.gym = response.data["gym"];
-          this.room = response.data["room"];
-          document.title = this.gym.name;
-        })
-        .catch((error) => {
-          toast({
-            message: "Ocurrio un problema obteniendo las configuraciones",
-            type: "is-danger",
-            dismissible: true,
-            pauseOnHover: true,
-            duration: 2000,
-            position: "bottom-right",
-          });
-        });
-      this.$store.commit("setIsLoading", false);
-    },
+    // async getClients() {
+    //   this.$store.commit("setIsLoading", true);
+    //   console.log(this.enrolling);
+    //   await axios
+    //     .get("/api/v1/activeClients"+this.enrolling)
+    //     .then((response) => {
+    //       console.log(response.data);
+    //       // this.clients = response.data;
+    //       this.createJsonClients(response.data,this.clientsNames);
+    //       console.log(this.clientsNames);
+    //     })
+    //     .catch((error) => {
+    //       toast({
+    //         message: "Ocurrio un problema cargando los clientes", type: "is-danger",
+    //         dismissible: true, pauseOnHover: true,
+    //         duration: 3000, position: "bottom-right",
+    //       });
+    //     });
+    //   this.$store.commit("setIsLoading", false);
+    // },
+    // async getSettings() {
+    //   this.$store.commit("setIsLoading", true);
+    //   await axios
+    //     .get("/api/v1/update-settings/")
+    //     .then((response) => {
+    //       this.config = response.data["config"];
+    //       this.gym = response.data["gym"];
+    //       this.room = response.data["room"];
+    //       document.title = this.gym.name;
+    //     })
+    //     .catch((error) => {
+    //       toast({
+    //         message: "Ocurrio un problema obteniendo las configuraciones",
+    //         type: "is-danger",
+    //         dismissible: true,
+    //         pauseOnHover: true,
+    //         duration: 2000,
+    //         position: "bottom-right",
+    //       });
+    //     });
+    //   this.$store.commit("setIsLoading", false);
+    // },
     async newActivity(){
       this.newOne = !this.newOne
       this.$store.commit("setIsLoading", true);
@@ -436,33 +444,42 @@ export default {
       this.$store.commit("setIsLoading", false);
       this.changing =  ""
     },
-    async enrollClient(activity){
-      console.log(this.enrolling)
-      this.$store.commit("setIsLoading", true);
-      const formData = {
-        clientsToEnroll : activity.newOnes,
-        clientsToUnenroll : activity.deletedOnes
+    async enrollClient(act){
+      var cli = act.client.length
+      if ((act.capacity * this.capacityPercentage) >= cli){
+        this.$store.commit("setIsLoading", true);
+        const formData = {
+          clientsToEnroll : act.newOnes,
+          clientsToUnenroll : act.deletedOnes,
+          capacityPercentage : this.capacityPercentage
+        }
+        await axios
+        .put("/api/v1/activities-enroll"+"/"+act.id+"/", formData)
+        .then(response => {
+            console.log(response)
+            toast({
+              message: "Ha actualizado los clientes de la actividad exitosamente", type: "is-success",
+              dismissible: true, pauseOnHover: true,
+              duration: 3000, position: "bottom-right",
+            });
+            location.reload();
+        })
+        .catch(error => {
+            console.log(error)
+            toast({
+              message: "Ocurrio un problema al modificar los clientes de la actividad", type: "is-danger",
+              dismissible: true, pauseOnHover: true,
+              duration: 3000, position: "bottom-right",
+            });
+        })
+        this.$store.commit("setIsLoading", false);
+      } else {
+        toast({
+          message: "No puede matricular más clientes que el aforo permitido", type: "is-danger",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
       }
-      await axios
-      .put("/api/v1/activities-enroll"+"/"+activity.id+"/", formData)
-      .then(response => {
-          console.log(response)
-          toast({
-            message: "Ha actualizado los clientes de la actividad exitosamente", type: "is-success",
-            dismissible: true, pauseOnHover: true,
-            duration: 3000, position: "bottom-right",
-          });
-          location.reload();
-      })
-      .catch(error => {
-          console.log(error)
-          toast({
-            message: "Ocurrio un problema al modificar los clientes de la actividad", type: "is-danger",
-            dismissible: true, pauseOnHover: true,
-            duration: 3000, position: "bottom-right",
-          });
-      })
-      this.$store.commit("setIsLoading", false);
     },
   },
 };
