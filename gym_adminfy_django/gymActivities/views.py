@@ -8,7 +8,8 @@ from rest_framework import serializers
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework import status
+
+from rest_framework import status, authentication, permissions
 
 from .serializers import ActivitiesSerializer, ScheduleActivitiesSerializer
 from gymServices.serializers import ServiceSerializer
@@ -85,13 +86,18 @@ class ActivityEnrollClients(ListCreateAPIView):
 
     def put(self, request, *args, **kwargs):
         activity = Activity.objects.get(id=kwargs['activity_id'])
-        clients = request.data['clients']
-        noMatriculados = Client.objects.exclude(pk__in=[o['person'] for o in act['client']])
+        clients_enroll = request.data['clientsToEnroll']
+        clients_unenroll = request.data['clientsToUnenroll']
+
         activities_related = Activity.objects.all().filter(dayofweek = activity.dayofweek, startime = activity.startime) 
         for act in activities_related:
-            for element in clients:
+            for element in clients_enroll:
                 client = Client.objects.get(person_id=element)
                 act.client.add(client)
+            act.save()
+            for element in clients_unenroll:
+                client = Client.objects.get(person_id=element)
+                act.client.remove(client)
             act.save()
         return Response(status=status.HTTP_202_ACCEPTED)
 

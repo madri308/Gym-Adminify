@@ -12,6 +12,13 @@ class ConfigSerializer(serializers.ModelSerializer):
             "get_absolute_url"
         )
 
+class ConfigSerializerCapacity(serializers.ModelSerializer):
+    class Meta:
+        model = Config
+        fields = (
+            "capacitypercentage",
+        )
+
 class GymSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gym
