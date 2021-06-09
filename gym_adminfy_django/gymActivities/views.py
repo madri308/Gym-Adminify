@@ -85,15 +85,10 @@ class AllActivities(ListCreateAPIView):
         return Response(status=status.HTTP_202_ACCEPTED)
 
 class AllScheduleActivities(ListCreateAPIView):
-    queryset = Activity.objects.all()
+    queryset = Activity.objects.raw('SELECT 1 as ID, EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity GROUP BY dayOfWeek,StarTime,EndTime,Schedule_ID,Service_ID,Teacher_ID')
+    # queryset = Activity.objects.all()
     serializer_class = ScheduleActivitiesSerializer
-    # def get(self, request, *args, **kwargs):
-    #     activities = Activity.objects.values('dayofweek','startime','endtime','service','teacher','schedule').annotate(day_count=Count('dayofweek'),startime_count=Count('startime')).order_by()
-    #     print(activities)
-    #     print(len(activities))
-    #     serialized_q = json.dumps(list(activities), cls=DjangoJSONEncoder)
-    #     return Response(status=status.HTTP_202_ACCEPTED)
-
+    
 class ActivityDetail(RetrieveUpdateDestroyAPIView):
     model = Activity
     def get_serializer_class(self):
