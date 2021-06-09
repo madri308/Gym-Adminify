@@ -244,6 +244,8 @@ export default {
         clientname:bill.clientname,
         paymethod: bill.paymethod.id,
       }
+      bill.paymentday =  paymentDay
+      bill.paymethod.name = "Payed"
       await axios
       .put("/api/v1/billsByMonth"+bill.get_absolute_url, formData)
       .then(response => {
