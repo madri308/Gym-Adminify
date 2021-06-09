@@ -36,3 +36,12 @@ class NewClientSerializer(serializers.ModelSerializer):
             "clientstate",
         )
 
+class ModifyClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = (
+            "person",
+            "balance",
+            "clientstate",
+        )
+        depth=2
