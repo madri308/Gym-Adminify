@@ -13,7 +13,8 @@
               <div class="grid relative md:grid-cols-2 sm:grid-cols-1">
                 <div>
                   <span class="font-extrabold">Descripción: </span>
-                  <input class="sm:w-10 md:w-52" :disabled="!isBeingChange(service.get_absolute_url)" type="text" v-model="service.description" placeholder="Descripción..." aria-label="Full name">
+                  <textarea class="sm:w-10 md:w-52 md:h-14" :disabled="!isBeingChange(service.get_absolute_url)" type="text" v-model="service.description" placeholder="Descripción..." aria-label="Full name">
+                  </textarea>
                 </div>
                 <div> 
                   <button  v-if="canDeleteService" v-on:click ='deleteService(service.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
