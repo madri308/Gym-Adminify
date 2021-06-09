@@ -87,7 +87,7 @@ export default {
     },
     normalizeInfo(data){
       for (var key in data) {
-        if(key != 'id' && typeof key != 'number'){
+        if(key != 'id' && key != 'get_absolute_url'  && typeof key != 'number'){
           if(typeof data[key] == 'object'){
             // this.userInfo.push({"key":key, "value":null})
             this.normalizeInfo(data[key])
