@@ -19,7 +19,7 @@
                           <i class="fas fa-pencil-alt fa-lg"></i>
                         </button> 
                         <div v-else>
-                          <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity"  class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                          <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity"  class="absolute top-5 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                             <i class="fas fa-save fa-lg"></i>
                           </button>
                           <button v-if="!(changing === '')" v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
@@ -179,7 +179,9 @@ export default {
     };
   },
   mounted() {
-    this.getActivities()
+    this.getActivities().then(()=> {
+      this.getTeachers()
+    })
   },
   computed: {
     canAddActivity() { //admin
@@ -210,9 +212,6 @@ export default {
           return;
         }
       });
-       console.log(" - - -- - -  UNROLL - - -- -- - ")
-      console.log("activity delete one")
-      console.log(activity.deletedOnes)
     },
     roll(activity, id){
       // var c = activity.client
@@ -237,9 +236,6 @@ export default {
           return;
         }
       });
-
-       console.log(" - - -- - -  ROLL - - -- -- - ")
-       console.log(activity.newOnes)
     },
     groupBy() {
       return this.activities.reduce((objectsByKeyValue, obj) => {  
@@ -299,8 +295,6 @@ export default {
           this.activities = response.data["activities"];
           this.activitiesPerWeek = this.groupBy();
           console.log(response.data);
-          console.log("this.capacityPercentage");
-          console.log(this.capacityPercentage);
         })
         .catch((error) => {
           toast({
@@ -354,6 +348,22 @@ export default {
     //     });
     //   this.$store.commit("setIsLoading", false);
     // },
+    async getTeachers() {
+      this.$store.commit("setIsLoading", true);
+      await axios
+      .get("/api/v1/teachers/")
+      .then((response) => {
+        this.createJsonTeacher(response.data,this.teachersNames);
+      })
+      .catch((error) => {
+        toast({
+          message: "Ocurrio un problema con los datos de instructores", type: "is-danger",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+      });
+      this.$store.commit("setIsLoading", false);
+    },
     async newActivity(){
       this.newOne = !this.newOne
       this.$store.commit("setIsLoading", true);

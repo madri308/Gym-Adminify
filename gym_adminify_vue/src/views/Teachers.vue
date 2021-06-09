@@ -190,7 +190,6 @@ export default {
       this.$store.commit("setIsLoading", false);
     },
     async getTeachers() {
-      console.log("inicio del request")
       this.$store.commit("setIsLoading", true);
       await axios
       .get("/api/v1/teachers/")
@@ -205,7 +204,6 @@ export default {
           duration: 3000, position: "bottom-right",
         });
       });
-      console.log("end del request")
       this.$store.commit("setIsLoading", false);
     },
     async addTeacher(){

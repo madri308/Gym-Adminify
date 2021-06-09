@@ -65,11 +65,11 @@
                 </div>
               <div v-if="canPay  && (bill.paymethod.name === sinPagar)">
                 <button v-if="!(changing === bill.get_absolute_url)" @click="changing = bill.get_absolute_url" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                  <i class="fas fa-money-check-alt"></i>
+                  <i class="fas fa-money-check-alt fa-lg"></i>
                 </button> 
                 <div v-else>
                   <button  type="button"  v-on:click ="payBill(bill)"  class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="fas fa-check-double"></i>
+                    <i class="fas fa-check-circle fa-lg"></i>
                   </button>
                   <button v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                     <i class="fas fa-times-circle fa-lg"></i>

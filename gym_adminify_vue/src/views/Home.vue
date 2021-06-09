@@ -2,10 +2,7 @@
   <div class="home">
     <div class="grid md:grid-cols-2 sm:grid-cols-1 gap-4 space-x-40">
       <div class="bg-gray-800 h-72 md:w-auto sm:w-20 bg-opacity-50">
-        <div class="hero-body has-text-centered">
-          <p class="text-white text-7xl align-middle ">EL MEJOR GIMNASIO</p>
-          <p class="text-white subtitle align-middle ">Ahora desde tu ordenador</p>
-        </div>
+        <img src="../assets/bg.png" alt="EL MEJOR GIMNASIO  Ahora desde tu ordenador">
       </div>
       <div>
         <template v-if="$store.state.isAuthenticated">
