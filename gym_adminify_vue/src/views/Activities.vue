@@ -38,18 +38,18 @@
                     <Disclosure v-bind:title="activity.dayofmonth+'/'+act.schedule.month+'/'+act.schedule.year">
                       <div class="relative">
                         <div v-if="changing === '/'+activity.id+'/'">
-                          <Multiselect class="mt-3" v-model="activityTeacher_edit" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
+                          <Multiselect class="mt-3" v-model="activity.teacher.get_absolute_url" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
                         </div>
                         <div v-else>
                           <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
-                          <span>{{ act.teacher.name }}</span>
+                          <span>{{ activity.teacher.name }}</span>
                         </div>
                         <div v-if="canChangeActivity"> 
-                          <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                          <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                             <i class="fas fa-pencil-alt fa-md"></i>
                           </button> 
                           <div v-else class="mt-2 space-x-2">
-                            <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity()"  class="-mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                            <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity(activity)"  class="-mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                               <i class="fas fa-save fa-lg"></i>
                             </button>
                             <button v-if="!(changing === '')" v-on:click ='changing = ""' type="button" class=" -mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
@@ -423,11 +423,9 @@ export default {
       }
     this.$store.commit("setIsLoading", false);
     },
-    async saveModifyActivity(){
+    async saveModifyActivity(activity){
       this.$store.commit("setIsLoading", true);
-      var teacher = this.activityTeacher_edit;
-      console.log(teacher);
-      console.log((teacher.replace("/", "")).replace("/", ""));
+      var teacher = activity.teacher.get_absolute_url;
       const formData = {
         teacher : (teacher.replace("/", "")).replace("/", ""),
       }
@@ -439,7 +437,7 @@ export default {
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
-          location.reload();
+          activity.teacher.name = response.data
           this.changing =  ""
       })
       .catch(error => {
@@ -465,13 +463,11 @@ export default {
         await axios
         .put("/api/v1/activities-enroll"+"/"+act.id+"/", formData)
         .then(response => {
-            console.log(response)
             toast({
               message: "Ha actualizado los clientes de la actividad exitosamente", type: "is-success",
               dismissible: true, pauseOnHover: true,
               duration: 3000, position: "bottom-right",
             });
-            location.reload();
         })
         .catch(error => {
             console.log(error)

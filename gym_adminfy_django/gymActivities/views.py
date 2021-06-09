@@ -168,4 +168,4 @@ class ActivityDetail(RetrieveUpdateDestroyAPIView):
         teacher = Teacher.objects.get(person_id=request.data['teacher'])
         activity.teacher = teacher
         activity.save(update_fields=["teacher"])
-        return Response(status=status.HTTP_202_ACCEPTED)
+        return Response(activity.teacher.person.name,status=status.HTTP_202_ACCEPTED)
