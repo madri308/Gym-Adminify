@@ -1,5 +1,5 @@
 import calendar
-from datetime import datetime
+from datetime import date, datetime
 from collections import namedtuple
 
 import json
@@ -12,21 +12,24 @@ from rest_framework import serializers
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework import status
+
+from rest_framework import status, authentication, permissions
 
 from .serializers import ActivitiesSerializer, ScheduleActivitiesSerializer
 from gymServices.serializers import ServiceSerializer
 from gymTeachers.serializers import TeacherSerializer
-from gymSettings.serializers import ConfigSerializer
+from gymSettings.serializers import ConfigSerializer, ConfigSerializerCapacity
 from gymClients.serializers import ClientNameSerializer
 from django.db.models import Count
 
 from .models import Activity
+from gymClients.models import Client, ClientState
 from gymServices.models import Service
 from gymTeachers.models import Teacher
 from gymSettings.models import Config
 from AdmSchedule.models import Schedule
 from gymClients.models import Client
+from AdmBills.models import Bill, PayMethod
 
 class AllActivities(ListCreateAPIView):
     queryset = Activity.objects.all()
@@ -80,8 +83,70 @@ class AllActivities(ListCreateAPIView):
                                 teacher = selected_teacher,
                                 schedule = selected_schedule                    
                             )
-            
             new_Act.save()    
+        return Response(status=status.HTTP_202_ACCEPTED)
+
+class ActivitiesWithSettings(RetrieveUpdateDestroyAPIView):
+    model = Activity
+    
+    def get(self, request, *args, **kwargs):
+        config = Config.objects.last()
+        config_ser = ConfigSerializerCapacity(config, many=False)
+
+        activities = Activity.objects.all()
+        act_ser = ActivitiesSerializer(activities,many=True)
+        
+        for act in act_ser.data:
+            noMatriculados = Client.objects.exclude(pk__in=[o['person'] for o in act['client']])
+            noMat_ser = ClientNameSerializer(noMatriculados,many=True)
+            act['unrolled_clients'] = noMat_ser.data
+            act['newOnes'] = []
+            act['deletedOnes'] = []
+
+        return Response({'config':config_ser.data, 'activities':act_ser.data})
+
+class ActivityEnrollClients(ListCreateAPIView):
+    queryset = Activity.objects.all()
+    serializer_class = ActivitiesSerializer
+
+    def put(self, request, *args, **kwargs):
+        activity = Activity.objects.get(id=kwargs['activity_id'])
+        service = Service.objects.get(name=activity.service)
+        clients_enroll = request.data['clientsToEnroll']
+        clients_unenroll = request.data['clientsToUnenroll']
+        today = datetime.today()
+        duration = (activity.endtime.hour - activity.startime.hour)
+        activities_related = Activity.objects.all().filter(dayofweek = activity.dayofweek, startime = activity.startime) 
+        not_paid = PayMethod.objects.get(name = "Sin Pagar")
+
+        for act in activities_related:
+            for element in clients_enroll:
+                client = Client.objects.get(person_id=element)
+                if (client.clientstate.name == "Activo"):
+                    act.client.add(client)
+                    b = Bill(
+                        paid = 0,
+                        paymentday = None,
+                        issuedate = today.strftime("%Y-%m-%d"),
+                        cost = service.hourfee * duration,
+                        activity = act,
+                        paymethod = not_paid,
+                        client = client
+                    )
+                    b.save()
+                # se necesita crear la factura
+            for element in clients_unenroll:
+                client = Client.objects.get(person_id=element)
+                act.client.remove(client)
+                # borrar la actura
+                bill = Bill.objects.get(activity = act.id,client = client.person.id) 
+                if (act.dayofmonth - today.day) > 0 or (activity.startime.hour - today.hour) >= 8:
+                    # si tiene balance
+                    if (bill.paid == 1):
+                        client.balance += bill.cost
+                        client.save(update_fields=["balance"])
+                bill.delete()
+            act.save()
         return Response(status=status.HTTP_202_ACCEPTED)
 
 class AllScheduleActivities(ListCreateAPIView):
@@ -98,7 +163,7 @@ class ActivityDetail(RetrieveUpdateDestroyAPIView):
 
     services = Service.objects.all()
     teachers = Teacher.objects.all()
-    config = Config.objects.first()
+    config = Config.objects.last()
     def get(self, request, *args, **kwargs):
         service_ser = ServiceSerializer(self.services,many=True)
         teachers_ser = TeacherSerializer(self.teachers,many=True)

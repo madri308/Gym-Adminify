@@ -51,8 +51,8 @@ class AllClients(ListCreateAPIView):
 
 class AllClientsByCategory(ListCreateAPIView):
     def get(self, request, category_id, format=None):
-        teachers = Client.objects.all().filter(teachercategory=category_id)
-        serializer = ClientSerializer(teachers,many=True)
+        clients = Client.objects.all().filter(teachercategory=category_id)
+        serializer = ClientSerializer(clients,many=True)
         return Response(serializer.data)
 
 class ClientDetail(RetrieveUpdateDestroyAPIView):    

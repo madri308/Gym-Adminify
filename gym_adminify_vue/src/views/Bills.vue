@@ -15,14 +15,14 @@
               <span class="font-extrabold height: 100% width:25% float:left"
                 >Fecha por pagar:
               </span>
-              <span>{{ bill.paymethod.name }}</span>
+              <span>{{ bill.issuedate }}</span>
                 </div>
-              <div v-if="canPay">
-                <button v-if="!(changing === bill.id) && (bill.paymethod != sinPagar)" @click="changing = bill.id" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                  <i class="fas fa-money-check scale-150"></i>
-                </button> 
+              <div v-if="canPay && (bill.paymethod.name === sinPagar)">
+                  <button v-if="!(changing === bill.get_absolute_url) " @click="changing = bill.get_absolute_url" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <i class="fas fa-money-check scale-150"></i>
+                  </button> 
                 <div v-else>
-                  <button  type="button"  v-on:click ="payBill(bill)"  class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <button  type="button" v-on:click ="payBill(bill)" class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                     <i class="fas fa-money-check"></i>
                   </button>
                   <button v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
@@ -51,9 +51,10 @@
               </div>
               <div class="mt-4">
                   <span class="font-extrabold height: 100% width:0% float:left">Método de Pago: </span>
-                  <Multiselect :disabled="!isBeingChange(bill.id)" class="object-left md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymentmethod.id" :options="billPaymentMethods"/>
+                  <Multiselect :disabled="!isBeingChange(bill.get_absolute_url)" class="object-left md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymethod.id" :options="billPaymentMethods"/>
               </div>
             </Disclosure>
+
             <Disclosure v-bind:title="bill.clientname+' - '+bill.issuedate" v-else>
               <div class="grid relative md:grid-cols-2 sm:grid-cols-1">
                 <div class="mt-3">
@@ -62,8 +63,8 @@
               </span>
               <span>{{ bill.issuedate }}</span>
                 </div>
-              <div v-if="canPay">
-                <button v-if="!(changing === bill.id) && (bill.paymethod.name != sinPagar)" @click="changing = bill.id" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+              <div v-if="canPay  && (bill.paymethod.name === sinPagar)">
+                <button v-if="!(changing === bill.get_absolute_url)" @click="changing = bill.get_absolute_url" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                   <i class="fas fa-money-check-alt"></i>
                 </button> 
                 <div v-else>
@@ -96,7 +97,7 @@
               </div>
               <div class="mt-4">
                   <span class="font-extrabold height: 100% width:0% float:left">Método de Pago: </span>
-                  <Multiselect :disabled="!isBeingChange(bill.id)" class="object-left md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymethod.id" :options="billPaymentMethods"/>
+                  <Multiselect :disabled="!isBeingChange(bill.get_absolute_url)" class="object-left md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymethod.id" :options="billPaymentMethods"/>
               </div>
             </Disclosure>
             </div>
@@ -171,10 +172,9 @@ export default {
   mounted() {
     
     this.getBills().then(()=>{
-        this.billsSorted = this.groupBy('get_month')
-        console.log(this.billsSorted)
+        this.billsSorted = this.groupBy('clientname')
+        this.getPaymentMethods()
     })
-    this.getPaymentMethods()
   },
   computed:{
     canPay() {
@@ -183,7 +183,6 @@ export default {
   },
   methods: {
     isBeingChange(id){
-      if(id == this.changing) console.log(true)
       if(id == this.changing) return true
       return false
     },
@@ -193,12 +192,10 @@ export default {
       await axios
         .get("/api/v1/billsPaymentMethods/")
         .then((response) => {
-          console.log(response)
           let sorting;
           sorting = response.data.map(function(obj) {
             return {value:obj.id, label:obj.name}
           });
-          console.log(this.billPaymentMethods)
           this.billPaymentMethods = Object.values(sorting)
         })
 
@@ -247,7 +244,6 @@ export default {
         clientname:bill.clientname,
         paymethod: bill.paymethod.id,
       }
-      console.log(formData)
       await axios
       .put("/api/v1/billsByMonth"+bill.get_absolute_url, formData)
       .then(response => {

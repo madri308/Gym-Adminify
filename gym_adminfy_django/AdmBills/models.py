@@ -1,7 +1,7 @@
 import datetime
 from django.db import models
 from gymClients.models import Client
-#from gymActivity.models import Activity
+from gymActivities.models import Activity
 
 # Create your models here.
 class PayMethod(models.Model):
@@ -18,7 +18,7 @@ class Bill(models.Model):
     paymentday = models.DateField(db_column='PaymentDay', blank=True, null=True)  # Field name made lowercase. 
     issuedate = models.DateField(db_column='IssueDate')  # Field name made lowercase.
     cost = models.DecimalField(db_column='Cost', max_digits=15, decimal_places=2)  # Field name made lowercase.
-    #activity = models.ForeignKey(Activity, models.DO_NOTHING, db_column='Activity_ID')  # Field name made lowercase.
+    activity = models.ForeignKey(Activity, models.DO_NOTHING, db_column='Activity_ID')  # Field name made lowercase.
     paymethod = models.ForeignKey(PayMethod, models.DO_NOTHING, db_column='PayMethod_ID')  # Field name made lowercase.
     client = models.ForeignKey(Client, models.DO_NOTHING, db_column='Client_ID')  # Field name made lowercase.
 
