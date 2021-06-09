@@ -26,6 +26,33 @@ class ActivitiesSerializer(serializers.ModelSerializer):
             "dayofmonth",
         )
 
+class SpecificDataActivitiesSerializer(serializers.ModelSerializer):
+    client = ClientNameSerializer(many=True)
+    teacher = TeacherNamesSerializer(many=False)
+    class Meta:
+        model = Activity
+        fields = (
+            "client",
+            "dayofmonth",
+            "teacher",
+        )
+
+class GeneralActivitiesSerializer(serializers.ModelSerializer):
+    service_name = serializers.CharField(source='service.name',read_only=True)
+    teacher = TeacherNamesSerializer(many=False)
+    schedule = ScheduleSerializer(many=False)
+    class Meta:
+        model = Activity
+        fields = (
+            "dayofweek",
+            "startime",
+            "endtime",
+            "service_name",
+            "teacher",
+            "capacity",
+            "schedule" 
+        )
+
 class ScheduleActivitiesSerializer(serializers.ModelSerializer):
     service_name = serializers.CharField(source='service.name',read_only=True)
     teacher_name = serializers.CharField(source='teacher.person.name',read_only=True)
@@ -33,9 +60,9 @@ class ScheduleActivitiesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
         fields = (
-            "id",
+            # "id",
             "dayofweek",
-            "dayofmonth",
+            # "dayofmonth",
             "startime",
             "endtime",
             "service_name",

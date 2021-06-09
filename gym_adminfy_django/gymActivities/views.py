@@ -15,7 +15,7 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 
 from rest_framework import status, authentication, permissions
 
-from .serializers import ActivitiesSerializer, ScheduleActivitiesSerializer
+from .serializers import ActivitiesSerializer, ScheduleActivitiesSerializer,SpecificDataActivitiesSerializer,GeneralActivitiesSerializer
 from gymServices.serializers import ServiceSerializer
 from gymTeachers.serializers import TeacherSerializer
 from gymSettings.serializers import ConfigSerializer, ConfigSerializerCapacity
@@ -31,23 +31,33 @@ from AdmSchedule.models import Schedule
 from gymClients.models import Client
 from AdmBills.models import Bill, PayMethod
 
+class SpecificActivities(ListCreateAPIView):
+    queryset = Activity.objects.all()
+    serializer_class = ActivitiesSerializer
+
+    def get(self, request, *args, **kwargs):
+        activity = Activity.objects.filter(startime=kwargs['startime'],dayofweek=kwargs['day']).only('dayofmonth','client')
+        ser = SpecificDataActivitiesSerializer(activity, many=True)
+        for act in ser.data:
+            noMatriculados = Client.objects.exclude(pk__in=[o['person'] for o in act['client']])
+            noMat_ser = ClientNameSerializer(noMatriculados,many=True)
+            act['unrolled_clients'] = noMat_ser.data
+        return Response(ser.data,status=status.HTTP_202_ACCEPTED)
+
 class AllActivities(ListCreateAPIView):
     queryset = Activity.objects.all()
     serializer_class = ActivitiesSerializer
 
-    Range = namedtuple('Range', ['start', 'end'])
-
     def get(self, request, *args, **kwargs):
-        activities = Activity.objects.all()
-        act_ser = ActivitiesSerializer(activities,many=True)
-        
-        for act in act_ser.data:
-            noMatriculados = Client.objects.exclude(pk__in=[o['person'] for o in act['client']])
-            noMat_ser = ClientNameSerializer(noMatriculados,many=True)
-            act['unrolled_clients'] = noMat_ser.data
-            act['newOnes'] = []
-            act['deletedOnes'] = []
-        return Response(act_ser.data,status=status.HTTP_202_ACCEPTED)
+        config = Config.objects.last()
+        config_ser = ConfigSerializerCapacity(config, many=False)
+        todays_date = date.today()
+        m = todays_date.month
+        y = todays_date.year
+        general_activities = Activity.objects.raw('SELECT 1 as ID, Capacity,EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity INNER JOIN Schedule ON Schedule.ID = Schedule_ID WHERE Schedule.Year ='+ str(y) +' AND Schedule.Month ='+ str(m) +' GROUP BY Capacity,Schedule_ID,dayOfWeek,StarTime,EndTime,Service_ID,Teacher_ID')
+        gen_act_ser = GeneralActivitiesSerializer(general_activities,many=True)
+    
+        return Response({'config':config_ser.data, 'gen_act':gen_act_ser.data},status=status.HTTP_202_ACCEPTED)
     
     def getDatesByDay(self, numberDay,month,year):
         c = calendar.Calendar(firstweekday=calendar.SUNDAY)
@@ -85,25 +95,6 @@ class AllActivities(ListCreateAPIView):
                             )
             new_Act.save()    
         return Response(status=status.HTTP_202_ACCEPTED)
-
-class ActivitiesWithSettings(RetrieveUpdateDestroyAPIView):
-    model = Activity
-    
-    def get(self, request, *args, **kwargs):
-        config = Config.objects.last()
-        config_ser = ConfigSerializerCapacity(config, many=False)
-
-        activities = Activity.objects.all()
-        act_ser = ActivitiesSerializer(activities,many=True)
-        
-        for act in act_ser.data:
-            noMatriculados = Client.objects.exclude(pk__in=[o['person'] for o in act['client']])
-            noMat_ser = ClientNameSerializer(noMatriculados,many=True)
-            act['unrolled_clients'] = noMat_ser.data
-            act['newOnes'] = []
-            act['deletedOnes'] = []
-
-        return Response({'config':config_ser.data, 'activities':act_ser.data})
 
 class ActivityEnrollClients(ListCreateAPIView):
     queryset = Activity.objects.all()
@@ -150,15 +141,9 @@ class ActivityEnrollClients(ListCreateAPIView):
         return Response(status=status.HTTP_202_ACCEPTED)
 
 class AllScheduleActivities(ListCreateAPIView):
-    queryset = Activity.objects.all()
+    queryset = Activity.objects.raw('SELECT 1 as ID, EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity GROUP BY dayOfWeek,StarTime,EndTime,Schedule_ID,Service_ID,Teacher_ID')
     serializer_class = ScheduleActivitiesSerializer
-    # def get(self, request, *args, **kwargs):
-    #     activities = Activity.objects.values('dayofweek','startime','endtime','service','teacher','schedule').annotate(day_count=Count('dayofweek'),startime_count=Count('startime')).order_by()
-    #     print(activities)
-    #     print(len(activities))
-    #     serialized_q = json.dumps(list(activities), cls=DjangoJSONEncoder)
-    #     return Response(status=status.HTTP_202_ACCEPTED)
-
+    
 class ActivityDetail(RetrieveUpdateDestroyAPIView):
     model = Activity
     def get_serializer_class(self):

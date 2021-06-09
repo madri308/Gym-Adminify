@@ -8,74 +8,87 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <div class>
         <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
-          <div v-for="(dayOfWeek,key) in activitiesPerWeek" :key="key" class="relative">
-            <Disclosure v-bind:title="key">
-              <dl class="md:grid md:grid-cols-2 md:gap-x-2">
-                <div v-for="activity in dayOfWeek" :key="activity" class="relative">
-                  <Disclosure v-bind:title="activity.dayofmonth+'/'+activity.schedule.month+'/'+activity.schedule.year">
-                    <div class="relative">
-                      <div v-if="canChangeActivity"> 
-                        <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                          <i class="fas fa-pencil-alt fa-lg"></i>
-                        </button> 
+          <div v-for="act in activities" :key="act" class="relative">
+            <Disclosure v-on:click ="act.client == null ? getDetails(act) : null" v-bind:title="act.service_name+' - '+act.startime +' - '+getLiteralDay(act.dayofweek-1)">
+              <dl>
+                <div>
+                  <span class="font-extrabold height: 100% width:25% float:left">Instructor fijo: </span>
+                  <span>{{ act.teacher.name }}</span>
+                </div>
+                <div>
+                  <span class="font-extrabold height: 100% width:25% float:left">  Hora: </span>
+                  <span>{{ act.startime }} </span> <span> - </span> <span>{{ act.endtime }} </span> 
+                  <span class="font-extrabold height: 100% width:25% float:left"> Dia: </span>
+                  <span>{{daysOfWeek[act.dayofweek-1]}} {{act.dayofmonth}}  </span>
+                </div>
+                <div>
+                  <span class="font-extrabold height: 100% width:25% float:left"> Capacidad: </span>
+                  <span>{{ act.capacity }}</span>
+                </div>
+                <div>
+                  <span class="font-extrabold height: 100% width:25% float:left">  Cupos disponibles: </span>
+                  <span>{{ act.spaces > 0 ? parseInt(act.spaces) : "No hay cupos disponibles"}} </span> 
+                </div>
+                <div>
+                  <span style="color:red" class="font-extrabold height: 100% width:25% float:left"> Aforo permitido: </span>
+                  <span style="color:red">{{ parseInt(act.capacity * this.capacityPercentage) }}</span>
+                </div>
+                <dl class="md:grid md:grid-cols-2 md:gap-x-1">
+                  <div v-for="activity in act.activities" :key="activity" class="relative">
+                    <Disclosure v-bind:title="activity.dayofmonth+'/'+act.schedule.month+'/'+act.schedule.year">
+                      <div class="relative">
+                        <div v-if="changing === ''">
+                          <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
+                          <span>{{ act.teacher.name }}</span>
+                        </div>
                         <div v-else>
-                          <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity"  class="absolute top-5 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                            <i class="fas fa-save fa-lg"></i>
-                          </button>
-                          <button v-if="!(changing === '')" v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                            <i class="fas fa-times-circle fa-lg"></i>
-                          </button>
+                          <Multiselect class="mt-3" v-model="activityTeacher" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
+                        </div>
+                        <div v-if="canChangeActivity"> 
+                          <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                            <i class="fas fa-pencil-alt fa-md"></i>
+                          </button> 
+                          <div v-else class="mt-2 space-x-2">
+                            <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity"  class="-mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                              <i class="fas fa-save fa-lg"></i>
+                            </button>
+                            <button v-if="!(changing === '')" v-on:click ='changing = ""' type="button" class=" -mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                              <i class="fas fa-times-circle fa-lg"></i>
+                            </button>
+                          </div>
                         </div>
                       </div>
-
-                      <div v-if="changing === ''">
-                        <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
-                        <span>{{ activity.teacher.name }}</span>
-                      </div>
-                      <div v-else>
-                        <Multiselect class="mt-3" v-model="activityTeacher" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
-                      </div>
-                      <span class="font-extrabold height: 100% width:25% float:left"> Dia: </span>
-                      
-                      <span>{{daysOfWeek[activity.dayofweek-1]}} {{activity.dayofmonth}}  </span>
-                      <span class="font-extrabold height: 100% width:25% float:left">  Hora: </span>
-                      <span>{{ activity.startime }} </span> <span> - </span> <span>{{ activity.endtime }} </span> 
-                      <br />
-
-                      <span class="font-extrabold height: 100% width:25% float:left"> Capacidad: </span>
-                      <span>{{ activity.capacity }}</span>
-                      <br />
-                      
-                      <span class="font-extrabold height: 100% width:25% float:left">  Cupos disponibles: </span>
-                      <span>{{ (activity.capacity*this.capacityPercentage)-(activity.client).length > 0 ? parseInt((activity.capacity*this.capacityPercentage)-(activity.client).length) : "No hay cupos disponibles"}} </span> 
-                      <br />
-                      
-                      <span style="color:red" class="font-extrabold height: 100% width:25% float:left"> Aforo permitido: </span>
-                      <span style="color:red">{{ parseInt(activity.capacity * this.capacityPercentage) }}</span>
-                      <br />
-
-                    </div>
-                  </Disclosure>
-                </div>
-              </dl>
-                <Disclosure v-if='canChangeActivity' class="px-7" v-bind:title="'Clientes'">
-                  <div class="grid relative py-3 md:grid-cols-2 sm:grid-cols-1">
-                    <div>
-                      <span class="font-extrabold height: 100% width:25% float:left">Matriculados: </span>
-                      <div v-for="cli in dayOfWeek[0].client" :key="cli.person.id">
-                          <input v-on:click ='unroll(dayOfWeek[0],cli.person), enrolling=dayOfWeek[0]' type="checkbox" class="mt-1 form-checkbox w-4 h-4 text-gray-600" checked> {{ cli.name }}
-                      </div>
-                      <span class="font-extrabold height: 100% width:25% float:left">No matriculados: </span>
-                      <div v-for="cli in dayOfWeek[0].unrolled_clients" :key="cli.person.id">
-                          <input v-on:click ='roll(dayOfWeek[0],cli.person), enrolling=dayOfWeek[0]' type="checkbox" class="mt-1 form-checkbox w-4 h-4 text-gray-600" > {{ cli.name }}
-                      </div>  
-                      <button v-on:click ='enrollClient(dayOfWeek[0])' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    </Disclosure>
+                  </div>
+                </dl>
+                <Disclosure v-if='canChangeActivity' v-bind:title="'Clientes'" >
+                  <div class="relative">
+                    <div class="grid relative py-3 md:grid-cols-2 sm:grid-cols-1">
+                      <button v-on:click ='enrollClient(act)' type="button" class="absolute top-0 right-2 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                         <i class="fas fa-save fa-lg"></i>
                       </button>
+                      <div>
+                        <span class="font-extrabold height: 100% width:25% float:left">Matriculados: </span>
+                        <div v-for="cli in act.client" :key="cli.person.id">
+                            <button v-on:click ='unroll(act,cli.person), enrolling=act.client' type="button" class="-mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                               <i class="fas fa-times-circle"></i>
+                               {{ cli.name }}
+                            </button>
+                        </div>
+                      </div>
+                      <div>
+                        <span class="font-extrabold height: 100% width:25% float:left">No matriculados: </span>
+                        <div v-for="cli in act.unrolled_clients" :key="cli.person.id">
+                            <button v-on:click ='roll(act,cli.person), enrolling=act.client' type="button" class="-mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"> 
+                              <i class="fas fa-check-circle"></i>
+                              {{ cli.name }}
+                            </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  
                 </Disclosure>
+              </dl>
             </Disclosure>
           </div>
           <Disclosure v-bind:title="'Nueva Actividad'" v-if="newOne">
@@ -192,6 +205,32 @@ export default {
     },
   },
   methods: {
+    async getDetails(act){
+      toast({
+        message: "Cargando..", type: "is-info",
+        dismissible: true, pauseOnHover: true,
+        duration: 4000, position: "bottom-right",
+      });
+      this.$store.commit("setIsLoading", true);
+      await axios
+        .get("/api/v1/activities/"+act.dayofweek+"/"+act.startime)
+        .then((response) => {
+          act.client = response.data[0]["client"];
+          act.unrolled_clients = response.data[0]["unrolled_clients"];
+          act.newOnes = [];
+          act.deletedOnes = [];
+          act.spaces = act.capacity*this.capacityPercentage - act.client.length
+          act.activities = response.data;
+        })
+        .catch((error) => {
+          toast({
+            message: "Ocurrio un problema con los datos de Actividades", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+        });
+      this.$store.commit("setIsLoading", false);      
+    },
     unroll(activity, id){
       var uc = activity.unrolled_clients
       var c = activity.client
@@ -277,6 +316,9 @@ export default {
       var day = this.days.indexOf(this.activityDay_new)+1;
       return day;
     },
+    getLiteralDay(day){
+      return this.daysOfWeek[day]
+    },
     validateHours(){
       console.log("hours");
       var splitS = this.activityStartTime_new.split(":"); 
@@ -292,9 +334,8 @@ export default {
         .get("/api/v1/activities/")
         .then((response) => {
           this.capacityPercentage = response.data["config"].capacitypercentage;
-          this.activities = response.data["activities"];
-          this.activitiesPerWeek = this.groupBy();
-          console.log(response.data);
+          this.activities = response.data["gen_act"];
+          // this.activitiesPerWeek = this.groupBy();
         })
         .catch((error) => {
           toast({
@@ -305,64 +346,6 @@ export default {
         });
       this.$store.commit("setIsLoading", false);
       this.changing = "";
-    },
-    // async getClients() {
-    //   this.$store.commit("setIsLoading", true);
-    //   console.log(this.enrolling);
-    //   await axios
-    //     .get("/api/v1/activeClients"+this.enrolling)
-    //     .then((response) => {
-    //       console.log(response.data);
-    //       // this.clients = response.data;
-    //       this.createJsonClients(response.data,this.clientsNames);
-    //       console.log(this.clientsNames);
-    //     })
-    //     .catch((error) => {
-    //       toast({
-    //         message: "Ocurrio un problema cargando los clientes", type: "is-danger",
-    //         dismissible: true, pauseOnHover: true,
-    //         duration: 3000, position: "bottom-right",
-    //       });
-    //     });
-    //   this.$store.commit("setIsLoading", false);
-    // },
-    // async getSettings() {
-    //   this.$store.commit("setIsLoading", true);
-    //   await axios
-    //     .get("/api/v1/update-settings/")
-    //     .then((response) => {
-    //       this.config = response.data["config"];
-    //       this.gym = response.data["gym"];
-    //       this.room = response.data["room"];
-    //       document.title = this.gym.name;
-    //     })
-    //     .catch((error) => {
-    //       toast({
-    //         message: "Ocurrio un problema obteniendo las configuraciones",
-    //         type: "is-danger",
-    //         dismissible: true,
-    //         pauseOnHover: true,
-    //         duration: 2000,
-    //         position: "bottom-right",
-    //       });
-    //     });
-    //   this.$store.commit("setIsLoading", false);
-    // },
-    async getTeachers() {
-      this.$store.commit("setIsLoading", true);
-      await axios
-      .get("/api/v1/teachers/")
-      .then((response) => {
-        this.createJsonTeacher(response.data,this.teachersNames);
-      })
-      .catch((error) => {
-        toast({
-          message: "Ocurrio un problema con los datos de instructores", type: "is-danger",
-          dismissible: true, pauseOnHover: true,
-          duration: 3000, position: "bottom-right",
-        });
-      });
-      this.$store.commit("setIsLoading", false);
     },
     async newActivity(){
       this.newOne = !this.newOne

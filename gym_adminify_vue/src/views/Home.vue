@@ -182,10 +182,10 @@ export default {
         },
         // Attributes for todos
         ...this.todos.map((todo) => ({
-          dates: new Date(todo.schedule.year,todo.schedule.month-1, todo.dayofmonth),
-          // dates: {weekdays:todo.dayofweek, months:todo.schedule.month , years:todo.schedule.year},
+          // dates: new Date(todo.schedule.year,todo.schedule.month-1, todo.dayofmonth),
+          dates: {weekdays:todo.dayofweek, months:todo.schedule.month , years:todo.schedule.year},
           dot: {
-            color: "red",
+            color: this.colors[Math.floor(Math.random() * this.colors.length)],
           },
           popover: {
             label: todo.service_name+" - "+todo.teacher_name+ " - " +(todo.startime) + "-" + (todo.endtime),
