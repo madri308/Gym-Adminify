@@ -15,10 +15,11 @@ class ClientSerializer(serializers.ModelSerializer):
         )
 
 class ClientNameSerializer(serializers.ModelSerializer):
-    person = PersonNameSerializer(many=False)
+    name = serializers.CharField(source='person.name',read_only=True)
     class Meta:
         model = Client
         fields = (
+            "name",
             "person",
         )
 

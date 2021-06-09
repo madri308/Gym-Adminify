@@ -1,15 +1,16 @@
 from rest_framework import serializers
 from .models import Activity, Service, Teacher, Client #, Schedule, ActivityHasClient
 
-from gymClients.serializers import ClientSerializer, ClientNameSerializer
-from gymServices.serializers import ServiceSerializer
-from gymTeachers.serializers import TeacherSerializer
+from gymClients.serializers import ClientNameSerializer
+from gymServices.serializers import NameServiceSerializer
+from gymTeachers.serializers import TeacherNamesSerializer
 from AdmSchedule.serializers import ScheduleSerializer
 
 class ActivitiesSerializer(serializers.ModelSerializer):
-    service = ServiceSerializer(many=False)
-    teacher = TeacherSerializer(many=False)
+    service = NameServiceSerializer(many=False)
+    teacher = TeacherNamesSerializer(many=False)
     client = ClientNameSerializer(many=True)
+    schedule = ScheduleSerializer(many=False)
     class Meta:
         model = Activity
         fields = (
@@ -24,6 +25,7 @@ class ActivitiesSerializer(serializers.ModelSerializer):
             "schedule",
             "dayofmonth",
         )
+
 class ScheduleActivitiesSerializer(serializers.ModelSerializer):
     service_name = serializers.CharField(source='service.name',read_only=True)
     teacher_name = serializers.CharField(source='teacher.person.name',read_only=True)
@@ -39,5 +41,4 @@ class ScheduleActivitiesSerializer(serializers.ModelSerializer):
             "service_name",
             "teacher_name", 
             "schedule",
-            "dayofmonth",
         )
