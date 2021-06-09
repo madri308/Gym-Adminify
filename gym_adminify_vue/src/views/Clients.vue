@@ -289,8 +289,8 @@ export default {
         clientsAux = this.clients[i]
         if(clientsAux.clientstate == id) this.clientsSorted.push(this.clients[i])
       }
+      console.log(this.clientsSorted)
     },
-   
   },
 };
 </script>
