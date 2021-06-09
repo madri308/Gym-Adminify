@@ -2,6 +2,10 @@ import calendar
 from datetime import datetime
 from collections import namedtuple
 
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+
+
 from django.shortcuts import render
 from rest_framework import serializers
 
@@ -15,6 +19,7 @@ from gymServices.serializers import ServiceSerializer
 from gymTeachers.serializers import TeacherSerializer
 from gymSettings.serializers import ConfigSerializer
 from gymClients.serializers import ClientNameSerializer
+from django.db.models import Count
 
 from .models import Activity
 from gymServices.models import Service
@@ -82,6 +87,12 @@ class AllActivities(ListCreateAPIView):
 class AllScheduleActivities(ListCreateAPIView):
     queryset = Activity.objects.all()
     serializer_class = ScheduleActivitiesSerializer
+    # def get(self, request, *args, **kwargs):
+    #     activities = Activity.objects.values('dayofweek','startime','endtime','service','teacher','schedule').annotate(day_count=Count('dayofweek'),startime_count=Count('startime')).order_by()
+    #     print(activities)
+    #     print(len(activities))
+    #     serialized_q = json.dumps(list(activities), cls=DjangoJSONEncoder)
+    #     return Response(status=status.HTTP_202_ACCEPTED)
 
 class ActivityDetail(RetrieveUpdateDestroyAPIView):
     model = Activity

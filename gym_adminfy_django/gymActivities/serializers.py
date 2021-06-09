@@ -41,5 +41,4 @@ class ScheduleActivitiesSerializer(serializers.ModelSerializer):
             "service_name",
             "teacher_name", 
             "schedule",
-            "dayofmonth",
         )

@@ -50,7 +50,7 @@ class AllSettings(APIView):
 
     def put(self, request, *args, **kwargs):
         config_ser = ConfigSerializer(instance=self.config, data=request.data['config'])
-        # room_ser = RoomSerializer(instance=self.room, data=request.data['room'])
+        room_ser = RoomSerializer(instance=self.room, data=request.data['room'])
         gym_ser = GymSerializer(instance=self.gym, data=request.data['gym'])
 
         if not gym_ser.is_valid():
@@ -59,11 +59,11 @@ class AllSettings(APIView):
         if not config_ser.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        # if not room_ser.is_valid():
-        #     print(room_ser.errors)
-        #     return Response(status=status.HTTP_400_BAD_REQUEST)
+        if not room_ser.is_valid():
+            print(room_ser.errors)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
         config_ser.save()
         gym_ser.save()
-        # room_ser.save()
+        room_ser.save()
         return Response(status=status.HTTP_202_ACCEPTED)
