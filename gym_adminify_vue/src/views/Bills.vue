@@ -1,7 +1,10 @@
 <!-- This example requires Tailwind CSS v2.0+ -->
 <template>
   <div class="bg-white">
-   <Selector @clicked="getOptions" v-bind:options="options" /> 
+    <div v-if="canPay">
+    <Selector @clicked="getOptions" v-bind:options="options" /> 
+    </div>
+
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <dl
         class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10"
@@ -135,6 +138,7 @@ export default {
       billsSorted:null,
       changing: String,
       typeSorted:String,
+      userName:String,
       sinPagar:"Sin Pagar",
       billPaymentMethods:[],
       permissions: this.$store.state.permissions,
@@ -170,18 +174,57 @@ export default {
   },
   
   mounted() {
-    
-    this.getBills().then(()=>{
-        this.billsSorted = this.groupBy('clientname')
-        this.getPaymentMethods()
-    })
+    this.getPaymentMethods()
+    let nameAux = this.$store.state.info
+    if(nameAux[0] && nameAux[0].value) this.userName = nameAux[0].value
+
+    if(!this.canPay && this.viewBill){
+     this.getBillsClient().then(()=>{
+       
+          this.billsSorted = this.groupBy('clientname')    
+      }) 
+    }
+    else{
+      this.getBills().then(()=>{
+          this.billsSorted = this.groupBy('clientname')    
+      })
+    }
   },
   computed:{
     canPay() {
       return this.permissions.includes("AdmBills.change_bill")
     },
+    viewBill(){
+      return this.permissions.includes("AdmBills.view_bill")
+    }
   },
   methods: {
+    async getBillsClient(){
+      this.$store.commit("setIsLoading", true);
+      await axios
+        .get("/api/v1/billsByMonth/")
+        .then((response) => {
+          this.bills = response.data;
+          this. bills = this.bills.filter((objects, obj)=>{
+            return objects.clientname === this.userName
+            
+          })
+        })
+        .catch((error) => {
+          toast({
+            message: "Ocurrio un problema con los datos de: Configuracion",
+            type: "is-danger",
+            dismissible: true,
+            pauseOnHover: true,
+            duration: 3000,
+            position: "bottom-right",
+          });
+        });
+      this.$store.commit("setIsLoading", false);
+
+      function filterById(obj) {
+      }
+    },
     isBeingChange(id){
       if(id == this.changing) return true
       return false
@@ -244,6 +287,8 @@ export default {
         clientname:bill.clientname,
         paymethod: bill.paymethod.id,
       }
+      bill.paymentday =  paymentDay
+      bill.paymethod.name = "Payed"
       await axios
       .put("/api/v1/billsByMonth"+bill.get_absolute_url, formData)
       .then(response => {
@@ -265,7 +310,6 @@ export default {
     },
     groupBy(key) {
       return this.bills.reduce((objectsByKeyValue, obj) => {
-        
         var value = obj[key];
         if(key == "get_month") value = this.orderedMonths[value]
         objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
@@ -276,6 +320,8 @@ export default {
       this.typeSorted = id  
       this.billsSorted = this.groupBy(id)
     }
+    //mariina@gmail.com 3452434
+    //h@miucce.com 3339743872
   },
 };
 </script>
