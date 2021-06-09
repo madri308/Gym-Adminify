@@ -69,8 +69,8 @@
                       <div v-for="cli in dayOfWeek[0].unrolled_clients" :key="cli.person.id">
                           <input v-on:click ='roll(dayOfWeek[0],cli.person), enrolling=dayOfWeek[0]' type="checkbox" class="mt-1 form-checkbox w-4 h-4 text-gray-600" > {{ cli.name }}
                       </div>  
-                      <button v-on:click ='enrollClient(dayOfWeek[0])' type="button" class="-mr-1 p-2 mt-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                        Guardar
+                      <button v-on:click ='enrollClient(dayOfWeek[0])' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                        <i class="fas fa-save fa-lg"></i>
                       </button>
                     </div>
                   </div>
