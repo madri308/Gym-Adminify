@@ -38,6 +38,6 @@ class RoomSerializer(serializers.ModelSerializer):
             "name",
             "capacity",
             "gym",
-            # "schedule",
+            "schedule",
             "get_absolute_url"
         )
