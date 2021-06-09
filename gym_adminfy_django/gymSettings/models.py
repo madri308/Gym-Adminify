@@ -1,4 +1,5 @@
 from django.db import models
+from AdmSchedule.models import Schedule
 
 class Config(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -19,6 +20,7 @@ class Gym(models.Model):
     name = models.CharField(db_column='Name', max_length=45)  # Field name made lowercase.
     tuitioncost = models.DecimalField(db_column='TuitionCost', max_digits=15, decimal_places=2)  # Field name made lowercase.
     config = models.ForeignKey(Config, models.DO_NOTHING, db_column='Config_ID')  # Field name made lowercase.
+    
     class Meta:
         managed = False
         db_table = 'Gym'
@@ -32,7 +34,7 @@ class Room(models.Model):
     name = models.CharField(db_column='Name', max_length=45)  # Field name made lowercase.
     capacity = models.IntegerField(db_column='Capacity')  # Field name made lowercase.
     gym = models.ForeignKey(Gym, models.DO_NOTHING, db_column='Gym_ID')  # Field name made lowercase.
-    # schedule = models.ForeignKey('Schedule', models.DO_NOTHING, db_column='Schedule_ID')  # Field name made lowercase.
+    schedule = models.ForeignKey(Schedule, models.DO_NOTHING, db_column='Schedule_ID')  # Field name made lowercase.
 
     class Meta:
         managed = False
