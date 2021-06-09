@@ -51,8 +51,10 @@ class AllActivities(ListCreateAPIView):
     def get(self, request, *args, **kwargs):
         config = Config.objects.last()
         config_ser = ConfigSerializerCapacity(config, many=False)
-
-        general_activities = Activity.objects.raw('SELECT 1 as ID, Capacity,EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity GROUP BY Capacity,Schedule_ID,dayOfWeek,StarTime,EndTime,Service_ID,Teacher_ID')
+        todays_date = date.today()
+        m = todays_date.month
+        y = todays_date.year
+        general_activities = Activity.objects.raw('SELECT 1 as ID, Capacity,EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity INNER JOIN Schedule ON Schedule.ID = Schedule_ID WHERE Schedule.Year ='+ str(y) +' AND Schedule.Month ='+ str(m) +' GROUP BY Capacity,Schedule_ID,dayOfWeek,StarTime,EndTime,Service_ID,Teacher_ID')
         gen_act_ser = GeneralActivitiesSerializer(general_activities,many=True)
     
         return Response({'config':config_ser.data, 'gen_act':gen_act_ser.data},status=status.HTTP_202_ACCEPTED)
