@@ -2,14 +2,19 @@
   <div class="bg-white">
     <div v-if="canAddTeacher">
       <button v-on:click ='newOne = !newOne' class="fixed z-50 bottom-10 right-10 w-12 h-12 bg-red-600 rounded-full hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
-        <PlusIcon class="text-white" aria-hidden="true" />
+        <div v-if="newOne">
+          <XIcon class="text-white" aria-hidden="true" />
+        </div>
+        <div v-else>
+          <PlusIcon class="text-white" aria-hidden="true" />
+        </div>
       </button>
     </div>
     <Selector @clicked="getByCategory" v-bind:options="options" />    
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <div class>
         <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
-          <div v-for="teacher in teachers" :key="teacher" class="relative">
+          <div v-for="teacher in currentList" :key="teacher" class="relative">
             <Disclosure v-bind:title="teacher.person.name">
               <div class="grid relative md:grid-cols-2 sm:grid-cols-1">
                 <div>
@@ -88,33 +93,34 @@
 import axios from "axios";
 import Selector from "../components/Selector";
 import Disclosure from "../components/Disclosure";
-import { PlusIcon,CheckCircleIcon  } from "@heroicons/vue/outline";
+import { PlusIcon,CheckCircleIcon,XIcon   } from "@heroicons/vue/outline";
 import Multiselect from '@vueform/multiselect'
 import { toast } from 'bulma-toast'
 
 export default {
   name: "Teachers",
   components: {
-    Disclosure, Selector,PlusIcon,CheckCircleIcon,Multiselect 
+    Disclosure, Selector,PlusIcon,CheckCircleIcon,Multiselect,XIcon  
   },
   data() {
     return {
       teachers: [],
+      teachersByCat: [],
+      currentList:[],
       options: Array,
       newOne:false,
 
       categories: [],
       categoriesOption:[],
       
-      // services:[],
       servicesOption:[],
     
-      teacherServices:[],
-      teacherType: 0,
       permissions: this.$store.state.permissions,
       changing: String,
 
-      name: "",
+      teacherServices:[],
+      teacherType: 0,
+      name: "Nuevo Instructor..",
       mail: "",
       phone: null,
       identification: "",
@@ -137,9 +143,9 @@ export default {
     },
   },
   methods: {
-    groupBy(key) {
+    groupByCategory() {
       return this.teachers.reduce((objectsByKeyValue, obj) => {
-        const value = obj[key];
+        const value = '/'+obj['teachercategory']+'/';
         objectsByKeyValue[value] = (objectsByKeyValue[value] || []).concat(obj);
         return objectsByKeyValue;
       }, {});
@@ -195,7 +201,9 @@ export default {
       .get("/api/v1/teachers/")
       .then((response) => {
         this.teachers = response.data;
+        this.currentList = this.teachers;
         this.changeServicesFormat();
+        this.teachersByCat = this.groupByCategory();
       })
       .catch((error) => {
         toast({
@@ -208,7 +216,7 @@ export default {
     },
     async addTeacher(){
       this.$store.commit("setIsLoading", true);
-      const formData = {
+      var formData = {
         person:{
           name: this.name,
           phone: this.phone,
@@ -218,17 +226,21 @@ export default {
         teachercategory: this.teacherType,
         services: this.teacherServices,
       }
+      console.log(formData)
       await axios
       .post("/api/v1/teachers/", formData)
       .then(response => {
-          // this.teachers.push(response.data)
           toast({
             message: "Instructor guardado exitosamente", type: "is-success",
             dismissible: true, pauseOnHover: true,
             duration: 3000, position: "bottom-right",
           });
           this.newOne = false
-          location.reload();
+          formData.person.id = response.data["person"]
+          formData.get_absolute_url = '/'+response.data["person"]+'/'
+          this.teachers.push(formData)
+          this.teachersByCat = this.groupByCategory();
+          // location.reload();
       })
       .catch(error => {
           toast({
@@ -237,6 +249,12 @@ export default {
             duration: 3000, position: "bottom-right",
           });
       })
+      this.teacherServices =[]
+      this.teacherType = 0
+      this.name = "Nuevo Instructor.."
+      this.mail = ""
+      this.phone = null
+      this.identification= "",
       this.$store.commit("setIsLoading", false);
     },
     async modifyTeacher(newTeacher){
@@ -306,24 +324,11 @@ export default {
         });
       this.$store.commit("setIsLoading", false);
     },
-    async getByCategory(id) {
+    getByCategory(id) {
       if(id == "/-1/"){
-        this.getTeachers();
+        this.currentList = this.teachers;
       }else{
-        this.$store.commit("setIsLoading", true);
-        await axios
-          .get("/api/v1/teachersByCategory"+id)
-          .then((response) => {
-            this.teachers = response.data;
-          })
-          .catch((error) => {
-            toast({
-              message: "Ocurrio un problema con los datos de: Categorias", type: "is-danger",
-              dismissible: true, pauseOnHover: true,
-              duration: 3000, position: "bottom-right",
-            });
-          });
-        this.$store.commit("setIsLoading", false);
+        this.currentList = this.teachersByCat[id]
       }
     },
   },
