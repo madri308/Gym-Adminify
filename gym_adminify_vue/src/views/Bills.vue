@@ -173,7 +173,7 @@ export default {
     
     this.getBills().then(()=>{
         this.billsSorted = this.groupBy('clientname')
-        this.getPaymentMethods()
+        let nameAux = this.$store.state.info
     })
   },
   computed:{
