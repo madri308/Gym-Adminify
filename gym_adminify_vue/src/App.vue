@@ -15,7 +15,7 @@
         <div class="navbar-start">
           <!-- SI ESTA AUTENTIFICADO ES DECIR LOGEADO -->
           <template v-if="$store.state.isAuthenticated">
-            <router-link @click="page=1" v-if="canViewClient" to="/clients" class="navbar-item">
+            <router-link @click="page=1" v-if="canViewClient" to="/clients" class="navbar-item" :class="page == 1? 'bg-black' : ''">
               Clientes
             </router-link>
             <nav :class="open ? 'navbar-open' : 'navbar-close'" class="navbar w-56 fixed bg-gray-900 top-20 left-0 h-auto">
