@@ -37,19 +37,19 @@
                   <div v-for="activity in act.activities" :key="activity" class="relative">
                     <Disclosure v-bind:title="activity.dayofmonth+'/'+act.schedule.month+'/'+act.schedule.year">
                       <div class="relative">
-                        <div v-if="changing === ''">
-                          <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
-                          <span>{{ act.teacher.name }}</span>
+                        <div v-if="changing === '/'+activity.id+'/'">
+                          <Multiselect class="mt-3" v-model="activityTeacher_edit" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
                         </div>
                         <div v-else>
-                          <Multiselect class="mt-3" v-model="activityTeacher" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
+                          <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
+                          <span>{{ act.teacher.name }}</span>
                         </div>
                         <div v-if="canChangeActivity"> 
                           <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                             <i class="fas fa-pencil-alt fa-md"></i>
                           </button> 
                           <div v-else class="mt-2 space-x-2">
-                            <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity"  class="-mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                            <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity()"  class="-mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                               <i class="fas fa-save fa-lg"></i>
                             </button>
                             <button v-if="!(changing === '')" v-on:click ='changing = ""' type="button" class=" -mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
@@ -347,18 +347,32 @@ export default {
       this.$store.commit("setIsLoading", false);
       this.changing = "";
     },
+    async getTeachers() {
+      this.$store.commit("setIsLoading", true);
+      await axios
+      .get("/api/v1/teachers/")
+      .then((response) => {
+        this.createJsonTeacher(response.data,this.teachersNames);
+      })
+      .catch((error) => {
+        console.log(error)
+        toast({
+          message: "Ocurrio un problema con los datos de: Instructores", type: "is-danger",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+      });
+      this.$store.commit("setIsLoading", false);
+    },
     async newActivity(){
       this.newOne = !this.newOne
       this.$store.commit("setIsLoading", true);
       await axios
-        .get("/api/v1/update-activities/")
+        .get("/api/v1/activities-detail/")
         .then((response) => {
           console.log(response.data);
           this.createJson(response.data['service'],this.servicesNames);
-          this.createJsonTeacher(response.data['teacher'],this.teachersNames);
           this.createJsonSchedule(response.data['config'].timeperday, this.days, this.start, this.end);
-          console.log(response.data['config'].timeperday);
-
           document.title = 'New_Activity';
         })
         .catch((error) => {
@@ -411,10 +425,11 @@ export default {
     },
     async saveModifyActivity(){
       this.$store.commit("setIsLoading", true);
-      var str = this.activityTeacher.replace("/", "");
-      str = str.replace("/", "");
+      var teacher = this.activityTeacher_edit;
+      console.log(teacher);
+      console.log((teacher.replace("/", "")).replace("/", ""));
       const formData = {
-        teacher : (this.activityTeacher.replace("/", "")).replace("/", ""),
+        teacher : (teacher.replace("/", "")).replace("/", ""),
       }
       await axios
       .put("/api/v1/activities"+this.changing, formData)
@@ -428,6 +443,7 @@ export default {
           this.changing =  ""
       })
       .catch(error => {
+        console.log(error)
           toast({
             message: "Ocurrio un problema al editar el instructor", type: "is-danger",
             dismissible: true, pauseOnHover: true,

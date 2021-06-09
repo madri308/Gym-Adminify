@@ -32,6 +32,7 @@ class SpecificDataActivitiesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
         fields = (
+            "id",
             "client",
             "dayofmonth",
             "teacher",

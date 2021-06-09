@@ -36,7 +36,7 @@ class SpecificActivities(ListCreateAPIView):
     serializer_class = ActivitiesSerializer
 
     def get(self, request, *args, **kwargs):
-        activity = Activity.objects.filter(startime=kwargs['startime'],dayofweek=kwargs['day']).only('dayofmonth','client')
+        activity = Activity.objects.filter(startime=kwargs['startime'],dayofweek=kwargs['day']).only('dayofmonth','client','id')
         ser = SpecificDataActivitiesSerializer(activity, many=True)
         for act in ser.data:
             noMatriculados = Client.objects.exclude(pk__in=[o['person'] for o in act['client']])
@@ -152,13 +152,11 @@ class ActivityDetail(RetrieveUpdateDestroyAPIView):
         return ActivitiesSerializer
 
     services = Service.objects.all()
-    teachers = Teacher.objects.all()
     config = Config.objects.last()
     def get(self, request, *args, **kwargs):
         service_ser = ServiceSerializer(self.services,many=True)
-        teachers_ser = TeacherSerializer(self.teachers,many=True)
         config_ser = ConfigSerializer(self.config, many=False)
-        return Response({'service':service_ser.data, 'teacher':teachers_ser.data, "config":config_ser.data})
+        return Response({'service':service_ser.data, "config":config_ser.data})
 
     def delete(self, request, activity_id, format=None):
         activity = Activity.objects.get(pk=activity_id)
@@ -168,8 +166,6 @@ class ActivityDetail(RetrieveUpdateDestroyAPIView):
     def put(self, request, *args, **kwargs):
         activity = Activity.objects.get(id=kwargs['activity_id'])
         teacher = Teacher.objects.get(person_id=request.data['teacher'])
-
         activity.teacher = teacher
-
         activity.save(update_fields=["teacher"])
         return Response(status=status.HTTP_202_ACCEPTED)

@@ -212,7 +212,7 @@ export default {
         })
         .catch((error) => {
           toast({
-            message: "Ocurrio un problema con los datos de: Configuracion",
+            message: "Ocurrio un problema con los datos de las facturas",
             type: "is-danger",
             dismissible: true,
             pauseOnHover: true,
@@ -271,42 +271,51 @@ export default {
       this.$store.commit("setIsLoading", false);
     },
     async payBill(bill){
-      this.$store.commit("setIsLoading", true);
-      //GET Today's date
-      var paymentDate = new Date();
-      var month = paymentDate.getUTCMonth() + 1; //months from 1-12
-      var day = paymentDate.getUTCDate();
-      var year = paymentDate.getUTCFullYear();
-      let paymentDay = year +"-"+ month +"-"+ day
+      if (bill.paymethod.id != 8) {
+        this.$store.commit("setIsLoading", true);
+        //GET Today's date
+        var paymentDate = new Date();
+        var month = paymentDate.getUTCMonth() + 1; //months from 1-12
+        var day = paymentDate.getUTCDate();
+        var year = paymentDate.getUTCFullYear();
+        let paymentDay = year +"-"+ month +"-"+ day
+        console.log(bill.paymethod.id)
 
-      const formData = {
-        paid:1,
-        cost:bill.cost,
-        paymentday: paymentDay,
-        issuedate:bill.issuedate,
-        clientname:bill.clientname,
-        paymethod: bill.paymethod.id,
+        const formData = {
+          paid:1,
+          cost:bill.cost,
+          paymentday: paymentDay,
+          issuedate:bill.issuedate,
+          clientname:bill.clientname,
+          paymethod: bill.paymethod.id,
+        }
+        bill.paymentday =  paymentDay
+        bill.paymethod.name = "Payed"
+        await axios
+        .put("/api/v1/billsByMonth"+bill.get_absolute_url, formData)
+        .then(response => {
+            toast({
+              message: "Factura Pagada!", type: "is-success",
+              dismissible: true, pauseOnHover: true,
+              duration: 3000, position: "bottom-right",
+            });
+            this.changing =  ""
+        })
+        .catch(error => {
+            toast({
+              message: "Ocurrio un problema al pagar ", type: "is-danger",
+              dismissible: true, pauseOnHover: true,
+              duration: 3000, position: "bottom-right",
+            });
+        })
+        this.$store.commit("setIsLoading", false);
+      } else{
+        toast({
+              message: "Seleccione el método de pago ", type: "is-danger",
+              dismissible: true, pauseOnHover: true,
+              duration: 3000, position: "bottom-right",
+            });
       }
-      bill.paymentday =  paymentDay
-      bill.paymethod.name = "Payed"
-      await axios
-      .put("/api/v1/billsByMonth"+bill.get_absolute_url, formData)
-      .then(response => {
-          toast({
-            message: "Factura Pagada!", type: "is-success",
-            dismissible: true, pauseOnHover: true,
-            duration: 3000, position: "bottom-right",
-          });
-          this.changing =  ""
-      })
-      .catch(error => {
-          toast({
-            message: "Ocurrio un problema al pagar ", type: "is-danger",
-            dismissible: true, pauseOnHover: true,
-            duration: 3000, position: "bottom-right",
-          });
-      })
-      this.$store.commit("setIsLoading", false);
     },
     groupBy(key) {
       return this.bills.reduce((objectsByKeyValue, obj) => {
