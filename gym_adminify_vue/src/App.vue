@@ -1,5 +1,5 @@
 <template>
-  <div id="wrapper" >
+  <div id="wrapper" class="bg-gray-700">
     <nav class="navbar is-dark">
       <div class="navbar-brand">
         <router-link @click="page=0" to="/" class="navbar-item" :class="page == 0? 'bg-black' : ''">
@@ -100,8 +100,8 @@
       <router-view />
     </section>
     <div class="clear" :style="{ clear: 'left' }"></div>
-    <footer class="footer">
-      <p class="has-text-centered">Copyright (c) 2021</p>
+    <footer class="footer bg-gray-800">
+      <p class="has-text-centered text-white">Copyright (c) 2021</p>
     </footer>
   </div>
 </template>

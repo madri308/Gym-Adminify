@@ -1,6 +1,6 @@
 <!-- This example requires Tailwind CSS v2.0+ -->
 <template>
-  <div class="bg-white">
+  <div class="bg-gray-700">
     <div v-if="canPay">
     <Selector @clicked="getOptions" v-bind:options="options" /> 
     </div>

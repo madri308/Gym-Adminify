@@ -6,7 +6,7 @@
       </div>
       <div>
         <template v-if="$store.state.isAuthenticated">
-          <Calendar ref="calendar" locale="es" :min-page="firstPage" mode="range" :attributes="attributes" :update:to-page="printPage()">
+          <Calendar is-dark ref="calendar" locale="es" :min-page="firstPage" mode="range" :attributes="attributes" :update:to-page="printPage()">
           </Calendar>
         </template>
         <template v-else>

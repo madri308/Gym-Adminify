@@ -10,7 +10,7 @@
     </div>
     <div class="columns is-multiline">
       <div class="column is-5">
-        <div class="flex max-w-sm w-full bg-white shadow-md rounded-lg overflow-hidden mx-auto">
+        <div class="flex max-w-sm w-full bg-gray-200 shadow-md rounded-lg overflow-hidden mx-auto">
           <div class="w-4 bg-indigo-500"></div>
           <div class="px-4">
             <input :disabled="!isChanging" v-model="gym.name" class="title appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Fecha inicio" aria-label="Full name"/>
@@ -18,7 +18,7 @@
             <input :disabled="!isChanging" v-model="gym.tuitioncost" class="appearance-none bg-transparent border-none w-min text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Fecha inicio" aria-label="Full name"/>
           </div>
         </div>
-        <div class="flex mt-4 max-w-sm w-full bg-white shadow-md rounded-lg overflow-hidden mx-auto">
+        <div class="flex mt-4 max-w-sm w-full bg-gray-200 shadow-md rounded-lg overflow-hidden mx-auto">
           <div class="w-4 bg-blue-400"></div>
           <div class="px-4">
             <h1 class="title divide-y mt-4">Configuracion General</h1>
@@ -28,7 +28,7 @@
             <input :disabled="!isChanging" v-model="config.capacitypercentage" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Fecha inicio" aria-label="Full name"/>
           </div>
         </div>
-        <div class="flex mt-4 max-w-sm w-full bg-white shadow-md rounded-lg overflow-hidden mx-auto">
+        <div class="flex mt-4 max-w-sm w-full bg-gray-200 shadow-md rounded-lg overflow-hidden mx-auto">
           <div class="w-2 bg-green-400"></div>
           <div class="px-4">
             <h1 class="title mt-4">Horario General</h1>
