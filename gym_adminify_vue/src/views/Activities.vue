@@ -467,7 +467,7 @@ export default {
           capacityPercentage : this.capacityPercentage
         }
         await axios
-        .put("/api/v1/activities-enroll"+"/"+act.id+"/", formData)
+        .put("/api/v1/activities-enroll"+"/"+act.activities[0].id+"/", formData)
         .then(response => {
             toast({
               message: "Ha actualizado los clientes de la actividad exitosamente", type: "is-success",
