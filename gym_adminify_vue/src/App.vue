@@ -32,20 +32,21 @@
             <router-link @click="page=3" to="/teachers" class="navbar-item" :class="page == 3? 'bg-black' : ''">
               Instructores
             </router-link>
+            <router-link @click="page=5" to="/services" class="navbar-item" :class="page == 5? 'bg-black' : ''">
+              Servicios
+            </router-link>
+            <router-link @click="page=6" to="/activities" class="navbar-item" :class="page == 6? 'bg-black' : ''">
+              Actividades
+            </router-link>
           </template>
           <!-- SI NO ESTA LOGEADO -->
-          <template v-else>
+          <!-- <template v-else>
             <router-link @click="page=4" to="/about" class="navbar-item" :class="page == 4? 'bg-black' : ''">
               ¿Quienes somos?
             </router-link>
-          </template>
+          </template> -->
           <!-- SIEMPRE SE PUEDEN VER -->
-          <router-link @click="page=5" to="/services" class="navbar-item" :class="page == 5? 'bg-black' : ''">
-            Servicios
-          </router-link>
-          <router-link @click="page=6" to="/activities" class="navbar-item" :class="page == 6? 'bg-black' : ''">
-            Actividades
-          </router-link>
+          
         </div>
       </div>
       <div class="navbar-end">
