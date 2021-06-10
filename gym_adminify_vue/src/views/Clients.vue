@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-700">
+  <div class="bg-gray-800 min-h-screen">
    <Selector @clicked="groupBy" v-bind:options="options" /> 
     <div v-if="canAddClient">
       <button v-on:click ='newOne = !newOne' class="fixed z-50 bottom-10 right-10 w-12 h-12 bg-red-600 rounded-full hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
@@ -18,24 +18,24 @@
               <div class="grid relative md:grid-cols-2 sm:grid-cols-1">
                 <div>
                   <span class="font-extrabold text-white">Nombre: </span>
-                  <input class="sm:w-10 md:w-52 text-gray-100" :disabled="!isBeingChange(client.get_absolute_url)" type="text" v-model="client.person.name" placeholder="Nombre..." aria-label="Full name">
+                  <input class="bg-gray-800 sm:w-10 md:w-52" :disabled="!isBeingChange(client.get_absolute_url)" type="text" v-model="client.person.name" placeholder="Nombre..." aria-label="Full name">
                   <span class="font-extrabold text-white">Identificacion: </span>
-                  <input class="sm:w-10 md:w-52 text-gray-100" :disabled="!isBeingChange(client.get_absolute_url)" type="number" v-model="client.person.identification" placeholder="Identificacion" aria-label="Full name">
+                  <input class="bg-gray-800 sm:w-10 md:w-52 " :disabled="!isBeingChange(client.get_absolute_url)" type="number" v-model="client.person.identification" placeholder="Identificacion" aria-label="Full name">
                 </div>
                 
                 <div>
                   <span class="font-extrabold text-white">Email : </span>
                   <br>
-                  <textarea class="sm:w-10 md:w-44 text-gray-100" :disabled="!isBeingChange(client.get_absolute_url)" type="text" v-model="client.person.mail" placeholder="Email" aria-label="Full name">
+                  <textarea class="bg-gray-800 sm:w-10 md:w-44 text-gray-100" :disabled="!isBeingChange(client.get_absolute_url)" type="text" v-model="client.person.mail" placeholder="Email" aria-label="Full name">
                   </textarea>
                 </div>
                 <div>
                   <span class="font-extrabold text-white">Telefono: </span>
-                  <input class="sm:w-10 md:w-52 text-gray-100" :disabled="!isBeingChange(client.get_absolute_url)" type="number" v-model="client.person.phone" placeholder="Telefono" aria-label="Full name">
+                  <input class="bg-gray-800 sm:w-10 md:w-52 text-gray-100" :disabled="!isBeingChange(client.get_absolute_url)" type="number" v-model="client.person.phone" placeholder="Telefono" aria-label="Full name">
                 </div>
                 <div>
                   <span class="font-extrabold text-white">Balance: </span>
-                  <input class="sm:w-10 md:w-40 text-gray-100" :disabled="!isBeingChange(client.get_absolute_url)" type="number" v-model="client.balance" placeholder="Balance" aria-label="Full name">
+                  <input class="bg-gray-800 sm:w-10 md:w-40 text-gray-100" :disabled="!isBeingChange(client.get_absolute_url)" type="number" v-model="client.balance" placeholder="Balance" aria-label="Full name">
                 </div>
                 <div> 
                   <button  v-if="canDeleteClient" v-on:click ='deleteClient(client.person.id)' type="button" class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">

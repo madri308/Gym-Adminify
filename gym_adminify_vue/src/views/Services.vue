@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-700">
+  <div class="bg-gray-800 min-h-screen">
     <div v-if="canAddService">
       <button v-on:click ='newOne = !newOne' class="fixed z-50 bottom-10 right-10 w-12 h-12 bg-red-600 rounded-full hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
         <div v-if="newOne">
@@ -10,7 +10,7 @@
         </div>
       </button>
     </div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
+    <div class="max-w-7xl min-h-screen mx-auto px-4 sm:px-7 lg:px-8">
       <div class>
         <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
           <div v-for="service in services" :key="service" class="relative">
@@ -70,7 +70,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import axios from "axios";
 import { toast } from 'bulma-toast'

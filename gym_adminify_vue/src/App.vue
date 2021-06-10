@@ -1,5 +1,5 @@
 <template>
-  <div id="wrapper" class="bg-gray-700">
+  <div id="wrapper" class="bg-gray-800">
     <nav class="navbar is-dark">
       <div class="navbar-brand">
         <router-link @click="page=0" to="/" class="navbar-item" :class="page == 0? 'bg-black' : ''">
@@ -92,16 +92,16 @@
       </div>
     </div>
 
-    <div class="is-loading-bar has-text-centered" v-bind:class="{ 'is-loading': $store.state.isLoading }">
+    <div class="is-loading-bar has-text-centered bg-gray-800" v-bind:class="{ 'is-loading': $store.state.isLoading }">
       <div class="lds-dual-ring"></div>
     </div>
 
-    <section class="section">
+    <section class="section g-gray-800">
       <router-view />
     </section>
-    <div class="clear" :style="{ clear: 'left' }"></div>
+    <div class="clear bg-gray-800" :style="{ clear: 'left' }"></div>
     <footer class="footer bg-gray-800">
-      <p class="has-text-centered text-white">Copyright (c) 2021</p>
+      <p class="has-text-centered text-white bg-gray-800">Copyright (c) 2021</p>
     </footer>
   </div>
 </template>

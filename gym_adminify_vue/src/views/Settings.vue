@@ -1,5 +1,5 @@
 <template>
-  <div class="page-settings">
+  <div class="page-settings min-h-screen">
     <div v-if="canChangeSettings">
       <button v-if="!isChanging" v-on:click="isChanging = !isChanging" class="fixed z-50 bottom-10 right-10 w-12 h-12 bg-blue-500 rounded-full hover:bg-blue-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
         <i class="text-white fas fa-pencil-alt fa-lg"></i>

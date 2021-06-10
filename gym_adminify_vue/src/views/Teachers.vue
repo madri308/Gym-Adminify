@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-700">
+  <div class="bg-gray-800">
     <div v-if="canAddTeacher">
       <button v-on:click ='newOne = !newOne' class="fixed z-50 bottom-10 right-10 w-12 h-12 bg-red-600 rounded-full hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
         <div v-if="newOne">

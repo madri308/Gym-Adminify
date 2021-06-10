@@ -1,10 +1,9 @@
 <!-- This example requires Tailwind CSS v2.0+ -->
 <template>
-  <div class="bg-gray-700">
+  <div class="bg-gray-800">
     <div v-if="canPay">
     <Selector @clicked="getOptions" v-bind:options="options" /> 
     </div>
-
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
       <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
         <div v-for="(billType,key) in billsSorted" :key="key" class="relative">
@@ -14,18 +13,18 @@
               <Disclosure :colors="''" v-bind:title="bill.issuedate" v-if="typeSorted === 'clientname' ">
                 <div class="grid relative md:grid-cols-2 sm:grid-cols-1">
                   <div class="mt-3">
-                <span class="font-extrabold height: 100% width:25% float:left"
+                <span class="text-white font-extrabold height: 100% width:25% float:left"
                   >Fecha por pagar:
                 </span>
-                <span>{{ bill.issuedate }}</span>
+                <span class="text-white"> {{ bill.issuedate }}</span>
                   </div>
                 <div v-if="canPay && (bill.paymethod.name === sinPagar)">
                     <button v-if="!(changing === bill.get_absolute_url) " @click="changing = bill.get_absolute_url" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                      <i class="fas fa-money-check scale-150"></i>
+                      <i class="fas fa-money-check" style="color:white;" ></i>
                     </button> 
                   <div v-else>
                     <button  type="button" v-on:click ="payBill(bill)" class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                      <i class="fas fa-money-check"></i>
+                      <i class="fas fa-money-check" style="color:white;" ></i>
                     </button>
                     <button v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                       <i class="fas fa-times-circle fa-lg"></i>
@@ -34,40 +33,40 @@
                 </div>
                 </div>
                 <div class="mt-3">
-                <span class="font-extrabold height: 100% width:25% float:left"
+                <span class="text-white font-extrabold height: 100% width:25% float:left"
                   >Fecha de Pago:
                 </span>
-                <span>{{ bill.paymentday }}</span>
+                <span class="text-white"> {{ bill.paymentday }}</span>
                 </div>
                 <div class="mt-3">
-                <span class="font-extrabold height: 100% width:25% float:left"
+                <span class="text-white font-extrabold height: 100% width:25% float:left"
                   >Cliente:
                 </span>
-                <span>{{ bill.clientname }}</span>
+                <span class="text-white"> {{ bill.clientname }}</span>
                 </div>
                 <div class="mt-3">
-                <span class="font-extrabold height: 100% width:25% float:left"
+                <span class="text-white font-extrabold height: 100% width:25% float:left"
                   >Costo:
                 </span>
-                <span>{{ bill.cost }}</span>
+                <span class="text-white"> {{ bill.cost }}</span>
                 </div>
                 <div class="mt-4">
-                    <span class="font-extrabold height: 100% width:0% float:left">Método de Pago: </span>
-                    <Multiselect :disabled="!isBeingChange(bill.get_absolute_url)" class="object-left md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymethod.id" :options="billPaymentMethods"/>
+                    <span class="text-white font-extrabold height: 100% width:0% float:left">Método de Pago: </span>
+                    <Multiselect :disabled="!isBeingChange(bill.get_absolute_url)" class="object-left bg-white md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymethod.id" :options="billPaymentMethods"/>
                 </div>
               </Disclosure>
             
               <Disclosure :colors="''" v-bind:title="bill.clientname+' - '+bill.issuedate" v-else>
                 <div class="grid relative md:grid-cols-2 sm:grid-cols-1">
                   <div class="mt-3">
-                <span class="font-extrabold height: 100% width:25% float:left"
+                <span class="text-white font-extrabold height: 100% width:25% float:left"
                   >Fecha por pagar:
                 </span>
-                <span>{{ bill.issuedate }}</span>
+                <span class="text-white"> {{ bill.issuedate }}</span>
                   </div>
                 <div v-if="canPay  && (bill.paymethod.name === sinPagar)">
                   <button v-if="!(changing === bill.get_absolute_url)" @click="changing = bill.get_absolute_url" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="fas fa-money-check-alt fa-lg"></i>
+                   <i class="fas fa-money-check" style="color:white;" ></i> 
                   </button> 
                   <div v-else>
                     <button  type="button"  v-on:click ="payBill(bill)"  class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
@@ -80,26 +79,26 @@
                 </div>
                 </div>
                 <div class="mt-3">
-                <span class="font-extrabold height: 100% width:25% float:left"
+                <span class="text-white font-extrabold height: 100% width:25% float:left"
                   >Fecha de Pago:
                 </span>
-                <span>{{ bill.paymentday }}</span>
+                <span class="text-white"> {{ bill.paymentday }}</span>
                 </div>
                 <div class="mt-3">
-                <span class="font-extrabold height: 100% width:25% float:left"
+                <span class="text-white font-extrabold height: 100% width:25% float:left"
                   >Cliente:
                 </span>
-                <span>{{ bill.clientname }}</span>
+                <span class="text-white"> {{ bill.clientname }}</span>
                 </div>
                 <div class="mt-3">
-                <span class="font-extrabold height: 100% width:25% float:left"
+                <span class="text-white font-extrabold height: 100% width:25% float:left"
                   >Costo:
                 </span>
-                <span>{{ bill.cost }}</span>
+                <span class="text-white"> {{ bill.cost }}</span>
                 </div>
                 <div class="mt-4">
-                    <span class="font-extrabold height: 100% width:0% float:left">Método de Pago: </span>
-                    <Multiselect :disabled="!isBeingChange(bill.get_absolute_url)" class="object-left md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymethod.id" :options="billPaymentMethods"/>
+                    <span class="text-white font-extrabold height: 100% width:0% float:left">Método de Pago: </span>
+                    <Multiselect :disabled="!isBeingChange(bill.get_absolute_url)" class="bg-white object-left md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymethod.id" :options="billPaymentMethods"/>
                 </div>
               </Disclosure>
             
@@ -144,7 +143,7 @@ export default {
       billPaymentMethods:[],
       permissions: this.$store.state.permissions,
       orderedMonths: {
-         1:"Enero",
+         1:"Enero", 
         2:"Febrero",
         3:"Marzo",
         4:"Abril",

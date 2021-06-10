@@ -10,7 +10,7 @@
           </Calendar>
         </template>
         <template v-else>
-          <div class="h-96 w-80 page-log-in rounded-lg shadow-lg p-4">
+          <div class="h-96 w-80 page-log-in rounded-lg shadow-lg bg-gray-300 p-4">
             <h1 class="title">Inicio de Sesion</h1>
             <form @submit.prevent="submitForm">
                 <div class="field">
