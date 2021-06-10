@@ -113,18 +113,19 @@ class ActivityEnrollClients(ListCreateAPIView):
         for act in activities_related:
             for element in clients_enroll:
                 client = Client.objects.get(person_id=element)
-                if (client.clientstate.name == "Activo"):
-                    act.client.add(client)
-                    b = Bill(
-                        paid = 0,
-                        paymentday = None,
-                        issuedate = today.strftime("%Y-%m-%d"),
-                        cost = service.hourfee * duration,
-                        activity = act,
-                        paymethod = not_paid,
-                        client = client
-                    )
-                    b.save()
+                if (client.clientstate.name != "Activo"):
+                    return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+                act.client.add(client)
+                b = Bill(
+                    paid = 0,
+                    paymentday = None,
+                    issuedate = today.strftime("%Y-%m-%d"),
+                    cost = service.hourfee * duration,
+                    activity = act,
+                    paymethod = not_paid,
+                    client = client
+                )
+                b.save()
                 # se necesita crear la factura
             for element in clients_unenroll:
                 client = Client.objects.get(person_id=element)
