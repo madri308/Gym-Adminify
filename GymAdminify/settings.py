@@ -60,7 +60,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "http://localhost:8081",
     "https://gym-adminify.vercel.app/",
-    "https://gym-adminifyv2.vercel.app/"
+    "https://gym-adminifyv2.vercel.app/",
+    "https://gym-adminify-v1.vercel.app/"
 ]
 
 MIDDLEWARE = [
