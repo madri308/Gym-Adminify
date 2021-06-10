@@ -6,104 +6,105 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
-      <dl
-        class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10"
-      >
+      <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
         <div v-for="(billType,key) in billsSorted" :key="key" class="relative">
           <Disclosure :title="key">
+            <dl class="space-y-2 lg:space-y-0 grid grid-cols-2 gap-x-2 gap-y-2  md:grid-cols-1 sm:grid-cols-1 ">
             <div v-for="bill in billType" :key="bill" class="relative">
-            <Disclosure v-bind:title="bill.issuedate" v-if="typeSorted === 'clientname' ">
-              <div class="grid relative md:grid-cols-2 sm:grid-cols-1">
-                <div class="mt-3">
-              <span class="font-extrabold height: 100% width:25% float:left"
-                >Fecha por pagar:
-              </span>
-              <span>{{ bill.issuedate }}</span>
+              <Disclosure :colors="''" v-bind:title="bill.issuedate" v-if="typeSorted === 'clientname' ">
+                <div class="grid relative md:grid-cols-2 sm:grid-cols-1">
+                  <div class="mt-3">
+                <span class="font-extrabold height: 100% width:25% float:left"
+                  >Fecha por pagar:
+                </span>
+                <span>{{ bill.issuedate }}</span>
+                  </div>
+                <div v-if="canPay && (bill.paymethod.name === sinPagar)">
+                    <button v-if="!(changing === bill.get_absolute_url) " @click="changing = bill.get_absolute_url" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                      <i class="fas fa-money-check scale-150"></i>
+                    </button> 
+                  <div v-else>
+                    <button  type="button" v-on:click ="payBill(bill)" class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                      <i class="fas fa-money-check"></i>
+                    </button>
+                    <button v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                      <i class="fas fa-times-circle fa-lg"></i>
+                    </button>
                 </div>
-              <div v-if="canPay && (bill.paymethod.name === sinPagar)">
-                  <button v-if="!(changing === bill.get_absolute_url) " @click="changing = bill.get_absolute_url" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="fas fa-money-check scale-150"></i>
+                </div>
+                </div>
+                <div class="mt-3">
+                <span class="font-extrabold height: 100% width:25% float:left"
+                  >Fecha de Pago:
+                </span>
+                <span>{{ bill.paymentday }}</span>
+                </div>
+                <div class="mt-3">
+                <span class="font-extrabold height: 100% width:25% float:left"
+                  >Cliente:
+                </span>
+                <span>{{ bill.clientname }}</span>
+                </div>
+                <div class="mt-3">
+                <span class="font-extrabold height: 100% width:25% float:left"
+                  >Costo:
+                </span>
+                <span>{{ bill.cost }}</span>
+                </div>
+                <div class="mt-4">
+                    <span class="font-extrabold height: 100% width:0% float:left">Método de Pago: </span>
+                    <Multiselect :disabled="!isBeingChange(bill.get_absolute_url)" class="object-left md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymethod.id" :options="billPaymentMethods"/>
+                </div>
+              </Disclosure>
+            
+              <Disclosure :colors="''" v-bind:title="bill.clientname+' - '+bill.issuedate" v-else>
+                <div class="grid relative md:grid-cols-2 sm:grid-cols-1">
+                  <div class="mt-3">
+                <span class="font-extrabold height: 100% width:25% float:left"
+                  >Fecha por pagar:
+                </span>
+                <span>{{ bill.issuedate }}</span>
+                  </div>
+                <div v-if="canPay  && (bill.paymethod.name === sinPagar)">
+                  <button v-if="!(changing === bill.get_absolute_url)" @click="changing = bill.get_absolute_url" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <i class="fas fa-money-check-alt fa-lg"></i>
                   </button> 
-                <div v-else>
-                  <button  type="button" v-on:click ="payBill(bill)" class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="fas fa-money-check"></i>
-                  </button>
-                  <button v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="fas fa-times-circle fa-lg"></i>
-                  </button>
-              </div>
-              </div>
-              </div>
-              <div class="mt-3">
-              <span class="font-extrabold height: 100% width:25% float:left"
-                >Fecha de Pago:
-              </span>
-              <span>{{ bill.paymentday }}</span>
-              </div>
-              <div class="mt-3">
-              <span class="font-extrabold height: 100% width:25% float:left"
-                >Cliente:
-              </span>
-              <span>{{ bill.clientname }}</span>
-              </div>
-              <div class="mt-3">
-              <span class="font-extrabold height: 100% width:25% float:left"
-                >Costo:
-              </span>
-              <span>{{ bill.cost }}</span>
-              </div>
-              <div class="mt-4">
-                  <span class="font-extrabold height: 100% width:0% float:left">Método de Pago: </span>
-                  <Multiselect :disabled="!isBeingChange(bill.get_absolute_url)" class="object-left md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymethod.id" :options="billPaymentMethods"/>
-              </div>
-            </Disclosure>
-
-            <Disclosure v-bind:title="bill.clientname+' - '+bill.issuedate" v-else>
-              <div class="grid relative md:grid-cols-2 sm:grid-cols-1">
-                <div class="mt-3">
-              <span class="font-extrabold height: 100% width:25% float:left"
-                >Fecha por pagar:
-              </span>
-              <span>{{ bill.issuedate }}</span>
+                  <div v-else>
+                    <button  type="button"  v-on:click ="payBill(bill)"  class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                      <i class="fas fa-check-circle fa-lg"></i>
+                    </button>
+                    <button v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                      <i class="fas fa-times-circle fa-lg"></i>
+                    </button>
                 </div>
-              <div v-if="canPay  && (bill.paymethod.name === sinPagar)">
-                <button v-if="!(changing === bill.get_absolute_url)" @click="changing = bill.get_absolute_url" type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                  <i class="fas fa-money-check-alt fa-lg"></i>
-                </button> 
-                <div v-else>
-                  <button  type="button"  v-on:click ="payBill(bill)"  class="absolute top-8 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="fas fa-check-circle fa-lg"></i>
-                  </button>
-                  <button v-on:click ='changing = ""' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                    <i class="fas fa-times-circle fa-lg"></i>
-                  </button>
-              </div>
-              </div>
-              </div>
-              <div class="mt-3">
-              <span class="font-extrabold height: 100% width:25% float:left"
-                >Fecha de Pago:
-              </span>
-              <span>{{ bill.paymentday }}</span>
-              </div>
-              <div class="mt-3">
-              <span class="font-extrabold height: 100% width:25% float:left"
-                >Cliente:
-              </span>
-              <span>{{ bill.clientname }}</span>
-              </div>
-              <div class="mt-3">
-              <span class="font-extrabold height: 100% width:25% float:left"
-                >Costo:
-              </span>
-              <span>{{ bill.cost }}</span>
-              </div>
-              <div class="mt-4">
-                  <span class="font-extrabold height: 100% width:0% float:left">Método de Pago: </span>
-                  <Multiselect :disabled="!isBeingChange(bill.get_absolute_url)" class="object-left md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymethod.id" :options="billPaymentMethods"/>
-              </div>
-            </Disclosure>
+                </div>
+                </div>
+                <div class="mt-3">
+                <span class="font-extrabold height: 100% width:25% float:left"
+                  >Fecha de Pago:
+                </span>
+                <span>{{ bill.paymentday }}</span>
+                </div>
+                <div class="mt-3">
+                <span class="font-extrabold height: 100% width:25% float:left"
+                  >Cliente:
+                </span>
+                <span>{{ bill.clientname }}</span>
+                </div>
+                <div class="mt-3">
+                <span class="font-extrabold height: 100% width:25% float:left"
+                  >Costo:
+                </span>
+                <span>{{ bill.cost }}</span>
+                </div>
+                <div class="mt-4">
+                    <span class="font-extrabold height: 100% width:0% float:left">Método de Pago: </span>
+                    <Multiselect :disabled="!isBeingChange(bill.get_absolute_url)" class="object-left md:w-52 sm:w-36" label="label" mode="single" v-model="bill.paymethod.id" :options="billPaymentMethods"/>
+                </div>
+              </Disclosure>
+            
             </div>
+            </dl>
           </Disclosure>
           
         </div>

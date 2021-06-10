@@ -2,7 +2,12 @@
   <div class="bg-white">
     <div v-if="canAddActivity">
       <button v-on:click ='newActivity' class="fixed z-50 bottom-10 right-10 w-12 h-12 bg-red-600 rounded-full hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
-        <PlusIcon class="text-white" aria-hidden="true" />
+        <div v-if="newOne">
+          <XIcon class="text-white" aria-hidden="true" />
+        </div>
+        <div v-else>
+          <PlusIcon class="text-white" aria-hidden="true" />
+        </div>
       </button>
     </div>
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
@@ -35,7 +40,7 @@
                 </div>
                 <dl class="md:grid md:grid-cols-2 md:gap-x-1">
                   <div v-for="activity in act.activities" :key="activity" class="relative">
-                    <Disclosure v-bind:title="activity.dayofmonth+'/'+act.schedule.month+'/'+act.schedule.year">
+                    <Disclosure :colors="''" v-bind:title="activity.dayofmonth+'/'+act.schedule.month+'/'+act.schedule.year">
                       <div class="relative">
                         <div v-if="changing === '/'+activity.id+'/'">
                           <Multiselect class="mt-3" v-model="activity.teacher.get_absolute_url" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
@@ -147,7 +152,7 @@ import axios from "axios";
 
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/vue/solid";
 import Selector from "../components/Selector";
-import { PlusIcon,CheckCircleIcon  } from "@heroicons/vue/outline";
+import { PlusIcon,XIcon  } from "@heroicons/vue/outline";
 import Multiselect from '@vueform/multiselect'
 import { toast } from 'bulma-toast'
 import Disclosure from '../components/Disclosure.vue';
@@ -161,6 +166,7 @@ export default {
     ChevronDownIcon,
     PlusIcon,
     Multiselect,
+    XIcon,
   },
   data() {
     Disclosure

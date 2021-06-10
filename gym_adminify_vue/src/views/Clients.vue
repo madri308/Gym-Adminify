@@ -3,7 +3,12 @@
    <Selector @clicked="groupBy" v-bind:options="options" /> 
     <div v-if="canAddClient">
       <button v-on:click ='newOne = !newOne' class="fixed z-50 bottom-10 right-10 w-12 h-12 bg-red-600 rounded-full hover:bg-red-700 active:shadow-lg mouse shadow transition ease-in duration-200 focus:outline-none">
-        <PlusIcon class="text-white" aria-hidden="true" />
+        <div v-if="newOne">
+          <XIcon class="text-white" aria-hidden="true" />
+        </div>
+        <div v-else>
+          <PlusIcon class="text-white" aria-hidden="true" />
+        </div>
       </button>
     </div>
     <div class="max-w-7xl mx-auto px-4 sm:px-7 lg:px-8">
@@ -20,7 +25,9 @@
                 
                 <div>
                   <span class="font-extrabold">Email : </span>
-                  <input class="sm:w-10 md:w-44" :disabled="!isBeingChange(client.get_absolute_url)" type="text" v-model="client.person.mail" placeholder="Email" aria-label="Full name">
+                  <br>
+                  <textarea class="sm:w-10 md:w-44" :disabled="!isBeingChange(client.get_absolute_url)" type="text" v-model="client.person.mail" placeholder="Email" aria-label="Full name">
+                  </textarea>
                 </div>
                 <div>
                   <span class="font-extrabold">Telefono: </span>
@@ -64,7 +71,8 @@
                   <input v-model="phone" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="number" placeholder="Número telefónico" aria-label="Full name">
                 </div>
                 <div class="flex items-center border-b border-teal-500 py-2">
-                  <input v-model="mail" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Correo electrónico" aria-label="Full name">
+                  <textarea v-model="mail" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Correo electrónico" aria-label="Full name">
+                  </textarea>
                 </div>
               </form>
               <button type="button" v-on:click ="addClient" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
@@ -83,7 +91,7 @@ import { toast } from 'bulma-toast'
 import Selector from "../components/Selector";
 import Multiselect from '@vueform/multiselect';
 import Disclosure from "../components/Disclosure";
-import { PlusIcon, CheckCircleIcon  } from "@heroicons/vue/outline";
+import { PlusIcon, CheckCircleIcon,XIcon } from "@heroicons/vue/outline";
 
 export default {
   name: "Clients",
@@ -93,6 +101,7 @@ export default {
     Disclosure,
     Multiselect,
     CheckCircleIcon,
+    XIcon,
   },
   data() {
     return {
