@@ -81,9 +81,9 @@ export default {
   },
   methods: {
     printPage(){
-      if(this.$refs.calendar != null){
-        console.log(this.$refs.calendar.pages[0].key);
-      }
+      // if(this.$refs.calendar != null){
+      //   console.log(this.$refs.calendar.pages[0].key);
+      // }
     },
     normalizeInfo(data){
       for (var key in data) {
@@ -96,6 +96,7 @@ export default {
           }
         }
       }
+      this.$store.commit('setInfo', this.userInfo);
     },
     async submitForm() {
         this.$store.commit("setIsLoading", true);
@@ -123,12 +124,12 @@ export default {
                 this.errors.push('Something went wrong. Please try again')
             }
         })
-        localStorage.removeItem("userInfo")
+        
         await axios
         .get("/api/v1/personInfo/")
         .then((response) => {
           this.normalizeInfo(response.data)
-          this.$store.commit('setInfo', this.userInfo);
+          
           // const toPath = this.$route.query.to || '/'
           // this.$router.push(toPath)
         })
@@ -150,8 +151,8 @@ export default {
             dismissible: true, pauseOnHover: true,duration: 2000, position: "bottom-right",
           });
         });
-        location.reload();
         this.$store.commit("setIsLoading", false);
+        location.reload();
     },
     async getActivities(){
       this.$store.commit("setIsLoading", true);
