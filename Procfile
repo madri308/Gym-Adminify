@@ -1,1 +1,1 @@
-web: gunicorn gym_adminfy_django.GymAdminify.wsgi --log-file -
+web: gunicorn GymAdminify.wsgi --log-file -
