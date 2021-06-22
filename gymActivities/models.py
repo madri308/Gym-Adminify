@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 from gymClients.models import Client
 from gymServices.models import Service
@@ -15,6 +16,8 @@ class Activity(models.Model):
     service = models.ForeignKey('gymServices.Service', models.DO_NOTHING, db_column='Service_ID')  # Field name made lowercase.
     teacher = models.ForeignKey('gymTeachers.Teacher', models.DO_NOTHING, db_column='Teacher_ID')  # Field name made lowercase.
     client = models.ManyToManyField(Client)
+    creator = models.ForeignKey(User,  on_delete=models.CASCADE)
+    state = models.IntegerField(db_column='State')  # Field name made lowercase.
 
     class Meta:
         managed = False

@@ -24,6 +24,8 @@ class ActivitiesSerializer(serializers.ModelSerializer):
             "client",
             "schedule",
             "dayofmonth",
+            "state",
+            "creator",
         )
 
 class SpecificDataActivitiesSerializer(serializers.ModelSerializer):
@@ -51,7 +53,9 @@ class GeneralActivitiesSerializer(serializers.ModelSerializer):
             "service_name",
             "teacher",
             "capacity",
-            "schedule" 
+            "schedule",
+            "state",
+            "creator_id", 
         )
 
 class ScheduleActivitiesSerializer(serializers.ModelSerializer):

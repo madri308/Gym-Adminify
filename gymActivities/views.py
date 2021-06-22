@@ -1,15 +1,6 @@
 import calendar
 from datetime import date, datetime
-from collections import namedtuple
 
-import json
-from django.core.serializers.json import DjangoJSONEncoder
-
-
-from django.shortcuts import render
-from rest_framework import serializers
-
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
@@ -17,19 +8,19 @@ from rest_framework import status, authentication, permissions
 
 from .serializers import ActivitiesSerializer, ScheduleActivitiesSerializer,SpecificDataActivitiesSerializer,GeneralActivitiesSerializer
 from gymServices.serializers import ServiceSerializer
-from gymTeachers.serializers import TeacherSerializer
 from gymSettings.serializers import ConfigSerializer, ConfigSerializerCapacity
 from gymClients.serializers import ClientNameSerializer
-from django.db.models import Count
 
 from .models import Activity
-from gymClients.models import Client, ClientState
 from gymServices.models import Service
 from gymTeachers.models import Teacher
 from gymSettings.models import Config
 from AdmSchedule.models import Schedule
 from gymClients.models import Client
 from AdmBills.models import Bill, PayMethod
+from gymPersons.models import Userofperson
+
+from django.contrib.auth.models import User
 
 class SpecificActivities(ListCreateAPIView):
     queryset = Activity.objects.all()
@@ -47,16 +38,22 @@ class SpecificActivities(ListCreateAPIView):
 class AllActivities(ListCreateAPIView):
     queryset = Activity.objects.all()
     serializer_class = ActivitiesSerializer
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
+        user = User.objects.get(pk = request.user.id)
         config = Config.objects.last()
         config_ser = ConfigSerializerCapacity(config, many=False)
         todays_date = date.today()
         m = todays_date.month
         y = todays_date.year
-        general_activities = Activity.objects.raw('SELECT 1 as ID, Capacity,EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity INNER JOIN Schedule ON Schedule.ID = Schedule_ID WHERE Schedule.Year ='+ str(y) +' AND Schedule.Month ='+ str(m) +' GROUP BY Capacity,Schedule_ID,dayOfWeek,StarTime,EndTime,Service_ID,Teacher_ID')
+        general_activities = Activity.objects.raw('SELECT 1 as ID, creator_ID,State,Capacity,EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity INNER JOIN Schedule ON Schedule.ID = Schedule_ID WHERE Schedule.Year ='+ str(y) +' AND Schedule.Month ='+ str(m) +' GROUP BY creator_ID,State,Capacity,Schedule_ID,dayOfWeek,StarTime,EndTime,Service_ID,Teacher_ID')
+        if user.groups.filter(name = "Teacher"): 
+            general_activities = Activity.objects.raw('SELECT 1 as ID, creator_ID,State,Capacity,EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity INNER JOIN Schedule ON Schedule.ID = Schedule_ID WHERE Schedule.Year ='+ str(y) +' AND Schedule.Month ='+ str(m) +' AND (Activity.creator_ID ='+ str(request.user.id)+ ' OR Activity.Teacher_ID ='+ str(request.user.id)+') GROUP BY creator_ID,State,Capacity,Schedule_ID,dayOfWeek,StarTime,EndTime,Service_ID,Teacher_ID')
+        elif user.groups.filter(name = "Client"):
+            general_activities = Activity.objects.raw('SELECT 1 as ID, creator_ID,State,Capacity,EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity INNER JOIN Schedule ON Schedule.ID = Schedule_ID WHERE Schedule.Year ='+ str(y) +' AND Schedule.Month ='+ str(m) +' AND Activity.State = 1 GROUP BY creator_ID,State,Capacity,Schedule_ID,dayOfWeek,StarTime,EndTime,Service_ID,Teacher_ID')
         gen_act_ser = GeneralActivitiesSerializer(general_activities,many=True)
-    
         return Response({'config':config_ser.data, 'gen_act':gen_act_ser.data},status=status.HTTP_202_ACCEPTED)
     
     def getDatesByDay(self, numberDay,month,year):
@@ -77,10 +74,14 @@ class AllActivities(ListCreateAPIView):
     def create(self, request, pk=None):
         if self.checkOverlap(request.data['startTime'],request.data['endTime'], request.data['day']):
             return Response(status=status.HTTP_409_CONFLICT)
-        selected_service = Service.objects.get(id=request.data['service'])
-        selected_teacher = Teacher.objects.get(person_id=request.data['teacher'])
-        selected_schedule = Schedule.objects.last()
         
+        user = User.objects.get(pk = request.user.id)
+
+        selected_service = Service.objects.get(id=request.data['service'])
+        selected_teacher = Teacher.objects.get(person_id = Userofperson.objects.get(user = request.user.id).person) if user.groups.filter(name = "Teacher") else Teacher.objects.get(person_id=request.data['teacher'])
+        selected_schedule = Schedule.objects.last()
+        actState = 0 if user.groups.filter(name = "Teacher") else 1
+
         for element in self.getDatesByDay(request.data['day'],selected_schedule.month,selected_schedule.year):
             new_Act = Activity( capacity = request.data['service'], 
                                 dayofweek = request.data['day'],
@@ -91,7 +92,10 @@ class AllActivities(ListCreateAPIView):
 
                                 service = selected_service, 
                                 teacher = selected_teacher,
-                                schedule = selected_schedule                    
+                                schedule = selected_schedule,
+
+                                creator = user,
+                                state = actState,                    
                             )
             new_Act.save()    
         return Response(status=status.HTTP_202_ACCEPTED)

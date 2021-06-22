@@ -14,86 +14,96 @@
       <div class>
         <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
           <div v-for="act in activities" :key="act" class="relative">
-            <Disclosure v-on:click ="act.client == null ? getDetails(act) : null" v-bind:title="act.service_name+' - '+act.startime +' - '+getLiteralDay(act.dayofweek-1)">
-              <dl>
-                <div>
-                  <span class="font-extrabold height: 100% width:25% float:left">Instructor fijo: </span>
-                  <span>{{ act.teacher.name }}</span>
+            <Disclosure v-on:click ="act.client == null ? getDetails(act) : null" v-bind:title="getLiteralState(act.state)+' '+  act.service_name+' - '+act.startime +' - '+getLiteralDay(act.dayofweek-1)">
+              <div class="relative">
+                <div v-if="act.state === 0 && canAcceptActivity">
+                  <button type="button"  v-on:click ="saveNewActivity"  class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <i class="fas fa-check-circle fa-lg"></i>
+                  </button>
+                  <button v-on:click ='newActivity' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <i class="fas fa-times-circle fa-lg"></i>
+                  </button>
                 </div>
-                <div>
-                  <span class="font-extrabold height: 100% width:25% float:left">  Hora: </span>
-                  <span>{{ act.startime }} </span> <span> - </span> <span>{{ act.endtime }} </span> 
-                  <span class="font-extrabold height: 100% width:25% float:left"> Dia: </span>
-                  <span>{{daysOfWeek[act.dayofweek-1]}} {{act.dayofmonth}}  </span>
-                </div>
-                <div>
-                  <span class="font-extrabold height: 100% width:25% float:left"> Capacidad: </span>
-                  <span>{{ act.capacity }}</span>
-                </div>
-                <div>
-                  <span class="font-extrabold height: 100% width:25% float:left">  Cupos disponibles: </span>
-                  <span>{{ act.spaces > 0 ? parseInt(act.spaces) : "No hay cupos disponibles"}} </span> 
-                </div>
-                <div>
-                  <span style="color:red" class="font-extrabold height: 100% width:25% float:left"> Aforo permitido: </span>
-                  <span style="color:red">{{ parseInt(act.capacity * this.capacityPercentage) }}</span>
-                </div>
-                <dl class="md:grid md:grid-cols-2 md:gap-x-1">
-                  <div v-for="activity in act.activities" :key="activity" class="relative">
-                    <Disclosure :colors="''" v-bind:title="activity.dayofmonth+'/'+act.schedule.month+'/'+act.schedule.year">
-                      <div class="relative">
-                        <div v-if="changing === '/'+activity.id+'/'">
-                          <Multiselect class="mt-3" v-model="activity.teacher.get_absolute_url" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
+                <dl>
+                  <div>
+                    <span class="font-extrabold height: 100% width:25% float:left">Instructor fijo: </span>
+                    <span>{{ act.teacher.name }}</span>
+                  </div>
+                  <div>
+                    <span class="font-extrabold height: 100% width:25% float:left">  Hora: </span>
+                    <span>{{ act.startime }} </span> <span> - </span> <span>{{ act.endtime }} </span> 
+                    <span class="font-extrabold height: 100% width:25% float:left"> Dia: </span>
+                    <span>{{daysOfWeek[act.dayofweek-1]}} {{act.dayofmonth}}  </span>
+                  </div>
+                  <div>
+                    <span class="font-extrabold height: 100% width:25% float:left"> Capacidad: </span>
+                    <span>{{ act.capacity }}</span>
+                  </div>
+                  <div>
+                    <span class="font-extrabold height: 100% width:25% float:left">  Cupos disponibles: </span>
+                    <span>{{ act.spaces > 0 ? parseInt(act.spaces) : "No hay cupos disponibles"}} </span> 
+                  </div>
+                  <div>
+                    <span style="color:red" class="font-extrabold height: 100% width:25% float:left"> Aforo permitido: </span>
+                    <span style="color:red">{{ parseInt(act.capacity * this.capacityPercentage) }}</span>
+                  </div>
+                  <dl class="md:grid md:grid-cols-2 md:gap-x-1">
+                    <div v-for="activity in act.activities" :key="activity" class="relative">
+                      <Disclosure :colors="''" v-bind:title="activity.dayofmonth+'/'+act.schedule.month+'/'+act.schedule.year">
+                        <div class="relative">
+                          <div v-if="changing === '/'+activity.id+'/'">
+                            <Multiselect class="mt-3" v-model="activity.teacher.get_absolute_url" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
+                          </div>
+                          <div v-else>
+                            <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
+                            <span>{{ activity.teacher.name }}</span>
+                          </div>
+                          <div v-if="canChangeActivity"> 
+                            <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                              <i class="fas fa-pencil-alt fa-md"></i>
+                            </button> 
+                            <div v-else class="mt-2 space-x-2">
+                              <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity(activity)"  class="-mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                                <i class="fas fa-save fa-lg"></i>
+                              </button>
+                              <button v-if="!(changing === '')" v-on:click ='changing = ""' type="button" class=" -mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                                <i class="fas fa-times-circle fa-lg"></i>
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                        <div v-else>
-                          <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
-                          <span>{{ activity.teacher.name }}</span>
+                      </Disclosure>
+                    </div>
+                  </dl>
+                  <Disclosure v-if='canChangeActivity' v-bind:title="'Clientes'" >
+                    <div class="relative">
+                      <div class="grid relative py-3 md:grid-cols-2 sm:grid-cols-1">
+                        <button v-on:click ='enrollClient(act)' type="button" class="absolute top-0 right-2 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                          <i class="fas fa-save fa-lg"></i>
+                        </button>
+                        <div>
+                          <span class="font-extrabold height: 100% width:25% float:left">Matriculados: </span>
+                          <div v-for="cli in act.client" :key="cli.person.id">
+                              <button v-on:click ='unroll(act,cli.person), enrolling=act.client' type="button" class="-mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                                <i class="fas fa-times-circle"></i>
+                                {{ cli.name }}
+                              </button>
+                          </div>
                         </div>
-                        <div v-if="canChangeActivity"> 
-                          <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                            <i class="fas fa-pencil-alt fa-md"></i>
-                          </button> 
-                          <div v-else class="mt-2 space-x-2">
-                            <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity(activity)"  class="-mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                              <i class="fas fa-save fa-lg"></i>
-                            </button>
-                            <button v-if="!(changing === '')" v-on:click ='changing = ""' type="button" class=" -mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                              <i class="fas fa-times-circle fa-lg"></i>
-                            </button>
+                        <div>
+                          <span class="font-extrabold height: 100% width:25% float:left">No matriculados: </span>
+                          <div v-for="cli in act.unrolled_clients" :key="cli.person.id">
+                              <button v-on:click ='roll(act,cli.person), enrolling=act.client' type="button" class="-mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"> 
+                                <i class="fas fa-check-circle"></i>
+                                {{ cli.name }}
+                              </button>
                           </div>
                         </div>
                       </div>
-                    </Disclosure>
-                  </div>
-                </dl>
-                <Disclosure v-if='canChangeActivity' v-bind:title="'Clientes'" >
-                  <div class="relative">
-                    <div class="grid relative py-3 md:grid-cols-2 sm:grid-cols-1">
-                      <button v-on:click ='enrollClient(act)' type="button" class="absolute top-0 right-2 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                        <i class="fas fa-save fa-lg"></i>
-                      </button>
-                      <div>
-                        <span class="font-extrabold height: 100% width:25% float:left">Matriculados: </span>
-                        <div v-for="cli in act.client" :key="cli.person.id">
-                            <button v-on:click ='unroll(act,cli.person), enrolling=act.client' type="button" class="-mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                               <i class="fas fa-times-circle"></i>
-                               {{ cli.name }}
-                            </button>
-                        </div>
-                      </div>
-                      <div>
-                        <span class="font-extrabold height: 100% width:25% float:left">No matriculados: </span>
-                        <div v-for="cli in act.unrolled_clients" :key="cli.person.id">
-                            <button v-on:click ='roll(act,cli.person), enrolling=act.client' type="button" class="-mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"> 
-                              <i class="fas fa-check-circle"></i>
-                              {{ cli.name }}
-                            </button>
-                        </div>
-                      </div>
                     </div>
-                  </div>
-                </Disclosure>
-              </dl>
+                  </Disclosure>
+                </dl>
+              </div>
             </Disclosure>
           </div>
           <Disclosure v-bind:title="'Nueva Actividad'" v-if="newOne">
@@ -111,7 +121,7 @@
               </div>
               
               <Multiselect class="mt-3" v-model="activityService_new" placeholder="Seleccione el servicio que se brindara" :options="this.servicesNames"/>
-              <Multiselect class="mt-3" v-model="activityTeacher_new" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
+              <Multiselect v-if="canSelectTeacher" class="mt-3" v-model="activityTeacher_new" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
               <Multiselect class="mt-3" v-model="activityDay_new" placeholder="Seleccione el día " v-on:click ='selectedDay=true' :options="this.days"/>
               
               <div class="table-responsive">
@@ -203,6 +213,12 @@ export default {
     })
   },
   computed: {
+    canAcceptActivity(){
+      return this.permissions.includes("gymActivities.accept_activity")
+    },
+    canSelectTeacher(){
+      return this.permissions.includes("gymActivities.select_teacher")
+    },
     canAddActivity() { //admin
       return this.permissions.includes("gymActivities.add_activity") 
     },
@@ -325,6 +341,9 @@ export default {
     getLiteralDay(day){
       return this.daysOfWeek[day]
     },
+    getLiteralState(state){
+      return state == 1 ? "✓" : "✗";
+    },
     validateHours(){
       console.log("hours");
       var splitS = this.activityStartTime_new.split(":"); 
@@ -341,7 +360,7 @@ export default {
         .then((response) => {
           this.capacityPercentage = response.data["config"].capacitypercentage;
           this.activities = response.data["gen_act"];
-          // this.activitiesPerWeek = this.groupBy();
+          console.log(this.activities)
         })
         .catch((error) => {
           toast({

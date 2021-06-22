@@ -21,18 +21,21 @@ class PersonDetail(APIView):
 
     def get(self, request, format=None):
         data = {}
+        type = "Administrador"
         if Userofperson.objects.filter(user=request.user).exists():
             # OBTENEMOS LA RELACION USUARIO PERSONA
             userofpersonRelation = Userofperson.objects.get(user=request.user)
             if Client.objects.filter(person = userofpersonRelation.person).exists():
                 clientObject = Client.objects.get(person = userofpersonRelation.person.pk)
                 data = ClientSerializer(clientObject).data
+                type = "Cliente"
             elif Teacher.objects.filter(person = userofpersonRelation.person).exists():
                 teacherObject = Teacher.objects.get(person = userofpersonRelation.person.pk)
                 data = JustDataTeacherSerializer(teacherObject).data
+                type = "Instructor"
         else:
             data = CurrentUserSerializer(User.objects.get(pk = request.user.id)).data
-        # print(data)
+        data["type"] = type
         return Response(data)
 
 class AllPersons(ListCreateAPIView):
