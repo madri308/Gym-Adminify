@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Activity, Service, Teacher, Client #, Schedule, ActivityHasClient
+from .models import Activity
 
 from gymClients.serializers import ClientNameSerializer
 from gymServices.serializers import NameServiceSerializer

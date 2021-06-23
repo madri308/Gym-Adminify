@@ -2,10 +2,26 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from gymClients.models import Client
-from gymServices.models import Service
-from gymTeachers.models import Teacher
-from AdmSchedule.models import Schedule
-class Activity(models.Model):
+
+class Subject:
+    _observers = []
+
+    def attach(self, observer):
+        if not observer in self._observers:
+            self._observers.append(observer)
+
+    def detach(self, observer):
+        try:
+            self._observers.remove(observer)
+        except ValueError:
+            pass
+
+    def notify(self):
+        for observer in self._observers:
+            print("Notifico")
+
+
+class Activity(models.Model,Subject):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     capacity = models.IntegerField(db_column='Capacity')  # Field name made lowercase.
     dayofweek = models.IntegerField(db_column='dayOfWeek')  # Field name made lowercase.
@@ -18,7 +34,9 @@ class Activity(models.Model):
     client = models.ManyToManyField(Client)
     creator = models.ForeignKey(User,  on_delete=models.CASCADE)
     state = models.IntegerField(db_column='State')  # Field name made lowercase.
-
+    _observers = []  #reset observers
+    # def __init__(self):
+        
     class Meta:
         managed = False
         db_table = 'Activity'

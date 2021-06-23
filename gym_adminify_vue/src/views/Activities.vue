@@ -20,7 +20,7 @@
                   <button type="button"  v-on:click ="saveNewActivity"  class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                     <i class="fas fa-check-circle fa-lg"></i>
                   </button>
-                  <button v-on:click ='newActivity' type="button" class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <button type="button" v-on:click ='newActivity' class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                     <i class="fas fa-times-circle fa-lg"></i>
                   </button>
                 </div>
@@ -189,6 +189,8 @@ export default {
       schedule:[],
       clientsUnenrolled:[],
       clientsEnrolled:[],
+
+      activityTeacher_new:"1",
 
       days:[],
       start:[],
@@ -380,7 +382,6 @@ export default {
         this.createJsonTeacher(response.data,this.teachersNames);
       })
       .catch((error) => {
-        console.log(error)
         toast({
           message: "Ocurrio un problema con los datos de: Instructores", type: "is-danger",
           dismissible: true, pauseOnHover: true,
@@ -395,13 +396,11 @@ export default {
       await axios
         .get("/api/v1/activities-detail/")
         .then((response) => {
-          console.log(response.data);
           this.createJson(response.data['service'],this.servicesNames);
           this.createJsonSchedule(response.data['config'].timeperday, this.days, this.start, this.end);
           document.title = 'New_Activity';
         })
         .catch((error) => {
-          console.log(error);
           toast({
             message: "Ocurrio un problema recuperando la información", type: "is-danger",
             dismissible: true, pauseOnHover: true,
@@ -412,7 +411,6 @@ export default {
     },
     async saveNewActivity(){
       this.$store.commit("setIsLoading", true);
-      console.log(this.validateHours());
       const formData = {
         capacity: this.activityCapacity_new,
         service: (this.activityService_new.replace("/", "")).replace("/", ""),

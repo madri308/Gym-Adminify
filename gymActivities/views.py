@@ -71,16 +71,10 @@ class AllActivities(ListCreateAPIView):
                 return True
         return False
 
-    def create(self, request, pk=None):
-        if self.checkOverlap(request.data['startTime'],request.data['endTime'], request.data['day']):
-            return Response(status=status.HTTP_409_CONFLICT)
-        
-        user = User.objects.get(pk = request.user.id)
-
+    def createByTeacher(self,request,user):
         selected_service = Service.objects.get(id=request.data['service'])
-        selected_teacher = Teacher.objects.get(person_id = Userofperson.objects.get(user = request.user.id).person) if user.groups.filter(name = "Teacher") else Teacher.objects.get(person_id=request.data['teacher'])
+        selected_teacher = Teacher.objects.get(person_id = Userofperson.objects.get(user = request.user.id).person) 
         selected_schedule = Schedule.objects.last()
-        actState = 0 if user.groups.filter(name = "Teacher") else 1
 
         for element in self.getDatesByDay(request.data['day'],selected_schedule.month,selected_schedule.year):
             new_Act = Activity( capacity = request.data['service'], 
@@ -95,9 +89,39 @@ class AllActivities(ListCreateAPIView):
                                 schedule = selected_schedule,
 
                                 creator = user,
-                                state = actState,                    
+                                state = 0,                    
                             )
+            new_Act.attach(user);   ##OBSERVER 
             new_Act.save()    
+
+    def createByAdmin(self,request, user):
+        selected_service = Service.objects.get(id=request.data['service'])
+        selected_teacher = Teacher.objects.get(person_id=request.data['teacher'])
+        selected_schedule = Schedule.objects.last()
+
+        for element in self.getDatesByDay(request.data['day'],selected_schedule.month,selected_schedule.year):
+            new_Act = Activity( capacity = request.data['service'], 
+                                dayofweek = request.data['day'],
+                                dayofmonth = element.day,
+
+                                startime = request.data['startTime'], 
+                                endtime = request.data['endTime'],
+
+                                service = selected_service, 
+                                teacher = selected_teacher,
+                                schedule = selected_schedule,
+
+                                creator = user,
+                                state = 1,                    
+                            )
+            new_Act.save()
+    def create(self, request, pk=None):
+        if self.checkOverlap(request.data['startTime'],request.data['endTime'], request.data['day']):
+            return Response(status=status.HTTP_409_CONFLICT)
+        user = User.objects.get(pk = request.user.id)
+        createActivities = self.createByTeacher if user.groups.filter(name = "Teacher") else self.createByAdmin
+        createActivities(request, user)
+            
         return Response(status=status.HTTP_202_ACCEPTED)
 
 class ActivityEnrollClients(ListCreateAPIView):
@@ -166,11 +190,14 @@ class ActivityDetail(RetrieveUpdateDestroyAPIView):
     def delete(self, request, activity_id, format=None):
         activity = Activity.objects.get(pk=activity_id)
         activity.delete()
+        
         return Response(status=status.HTTP_200_OK)
 
     def put(self, request, *args, **kwargs):
         activity = Activity.objects.get(id=kwargs['activity_id'])
         teacher = Teacher.objects.get(person_id=request.data['teacher'])
         activity.teacher = teacher
+        activity.notify()
+        print(activity._observers)
         activity.save(update_fields=["teacher"])
         return Response(activity.teacher.person.name,status=status.HTTP_202_ACCEPTED)

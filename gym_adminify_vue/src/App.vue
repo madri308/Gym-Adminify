@@ -18,7 +18,20 @@
             <router-link @click="page=1" v-if="canViewClient" to="/clients" class="navbar-item" :class="page == 1? 'bg-black' : ''">
               Clientes
             </router-link>
-            <nav :class="open ? 'navbar-open' : 'navbar-close'" class="navbar w-56 fixed bg-gray-900 top-20 left-0 h-auto">
+            <nav :class="notif ? 'navbar-open2' : 'navbar-close2'" class="navbar2 w-56 fixed rounded-lg bg-opacity-30 bg-gray-900 top-20 right-0 h-auto">
+              
+              <div v-for="info in userInfo" :key="info" class="relative mt-3 mb-3 left-3">
+                <!-- <b>{{info.key}}: </b> -->
+                <div class="flex max-w-sm w-auto bg-gray-700 rounded-lg overflow-hidden mx-auto">
+                  <div class="w-3 bg-yellow-400"></div>
+                  <div class="px-4" to="/clients">
+                    <h1 onclick="location.href='/activities'" class="text-white text-sm mt-1 mb-1">Solicitud de Esteban Madrigal para crear la actividad Yoga</h1>
+                  </div>
+                </div>
+              </div>
+              
+            </nav>
+            <nav :class="open ? 'navbar-open' : 'navbar-close'" class="navbar w-56 fixed bg-opacity-90 bg-gray-900 top-20 left-0 h-auto">
               <ul>
                 <div v-for="info in userInfo" :key="info" class="relative mt-2 mb-2 left-3">
                   <!-- <b>{{info.key}}: </b> -->
@@ -56,6 +69,9 @@
               <router-link v-if="canViewConfig" to="/gym_settings" @click="page=7" class="button is-light" :class="page == 7? 'is-success' : ''">
                 <span class="icon"><i class="fas fa-info"></i></span>
               </router-link>
+              <button @click='notif = !notif ' class="button is-light" :class="notif ? 'is-success' : ''">
+                <span class="icon"><i class="fa fa-bell"></i></span>
+              </button>
               <button @click='open = !open ' class="button is-light" :class="open ? 'is-success' : ''">
                 <span class="icon"><i class="fas fa-user"></i></span>
               </button>
@@ -122,6 +138,7 @@ export default {
       messageToggle: true,
       permissions: this.$store.state.permissions,
       open: false,
+      notif: false,
       page:0,
     };
   },
@@ -194,6 +211,18 @@ export default {
 .navbar-close {
   transform: translateX(-100%);
 }
+
+.navbar2 {
+  transition: all 330ms ease-out;
+}
+
+.navbar-open2 {
+  transform: translateX(0%);
+}
+.navbar-close2 {
+  transform: translateX(100%);
+}
+
 @keyframes lds-dual-ring {
   0% {
     transform: rotate(0deg);
