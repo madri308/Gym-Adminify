@@ -18,14 +18,19 @@
             <router-link @click="page=1" v-if="canViewClient" to="/clients" class="navbar-item" :class="page == 1? 'bg-black' : ''">
               Clientes
             </router-link>
-            <nav :class="notif ? 'navbar-open2' : 'navbar-close2'" class="navbar2 w-56 fixed rounded-lg bg-opacity-30 bg-gray-900 top-20 right-0 h-auto">
-              
-              <div v-for="info in userInfo" :key="info" class="relative mt-3 mb-3 left-3">
+            <nav :class="notif ? 'navbar-open2' : 'navbar-close2'" class="navbar2 w-56 fixed rounded-lg bg-opacity-30 bg-gray-900 top-14 right-0 h-auto">
+              <button @click="deleteNotifications()" type="button" class="ml-1 mt-1 -mr-1 p-2 rounded-md transition hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-white">
+                <i class="fas fa-trash"></i>
+              </button> 
+              <button @click="getNotifications" type="button" class="ml-1 mt-1  p-2 rounded-md transition hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-white ">
+                <i class="fas fa-sync-alt"></i>
+              </button> 
+              <div v-for="notif in notifications" :key="notif" class="relative mt-3 mb-3 left-3">
                 <!-- <b>{{info.key}}: </b> -->
                 <div class="flex max-w-sm w-auto bg-gray-700 rounded-lg overflow-hidden mx-auto">
                   <div class="w-3 bg-yellow-400"></div>
                   <div class="px-4" to="/clients">
-                    <h1 onclick="location.href='/activities'" class="text-white text-sm mt-1 mb-1">Solicitud de Esteban Madrigal para crear la actividad Yoga</h1>
+                    <h1 onclick="location.href='/activities'" class="text-white text-sm mt-1 mb-1">{{notif.message}}</h1>
                   </div>
                 </div>
               </div>
@@ -69,7 +74,7 @@
               <router-link v-if="canViewConfig" to="/gym_settings" @click="page=7" class="button is-light" :class="page == 7? 'is-success' : ''">
                 <span class="icon"><i class="fas fa-info"></i></span>
               </router-link>
-              <button @click='notif = !notif ' class="button is-light" :class="notif ? 'is-success' : ''">
+              <button @click='notifications == null ? getNotifications2() : notif = !notif' class="button is-light" :class="notif ? 'is-success' : ''">
                 <span class="icon"><i class="fa fa-bell"></i></span>
               </button>
               <button @click='open = !open ' class="button is-light" :class="open ? 'is-success' : ''">
@@ -128,6 +133,7 @@
 import { SpeakerphoneIcon, XIcon } from "@heroicons/vue/outline";
 import axios from 'axios'
 import Disclosure from './components/Disclosure.vue';
+import { toast } from 'bulma-toast'
 
 export default {
   name: "app",
@@ -140,6 +146,7 @@ export default {
       open: false,
       notif: false,
       page:0,
+      notifications:null,
     };
   },
   beforeCreate() {
@@ -166,6 +173,50 @@ export default {
     Disclosure,
   },
   methods:{
+    async getNotifications(){
+      if(this.notif){ 
+        this.$store.commit("setIsLoading", true);
+        await axios
+        .get("/api/v1/notifications/")
+        .then((response) => {
+          this.notifications = response.data;
+          console.log(response.data)
+        })
+        .catch((error) => {
+          toast({
+            message: "Ocurrio un problema al traer las notificaciones", type: "is-danger",
+            dismissible: true, pauseOnHover: true,
+            duration: 3000, position: "bottom-right",
+          });
+        });
+        this.$store.commit("setIsLoading", false);
+      }
+    },
+    getNotifications2(){
+      this.notif = !this.notif;
+      this.getNotifications();
+    },
+    async deleteNotifications(){
+      this.$store.commit("setIsLoading", true);
+      await axios
+      .delete("/api/v1/notifications/")
+      .then((response) => {
+        this.notifications = null;
+        toast({
+          message: "Notificaciones eliminadas correctamente", type: "is-success",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+      })
+      .catch((error) => {
+        toast({
+          message: "Ocurrio un problema al traer las notificaciones", type: "is-danger",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+      });
+      this.$store.commit("setIsLoading", false);
+    },
     logout() {
         this.page = -1
         this.userInfo = []

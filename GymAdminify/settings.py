@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'gymTeachers',
     'gymPermissions',
     'gymActivities',
+    "AdmNotifications",
 ]
 
 CORS_ALLOWED_ORIGINS = [

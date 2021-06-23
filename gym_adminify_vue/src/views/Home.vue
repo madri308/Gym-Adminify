@@ -124,7 +124,6 @@ export default {
                 this.errors.push('Something went wrong. Please try again')
             }
         })
-        
         await axios
         .get("/api/v1/personInfo/")
         .then((response) => {
