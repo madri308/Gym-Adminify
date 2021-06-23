@@ -1,27 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.translation import activate
 
 from gymClients.models import Client
-
-class Subject:
-    _observers = []
-
-    def attach(self, observer):
-        if not observer in self._observers:
-            self._observers.append(observer)
-
-    def detach(self, observer):
-        try:
-            self._observers.remove(observer)
-        except ValueError:
-            pass
-
-    def notify(self):
-        for observer in self._observers:
-            print("Notifico")
-
-
-class Activity(models.Model,Subject):
+from AdmNotifications.models import Notifications
+class Activity(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     capacity = models.IntegerField(db_column='Capacity')  # Field name made lowercase.
     dayofweek = models.IntegerField(db_column='dayOfWeek')  # Field name made lowercase.
@@ -34,9 +17,9 @@ class Activity(models.Model,Subject):
     client = models.ManyToManyField(Client)
     creator = models.ForeignKey(User,  on_delete=models.CASCADE)
     state = models.IntegerField(db_column='State')  # Field name made lowercase.
-    _observers = []  #reset observers
-    # def __init__(self):
-        
+
+    def get_observers(self):
+        return ActivityObservers.objects.filter(activity=self.pk)
     class Meta:
         managed = False
         db_table = 'Activity'
@@ -46,3 +29,29 @@ class Activity(models.Model,Subject):
 
     def __str__(self):
         return self.activity.service
+
+    def attach(self, observer):
+        observers = self.get_observers()
+        if not observer in observers:
+            new_obs = ActivityObservers(activity = self, user = observer)
+            new_obs.save()
+
+    def detach(self, observer):
+        obs = ActivityObservers.objects.get(activity = self, user = observer)
+        obs.delete()
+
+    def notify(self, newMessage):
+        observers = self.get_observers()
+        for observer in observers:
+            print(observer.user.id)
+            new_msg = Notifications(message = newMessage, user = observer.user)
+            new_msg.save()
+
+class ActivityObservers(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    activity = models.ForeignKey('Activity', models.DO_NOTHING, db_column='activity_ID', blank=True, null=True)  # Field name made lowercase.
+    user = models.ForeignKey(User,  on_delete=models.CASCADE)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'Activity_observers'
