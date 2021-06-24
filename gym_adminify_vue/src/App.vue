@@ -18,7 +18,7 @@
             <router-link @click="page=1" v-if="canViewClient" to="/clients" class="navbar-item" :class="page == 1? 'bg-black' : ''">
               Clientes
             </router-link>
-            <nav :class="notif ? 'navbar-open2' : 'navbar-close2'" class="navbar2 w-56 fixed rounded-lg bg-opacity-30 bg-gray-900 top-14 right-0 h-auto">
+            <nav :class="notif ? 'navbar-open2' : 'navbar-close2'" class="navbar2 w-60 fixed rounded-lg bg-opacity-30 bg-gray-900 top-14 right-0 h-auto">
               <button @click="deleteNotifications()" type="button" class="ml-1 mt-1 -mr-1 p-2 rounded-md transition hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-white">
                 <i class="fas fa-trash"></i>
               </button> 
@@ -29,7 +29,7 @@
                 <!-- <b>{{info.key}}: </b> -->
                 <div class="flex max-w-sm w-auto bg-gray-700 rounded-lg overflow-hidden mx-auto">
                   <div class="w-3 bg-yellow-400"></div>
-                  <div class="px-4" to="/clients">
+                  <div class="px-2" to="/clients">
                     <h1 onclick="location.href='/activities'" class="text-white text-sm mt-1 mb-1">{{notif.message}}</h1>
                   </div>
                 </div>
