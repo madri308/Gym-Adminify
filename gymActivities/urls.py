@@ -4,6 +4,7 @@ from gymActivities import views
 
 urlpatterns = [
     path('activities/', views.AllActivities.as_view()),
+    path('activitiesTeacher/<int:activity_id>/', views.ActivityTeacher.as_view()),
     path('activities/<int:activity_id>/', views.ActivityDetail.as_view()),
     path('activities-enroll/<int:activity_id>/', views.ActivityEnrollClients.as_view()),
     path('activities/<int:day>/<str:startime>', views.SpecificActivities.as_view()),

@@ -25,27 +25,80 @@
                   </button>
                 </div>
                 <dl>
-                  <div>
-                    <span class="font-extrabold height: 100% width:25% float:left">Instructor fijo: </span>
-                    <span>{{ act.teacher.name }}</span>
+                  <!-- <v-if>
+                    
+                    
+                  AQUIIIIIII  
+                    
+                    
+                  </v-if> -->
+                  <div> <!--    PERMISIONS     -->
+                    <button type="button" v-if="(changing === '')&(act.state!=0)" @click="changing = act.activities[0].id" class="absolute top-0 right-3 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                      <i class="fas fa-pencil-alt fa-md"></i>
+                    </button>
+                    <button type="button" v-if="(changing !== '')&(act.state!=0)" @click="saveModifyActivity(act.client)" class="absolute top-0 right-3 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                      <i class="fas fa-save fa-lg"></i>
+                    </button>
+                    <button type="button" v-if="(changing !== '')&(act.state!=0)" @click="changing = ''" class="absolute top-0 right-11 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                      <i class="fas fa-times-circle fa-lg"></i>
+                    </button>
                   </div>
                   <div>
-                    <span class="font-extrabold height: 100% width:25% float:left">  Hora: </span>
-                    <span>{{ act.startime }} </span> <span> - </span> <span>{{ act.endtime }} </span> 
-                    <span class="font-extrabold height: 100% width:25% float:left"> Dia: </span>
-                    <span>{{daysOfWeek[act.dayofweek-1]}} {{act.dayofmonth}}  </span>
-                  </div>
-                  <div>
-                    <span class="font-extrabold height: 100% width:25% float:left"> Capacidad: </span>
-                    <span>{{ act.capacity }}</span>
-                  </div>
-                  <div>
-                    <span class="font-extrabold height: 100% width:25% float:left">  Cupos disponibles: </span>
-                    <span>{{ act.spaces > 0 ? parseInt(act.spaces) : "No hay cupos disponibles"}} </span> 
-                  </div>
-                  <div>
-                    <span style="color:red" class="font-extrabold height: 100% width:25% float:left"> Aforo permitido: </span>
-                    <span style="color:red">{{ parseInt(act.capacity * this.capacityPercentage) }}</span>
+                    <div>
+                      <span class="font-extrabold height: 100% width:25% float:left">Instructor fijo: </span>
+                      <span>{{ act.teacher.name }}</span>
+                    </div>
+                    <div v-if="changing !== ''"> 
+                      <!-- IF E -->
+                      <div class="table-responsive">
+                        <table class="table-hover" >
+                        <br />
+                          <tbody>
+                              <tr>
+                                <span class="px-2">Hora inicio</span>
+                                <td>
+                                  <input v-model="activityStartTime_edit" type="time" min=this.start[getDay(activityDay_new)]/>
+                                </td>
+                                <button v-if="isChanging" type="button" class="rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                                  <i class="far fa-times-circle fa-sm"></i>
+                                </button>
+                                
+                                <span class="px-2">Hora fin</span>
+                                <td>
+                                  <input v-model="activityEndTime_edit" type="time" max=this.end[getDay(activityDay_new)]/>
+                                </td>
+                                <button v-if="isChanging" type="button" class="rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                                  <i class="far fa-times-circle fa-sm"></i>
+                                </button>
+                              </tr>
+                              <br />
+                          </tbody>
+                        </table>
+                      </div>
+                      <Multiselect class="mt-3" v-model="activityDay_edit" placeholder="Seleccione el día " v-on:click ='selectedDay=true' :options="this.days"/>
+                      <input v-model="activityCapacity_edit" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" style="width:88%;height:30px;" type="number" placeholder="Capacidad" aria-label="Full name" min="1" >
+                    </div>
+                    <div v-if="changing === ''">
+                        <!-- NOT EDTING -->
+                      <div>
+                        <span class="font-extrabold height: 100% width:25% float:left">  Hora: </span>
+                        <span>{{ act.startime }} </span> <span> - </span> <span>{{ act.endtime }} </span> 
+                        <span class="font-extrabold height: 100% width:25% float:left"> Dia: </span>
+                        <span>{{daysOfWeek[act.dayofweek-1]}} {{act.dayofmonth}}  </span>
+                      </div>
+                      <div>
+                        <span class="font-extrabold height: 100% width:25% float:left"> Capacidad: </span>
+                        <span>{{ act.capacity }}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="font-extrabold height: 100% width:25% float:left">  Cupos disponibles: </span>
+                      <span>{{ act.spaces > 0 ? parseInt(act.spaces) : "No hay cupos disponibles"}} </span> 
+                    </div>
+                    <div>
+                      <span style="color:red" class="font-extrabold height: 100% width:25% float:left"> Aforo permitido: </span>
+                      <span style="color:red">{{ parseInt(act.capacity * this.capacityPercentage) }}</span>
+                    </div>
                   </div>
                   <dl class="md:grid md:grid-cols-2 md:gap-x-1">
                     <div v-for="activity in act.activities" :key="activity" class="relative">
@@ -63,7 +116,7 @@
                               <i class="fas fa-pencil-alt fa-md"></i>
                             </button> 
                             <div v-else class="mt-2 space-x-2">
-                              <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity(activity)"  class="-mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                              <button v-if="!(changing === '')" type="button"  v-on:click ="saveTeacherActivity(activity)"  class="-mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                                 <i class="fas fa-save fa-lg"></i>
                               </button>
                               <button v-if="!(changing === '')" v-on:click ='changing = ""' type="button" class=" -mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
@@ -212,6 +265,8 @@ export default {
   mounted() {
     this.getActivities().then(()=> {
       this.getTeachers()
+    }).then(()=>{
+      this.getSettings()
     })
   },
   computed: {
@@ -355,6 +410,9 @@ export default {
       } 
       return true;
     },
+    test(ac){
+      console.log(ac)
+    },
     async getActivities() {
       this.$store.commit("setIsLoading", true);
       await axios
@@ -390,6 +448,26 @@ export default {
       });
       this.$store.commit("setIsLoading", false);
     },
+    async getSettings() {
+      this.$store.commit("setIsLoading", true);
+      await axios
+        .get("/api/v1/update-settings/")
+        .then((response) => {
+          this.createJsonSchedule(response.data['config'].timeperday, this.days, this.start, this.end);
+          document.title = 'Settings';
+        })
+        .catch((error) => {
+          toast({
+            message: "Ocurrio un problema obteniendo la informacion",
+            type: "is-danger",
+            dismissible: true,
+            pauseOnHover: true,
+            duration: 2000,
+            position: "bottom-right",
+          });
+        });
+      this.$store.commit("setIsLoading", false);
+    },
     async newActivity(){
       this.newOne = !this.newOne
       this.$store.commit("setIsLoading", true);
@@ -397,7 +475,6 @@ export default {
         .get("/api/v1/activities-detail/")
         .then((response) => {
           this.createJson(response.data['service'],this.servicesNames);
-          this.createJsonSchedule(response.data['config'].timeperday, this.days, this.start, this.end);
           document.title = 'New_Activity';
         })
         .catch((error) => {
@@ -446,14 +523,50 @@ export default {
       }
     this.$store.commit("setIsLoading", false);
     },
-    async saveModifyActivity(activity){
+    async saveModifyActivity(actClient){
+      if (actClient.length == 0){
+        this.$store.commit("setIsLoading", true);
+        const formData = {
+          capacity: this.activityCapacity_edit,
+          dayofweek: this.days.indexOf(this.activityDay_edit)+1,
+          startime: this.activityStartTime_edit,
+          endtime: this.activityEndTime_edit,
+        }
+        await axios
+        .put("/api/v1/activities/"+this.changing+"/", formData)
+        .then(response => {
+            toast({
+              message: "Ha modificado la actividad exitosamente", type: "is-success",
+              dismissible: true, pauseOnHover: true,
+              duration: 3000, position: "bottom-right",
+            });
+        })
+        .catch(error => {
+          console.log(error)
+            toast({
+              message: "Ocurrio un problema al editar la actividad", type: "is-danger",
+              dismissible: true, pauseOnHover: true,
+              duration: 3000, position: "bottom-right",
+            });
+        })
+        this.$store.commit("setIsLoading", false);
+        this.changing =  ""
+      } else {
+        toast({
+          message: "La actividad no se puede editar, tiene clientes matriculados", type: "is-danger",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+      }
+    },
+    async saveTeacherActivity(activity){
       this.$store.commit("setIsLoading", true);
       var teacher = activity.teacher.get_absolute_url;
       const formData = {
         teacher : (teacher.replace("/", "")).replace("/", ""),
       }
       await axios
-      .put("/api/v1/activities"+this.changing, formData)
+      .put("/api/v1/activitiesTeacher/"+this.changing+"/", formData)
       .then(response => {
           toast({
             message: "Ha cambiado el instructor de la actividad exitosamente", type: "is-success",
@@ -461,7 +574,6 @@ export default {
             duration: 3000, position: "bottom-right",
           });
           activity.teacher.name = response.data
-          this.changing =  ""
       })
       .catch(error => {
         console.log(error)
@@ -484,7 +596,7 @@ export default {
           capacityPercentage : this.capacityPercentage
         }
         await axios
-        .put("/api/v1/activities-enroll"+"/"+act.id+"/", formData)
+        .put("/api/v1/activities-enroll"+"/"+act.activities[0].id+"/", formData)
         .then(response => {
             toast({
               message: "Ha actualizado los clientes de la actividad exitosamente", type: "is-success",
@@ -493,9 +605,8 @@ export default {
             });
         })
         .catch(error => {
-            console.log(error)
             toast({
-              message: "Ocurrio un problema al modificar los clientes de la actividad", type: "is-danger",
+              message: "Ocurrio un problema al modificar los clientes de la actividad, no se pueden matricular clientes morosos", type: "is-danger",
               dismissible: true, pauseOnHover: true,
               duration: 3000, position: "bottom-right",
             });
