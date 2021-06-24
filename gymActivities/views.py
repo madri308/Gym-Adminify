@@ -19,6 +19,7 @@ from AdmSchedule.models import Schedule
 from gymClients.models import Client
 from AdmBills.models import Bill, PayMethod
 from gymPersons.models import Userofperson
+from django.db import transaction
 
 from django.contrib.auth.models import User
 
@@ -71,11 +72,13 @@ class AllActivities(ListCreateAPIView):
                 return True
         return False
 
+    @transaction.atomic
     def createByTeacher(self,request,user):
         selected_service = Service.objects.get(id=request.data['service'])
         selected_teacher = Teacher.objects.get(person_id = Userofperson.objects.get(user = request.user.id).person) 
         selected_schedule = Schedule.objects.last()
-
+        new_Act = None
+        superusers = User.objects.filter(is_superuser=True).first()
         for element in self.getDatesByDay(request.data['day'],selected_schedule.month,selected_schedule.year):
             new_Act = Activity( capacity = request.data['service'], 
                                 dayofweek = request.data['day'],
@@ -91,8 +94,13 @@ class AllActivities(ListCreateAPIView):
                                 creator = user,
                                 state = 0,                    
                             )
-            new_Act.attach(user);   ##OBSERVER 
-            new_Act.save()    
+            new_Act.save()
+            # OBSERVER
+            new_Act.attach(superusers)
+            new_Act.attach(user)
+        new_Act.notify("Solicitud de "+user.username+": creacion de la actividad "+new_Act.service.name)
+        
+               
 
     def createByAdmin(self,request, user):
         selected_service = Service.objects.get(id=request.data['service'])
@@ -114,6 +122,7 @@ class AllActivities(ListCreateAPIView):
                                 creator = user,
                                 state = 1,                    
                             )
+            new_Act.attach(user)
             new_Act.save()
     def create(self, request, pk=None):
         if self.checkOverlap(request.data['startTime'],request.data['endTime'], request.data['day']):
@@ -216,7 +225,5 @@ class ActivityTeacher(RetrieveUpdateDestroyAPIView):
         activity = Activity.objects.get(id=kwargs['activity_id'])
         teacher = Teacher.objects.get(person_id=request.data['teacher'])
         activity.teacher = teacher
-        activity.notify()
-        print(activity._observers)
         activity.save(update_fields=["teacher"])
         return Response(activity.teacher.person.name,status=status.HTTP_202_ACCEPTED)
