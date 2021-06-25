@@ -65,6 +65,7 @@ export default {
       todos,
       username: '',
       password: '',
+      RespoID:-1,
       errors: [],
       currentDate: new Date(),
       firstPage:null,
@@ -73,7 +74,7 @@ export default {
   },
   mounted() {
       document.title = 'Home | Gym-Adminify';
-    
+      this.getPersonType()
       const month = this.currentDate.getMonth()+1;
       const year = this.currentDate.getFullYear();
       this.firstPage = { month, year }
@@ -155,8 +156,10 @@ export default {
     },
     async getActivities(){
       this.$store.commit("setIsLoading", true);
+      const formData = {IDResponse: this.RespoID,}
+
       await axios
-      .get("/api/v1/schedule-activities/")
+      .get("/api/v1/schedule-activities/", formData)
       .then((response) => {
         this.todos = response.data;
       })
@@ -168,7 +171,27 @@ export default {
         });
       });
       this.$store.commit("setIsLoading", false);
-    }
+    },
+     async getPersonType() {
+      this.$store.commit("setIsLoading", true);
+      await axios
+      .get("/api/v1/teachers/")
+      .then((response) => {
+        let element
+        for(element in response.data){
+
+          console.log(element)
+          console.log("Lo de arriba es element")
+          //if(element.person.name == "") this.RespoID = Integer.parseInt(element.get_absolute_url.substring(1,element.get_absolute_url.length -1))
+        }
+        console.log(this.RespoID)
+      })
+      .catch((error) => {
+        console.log(error)
+        
+      });
+      this.$store.commit("setIsLoading", false);
+    },
   },
   computed: {
     attributes() {

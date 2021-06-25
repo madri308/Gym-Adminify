@@ -1,16 +1,13 @@
 import calendar
 from datetime import date, datetime
-
+from typing import Any
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-
 from rest_framework import status, authentication, permissions
-
 from .serializers import ActivitiesSerializer, ScheduleActivitiesSerializer,SpecificDataActivitiesSerializer,GeneralActivitiesSerializer
 from gymServices.serializers import ServiceSerializer
 from gymSettings.serializers import ConfigSerializer, ConfigSerializerCapacity
 from gymClients.serializers import ClientNameSerializer
-
 from .models import Activity
 from gymServices.models import Service
 from gymTeachers.models import Teacher
@@ -20,8 +17,33 @@ from gymClients.models import Client
 from AdmBills.models import Bill, PayMethod
 from gymPersons.models import Userofperson
 from django.db import transaction
-
 from django.contrib.auth.models import User
+
+class Visitor():
+    
+    def __init__(self, IDResponse):
+        self.queryString  = ""
+        self.rawObjects = Any
+
+        if IDResponse != -1:
+            self.visitTeacher( IDResponse)
+        else:
+            self.visitAdmin()
+
+    def visitTeacher(self, idTeacher):
+        self.queryString = 'SELECT 1 as ID, EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity WHERE Teacher_ID = '+ str(idTeacher) +' GROUP BY dayOfWeek,StarTime,EndTime,Schedule_ID,Service_ID,Teacher_ID'
+        self.rawObjects = Activity.objects.raw(self.queryString)
+
+    def visitAdmin(self):
+        self.queryString = 'SELECT 1 as ID, EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity GROUP BY dayOfWeek,StarTime,EndTime,Schedule_ID,Service_ID,Teacher_ID'
+        self.rawObjects = Activity.objects.raw(self.queryString)
+
+class AllScheduleActivities(ListCreateAPIView):
+    #WHERE TEACHER_ID = pTeacher_ID
+    IDResponse = 200
+    querysetAux = Visitor(IDResponse)
+    queryset = querysetAux.rawObjects
+    serializer_class = ScheduleActivitiesSerializer
 
 class SpecificActivities(ListCreateAPIView):
     queryset = Activity.objects.all()
@@ -178,9 +200,8 @@ class ActivityEnrollClients(ListCreateAPIView):
             act.save()
         return Response(status=status.HTTP_202_ACCEPTED)
 
-class AllScheduleActivities(ListCreateAPIView):
-    queryset = Activity.objects.raw('SELECT 1 as ID, EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity GROUP BY dayOfWeek,StarTime,EndTime,Schedule_ID,Service_ID,Teacher_ID')
-    serializer_class = ScheduleActivitiesSerializer
+
+
     
 class ActivityDetail(RetrieveUpdateDestroyAPIView):
     model = Activity
