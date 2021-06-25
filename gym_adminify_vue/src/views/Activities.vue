@@ -17,22 +17,16 @@
             <Disclosure v-on:click ="act.client == null ? getDetails(act) : null" v-bind:title="getLiteralState(act.state)+' '+  act.service_name+' - '+act.startime +' - '+getLiteralDay(act.dayofweek-1)">
               <div class="relative">
                 <div v-if="act.state === 0 && canAcceptActivity">
-                  <button type="button"  v-on:click ="saveNewActivity"  class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <button type="button"  v-on:click ="acceptActivity(act.activities[0].id)"  class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                     <i class="fas fa-check-circle fa-lg"></i>
                   </button>
-                  <button type="button" v-on:click ='newActivity' class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <button type="button" v-on:click ='rejectActivity(act.activities[0].id)' class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                     <i class="fas fa-times-circle fa-lg"></i>
                   </button>
                 </div>
                 <dl>
-                  <!-- <v-if>
-                    
-                    
-                  AQUIIIIIII  
-                    
-                    
-                  </v-if> -->
-                  <div> <!--    PERMISIONS     -->
+                  
+                  <div v-if='canChangeActivityDetails'> 
                     <button type="button" v-if="(changing === '')&(act.state!=0)" @click="changing = act.activities[0].id" class="absolute top-0 right-3 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                       <i class="fas fa-pencil-alt fa-md"></i>
                     </button>
@@ -49,7 +43,6 @@
                       <span>{{ act.teacher.name }}</span>
                     </div>
                     <div v-if="changing !== ''"> 
-                      <!-- IF E -->
                       <div class="table-responsive">
                         <table class="table-hover" >
                         <br />
@@ -79,7 +72,6 @@
                       <input v-model="activityCapacity_edit" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" style="width:88%;height:30px;" type="number" placeholder="Capacidad" aria-label="Full name" min="1" >
                     </div>
                     <div v-if="changing === ''">
-                        <!-- NOT EDTING -->
                       <div>
                         <span class="font-extrabold height: 100% width:25% float:left">  Hora: </span>
                         <span>{{ act.startime }} </span> <span> - </span> <span>{{ act.endtime }} </span> 
@@ -282,6 +274,9 @@ export default {
     canChangeActivity() { //change teacher and enroll clients
       return this.permissions.includes("gymActivities.change_activity")
     },
+    canChangeActivityDetails() { //change capacity, day, ...
+      return this.permissions.includes("gymActivities.change_activity_details")
+    },
   },
   methods: {
     async getDetails(act){
@@ -454,7 +449,6 @@ export default {
         .get("/api/v1/update-settings/")
         .then((response) => {
           this.createJsonSchedule(response.data['config'].timeperday, this.days, this.start, this.end);
-          document.title = 'Settings';
         })
         .catch((error) => {
           toast({
@@ -521,7 +515,7 @@ export default {
           duration: 3000, position: "bottom-right",
         });
       }
-    this.$store.commit("setIsLoading", false);
+      this.$store.commit("setIsLoading", false);
     },
     async saveModifyActivity(actClient){
       if (actClient.length == 0){
@@ -619,6 +613,48 @@ export default {
           duration: 3000, position: "bottom-right",
         });
       }
+    },
+    async acceptActivity(act){
+      this.$store.commit("setIsLoading", true);
+      await axios
+      .put("/api/v1/activitiesAccepted/"+act+"/")
+      .then((response) => {
+        toast({
+          message: "Actividad aceptada", type: "is-success",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+        location.reload();
+      })
+      .catch((error) => {
+        toast({
+          message: "Ocurrio un problema con la actividad", type: "is-danger",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+      });
+      this.$store.commit("setIsLoading", false);
+    },
+    async rejectActivity(act){
+      this.$store.commit("setIsLoading", true);
+      await axios
+      .put("/api/v1/activitiesRejected/"+act+"/")
+      .then((response) => {
+        toast({
+          message: "Actividad rechazada", type: "is-success",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+        location.reload();
+      })
+      .catch((error) => {
+        toast({
+          message: "Ocurrio un problema con la actividad", type: "is-danger",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+      });
+      this.$store.commit("setIsLoading", false);
     },
   },
 };

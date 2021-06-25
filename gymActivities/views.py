@@ -100,8 +100,6 @@ class AllActivities(ListCreateAPIView):
             new_Act.attach(user)
         new_Act.notify("Solicitud de "+user.username+": creacion de la actividad "+new_Act.service.name)
         
-               
-
     def createByAdmin(self,request, user):
         selected_service = Service.objects.get(id=request.data['service'])
         selected_teacher = Teacher.objects.get(person_id=request.data['teacher'])
@@ -213,6 +211,36 @@ class ActivityDetail(RetrieveUpdateDestroyAPIView):
             act.save(update_fields=['capacity','dayofweek', 'startime','endtime'])
         return Response(status=status.HTTP_202_ACCEPTED)
 
+class ActivityRejected(RetrieveUpdateDestroyAPIView):
+    model = Activity
+    def get_serializer_class(self):
+        if self.request.method == 'PUT':
+            return ActivitiesSerializer
+        return ActivitiesSerializer
+
+    def put(self, request, *args, **kwargs):
+        activity = Activity.objects.get(id=kwargs['activity_id'])
+        activities_related = Activity.objects.all().filter(dayofweek = activity.dayofweek, 
+                                                            startime = activity.startime) 
+        for act in activities_related:
+            act.delete()
+        return Response(status=status.HTTP_200_OK)
+
+class ActivityAccepted(RetrieveUpdateDestroyAPIView):
+    model = Activity
+    def get_serializer_class(self):
+        if self.request.method == 'PUT':
+            return ActivitiesSerializer
+        return ActivitiesSerializer
+
+    def put(self, request, *args, **kwargs):
+        activity = Activity.objects.get(id=kwargs['activity_id'])
+        activities_related = Activity.objects.all().filter(dayofweek = activity.dayofweek, 
+                                                            startime = activity.startime) 
+        for act in activities_related:
+            act.state = 1
+            act.save(update_fields=['state'])
+        return Response(status=status.HTTP_200_OK)
 
 class ActivityTeacher(RetrieveUpdateDestroyAPIView):
     model = Activity
