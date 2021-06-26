@@ -154,7 +154,7 @@ export default {
           });
         });
         this.$store.commit("setIsLoading", false);
-        
+        location.reload();
     },
     async getActivities(){
       this.$store.commit("setIsLoading", true);
