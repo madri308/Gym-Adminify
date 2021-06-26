@@ -18,16 +18,15 @@
             <router-link @click="page=1" v-if="canViewClient" to="/clients" class="navbar-item" :class="page == 1? 'bg-black' : ''">
               Clientes
             </router-link>
-            <nav :class="notif ? 'navbar-open2' : 'navbar-close2'" class="navbar2 w-60 fixed rounded-lg bg-opacity-30 bg-gray-900 top-14 right-0 h-auto">
+            <nav :class="notif ? 'navbar-open2' : 'navbar-close2'" style="overflow-y:scroll;" class="navbar2 w-60 fixed rounded-lg bg-opacity-30 bg-gray-900 top-14 right-0 h-96">
               <button @click="deleteNotifications()" type="button" class="ml-1 mt-1 -mr-1 p-2 rounded-md transition hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-white">
                 <i class="fas fa-trash"></i>
               </button> 
               <button @click="getNotifications" type="button" class="ml-1 mt-1  p-2 rounded-md transition hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-white ">
                 <i class="fas fa-sync-alt"></i>
               </button> 
-              <div v-for="notif in notifications" :key="notif" class="relative mt-3 mb-3 left-3">
-                <!-- <b>{{info.key}}: </b> -->
-                <div class="flex max-w-sm w-auto bg-gray-700 rounded-lg overflow-hidden mx-auto">
+              <div v-for="notif in notifications" :key="notif" class="relative mt-3 mr-3 mb-3 left-3 ">
+                <div class="flex max-w-sm w-auto bg-gray-700 rounded-lg overflow-hidden mx-auto h-30">
                   <div class="w-3 bg-yellow-400"></div>
                   <div class="px-2" to="/clients">
                     <h1 onclick="location.href='/activities'" class="text-white text-sm mt-1 mb-1">{{notif.message}}</h1>
@@ -179,8 +178,7 @@ export default {
         await axios
         .get("/api/v1/notifications/")
         .then((response) => {
-          this.notifications = response.data;
-          console.log(response.data)
+          this.notifications = response.data.reverse();
         })
         .catch((error) => {
           toast({

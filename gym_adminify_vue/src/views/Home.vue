@@ -73,12 +73,15 @@ export default {
   },
   mounted() {
       document.title = 'Home | Gym-Adminify';
-    
       const month = this.currentDate.getMonth()+1;
       const year = this.currentDate.getFullYear();
       this.firstPage = { month, year }
-      this.getActivities()
+      this.$store.commit('initializeStore')
+      const token = this.$store.state.token
+      if (token) this.getActivities()
+      console.log(this.todos)
   },
+
   methods: {
     printPage(){
       // if(this.$refs.calendar != null){
@@ -168,7 +171,7 @@ export default {
         });
       });
       this.$store.commit("setIsLoading", false);
-    }
+    },
   },
   computed: {
     attributes() {

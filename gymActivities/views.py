@@ -1,16 +1,13 @@
 import calendar
 from datetime import date, datetime
-
+from typing import Any
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-
 from rest_framework import status, authentication, permissions
-
 from .serializers import ActivitiesSerializer, ScheduleActivitiesSerializer,SpecificDataActivitiesSerializer,GeneralActivitiesSerializer
 from gymServices.serializers import ServiceSerializer
 from gymSettings.serializers import ConfigSerializer, ConfigSerializerCapacity
 from gymClients.serializers import ClientNameSerializer
-
 from .models import Activity
 from gymServices.models import Service
 from gymTeachers.models import Teacher
@@ -20,10 +17,13 @@ from gymClients.models import Client
 from AdmBills.models import Bill, PayMethod
 from gymPersons.models import Userofperson
 from django.db import transaction
-
 from django.contrib.auth.models import User
 
-class SpecificActivities(ListCreateAPIView):
+class AllScheduleActivities(ListCreateAPIView):    
+    queryset = Activity.objects.raw('SELECT 1 as ID, EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity GROUP BY dayOfWeek,StarTime,EndTime,Schedule_ID,Service_ID,Teacher_ID')
+    serializer_class = ScheduleActivitiesSerializer
+
+class SpecificActivities(ListCreateAPIView): 
     queryset = Activity.objects.all()
     serializer_class = ActivitiesSerializer
 
@@ -36,26 +36,46 @@ class SpecificActivities(ListCreateAPIView):
             act['unrolled_clients'] = noMat_ser.data
         return Response(ser.data,status=status.HTTP_202_ACCEPTED)
 
+class Visitor():
+    def __init__(self):
+        self.queryString  = ""
+        self.rawObjects = Any
+        self.todays_date = date.today()
+        self.m = self.todays_date.month
+        self.y = self.todays_date.year
+
+    def getActivities(self, user):
+        if user.groups.filter(name = "Teacher"): 
+            return self.visitTeacher(user.id)
+        elif user.groups.filter(name = "Clients"):
+            return self.visitClient()
+        return self.visitAdmin()
+
+    def visitTeacher(self,  idPerson):
+        self.queryString = 'SELECT 1 as ID, creator_ID,State,Capacity,EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity INNER JOIN Schedule ON Schedule.ID = Schedule_ID WHERE Schedule.Year ='+ str(self.y) +' AND Schedule.Month ='+ str(self.m) +' AND (Activity.creator_ID ='+ str(idPerson)+ ' OR Activity.Teacher_ID ='+ str(idPerson)+') GROUP BY creator_ID,State,Capacity,Schedule_ID,dayOfWeek,StarTime,EndTime,Service_ID,Teacher_ID'
+        return Activity.objects.raw(self.queryString)
+
+    def visitAdmin(self):
+        self.queryString = 'SELECT 1 as ID, creator_ID,State,Capacity,EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity INNER JOIN Schedule ON Schedule.ID = Schedule_ID WHERE Schedule.Year ='+ str(self.y) +' AND Schedule.Month ='+ str(self.m) +' GROUP BY creator_ID,State,Capacity,Schedule_ID,dayOfWeek,StarTime,EndTime,Service_ID,Teacher_ID'
+        return Activity.objects.raw(self.queryString)
+
+    def visitClient(self):
+        self.queryString = 'SELECT 1 as ID, creator_ID,State,Capacity,EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity INNER JOIN Schedule ON Schedule.ID = Schedule_ID WHERE Schedule.Year ='+ str(self.y) +' AND Schedule.Month ='+ str(self.m) +' AND Activity.State = 1 GROUP BY creator_ID,State,Capacity,Schedule_ID,dayOfWeek,StarTime,EndTime,Service_ID,Teacher_ID'
+        return Activity.objects.raw(self.queryString)
+
 class AllActivities(ListCreateAPIView):
+    visitor = Visitor()
     queryset = Activity.objects.all()
     serializer_class = ActivitiesSerializer
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
-
     def get(self, request, *args, **kwargs):
         user = User.objects.get(pk = request.user.id)
         config = Config.objects.last()
         config_ser = ConfigSerializerCapacity(config, many=False)
-        todays_date = date.today()
-        m = todays_date.month
-        y = todays_date.year
-        general_activities = Activity.objects.raw('SELECT 1 as ID, creator_ID,State,Capacity,EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity INNER JOIN Schedule ON Schedule.ID = Schedule_ID WHERE Schedule.Year ='+ str(y) +' AND Schedule.Month ='+ str(m) +' GROUP BY creator_ID,State,Capacity,Schedule_ID,dayOfWeek,StarTime,EndTime,Service_ID,Teacher_ID')
-        if user.groups.filter(name = "Teacher"): 
-            general_activities = Activity.objects.raw('SELECT 1 as ID, creator_ID,State,Capacity,EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity INNER JOIN Schedule ON Schedule.ID = Schedule_ID WHERE Schedule.Year ='+ str(y) +' AND Schedule.Month ='+ str(m) +' AND (Activity.creator_ID ='+ str(request.user.id)+ ' OR Activity.Teacher_ID ='+ str(request.user.id)+') GROUP BY creator_ID,State,Capacity,Schedule_ID,dayOfWeek,StarTime,EndTime,Service_ID,Teacher_ID')
-        elif user.groups.filter(name = "Client"):
-            general_activities = Activity.objects.raw('SELECT 1 as ID, creator_ID,State,Capacity,EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity INNER JOIN Schedule ON Schedule.ID = Schedule_ID WHERE Schedule.Year ='+ str(y) +' AND Schedule.Month ='+ str(m) +' AND Activity.State = 1 GROUP BY creator_ID,State,Capacity,Schedule_ID,dayOfWeek,StarTime,EndTime,Service_ID,Teacher_ID')
+        general_activities = self.visitor.getActivities(user) 
         gen_act_ser = GeneralActivitiesSerializer(general_activities,many=True)
-        return Response({'config':config_ser.data, 'gen_act':gen_act_ser.data},status=status.HTTP_202_ACCEPTED)
+        return Response({'config':config_ser.data, 'gen_act':gen_act_ser.data},status=status.HTTP_202_ACCEPTED) 
     
     def getDatesByDay(self, numberDay,month,year):
         c = calendar.Calendar(firstweekday=calendar.SUNDAY)
@@ -76,7 +96,7 @@ class AllActivities(ListCreateAPIView):
     def createByTeacher(self,request,user):
         selected_service = Service.objects.get(id=request.data['service'])
         selected_teacher = Teacher.objects.get(person_id = Userofperson.objects.get(user = request.user.id).person) 
-        selected_schedule = Schedule.objects.last()
+        selected_schedule = Schedule.objects.last() 
         new_Act = None
         superusers = User.objects.filter(is_superuser=True).first()
         for element in self.getDatesByDay(request.data['day'],selected_schedule.month,selected_schedule.year):
@@ -177,9 +197,8 @@ class ActivityEnrollClients(ListCreateAPIView):
             act.save()
         return Response(status=status.HTTP_202_ACCEPTED)
 
-class AllScheduleActivities(ListCreateAPIView):
-    queryset = Activity.objects.raw('SELECT 1 as ID, EndTime,Schedule_ID,Service_ID,Teacher_ID,dayOfWeek,StarTime,COUNT(dayOfWeek) AS "a",COUNT(StarTime) as "b" FROM Activity GROUP BY dayOfWeek,StarTime,EndTime,Schedule_ID,Service_ID,Teacher_ID')
-    serializer_class = ScheduleActivitiesSerializer
+
+
     
 class ActivityDetail(RetrieveUpdateDestroyAPIView):
     model = Activity
