@@ -46,12 +46,9 @@ class Visitor():
 
     def getActivities(self, user):
         if user.groups.filter(name = "Teacher"): 
-            print("ticher")
             return self.visitTeacher(user.id)
         elif user.groups.filter(name = "Clients"):
-            print("cl")
             return self.visitClient()
-        print("fuck")
         return self.visitAdmin()
 
     def visitTeacher(self,  idPerson):
