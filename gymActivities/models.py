@@ -36,6 +36,11 @@ class Activity(models.Model):
             new_obs = ActivityObservers(activity = self, user = observer)
             new_obs.save()
 
+    def detachAll(self):
+        observers = self.get_observers()
+        for observer in observers:
+            observer.delete()
+
     def detach(self, observer):
         obs = ActivityObservers.objects.get(activity = self, user = observer)
         obs.delete()

@@ -16,4 +16,5 @@ class GetPermissionsByUser(ListCreateAPIView):
     
     def get(self, request, format=None):
         permission = User.objects.get(pk = request.user.id).get_all_permissions()
+        print(permission)
         return Response(permission)

@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'gymTeachers',
     'gymPermissions',
     'gymActivities',
+    'gymActivitiesBU',
     "AdmNotifications",
 ]
 

@@ -9,13 +9,14 @@ from gymServices.serializers import ServiceSerializer
 from gymSettings.serializers import ConfigSerializer, ConfigSerializerCapacity
 from gymClients.serializers import ClientNameSerializer
 from .models import Activity
+from gymActivitiesBU.models import ActivityBU
 from gymServices.models import Service
 from gymTeachers.models import Teacher
 from gymSettings.models import Config
 from AdmSchedule.models import Schedule
 from gymClients.models import Client
 from AdmBills.models import Bill, PayMethod
-from gymPersons.models import Userofperson
+from gymPersons.models import Userofperson, Person
 from django.db import transaction
 from django.contrib.auth.models import User
 
@@ -142,6 +143,7 @@ class AllActivities(ListCreateAPIView):
                             )
             new_Act.attach(user)
             new_Act.save()
+
     def create(self, request, pk=None):
         if self.checkOverlap(request.data['startTime'],request.data['endTime'], request.data['day']):
             return Response(status=status.HTTP_409_CONFLICT)
@@ -155,6 +157,7 @@ class ActivityEnrollClients(ListCreateAPIView):
     queryset = Activity.objects.all()
     serializer_class = ActivitiesSerializer
 
+    @transaction.atomic
     def put(self, request, *args, **kwargs):
         activity = Activity.objects.get(id=kwargs['activity_id'])
         service = Service.objects.get(name=activity.service)
@@ -202,6 +205,8 @@ class ActivityEnrollClients(ListCreateAPIView):
     
 class ActivityDetail(RetrieveUpdateDestroyAPIView):
     model = Activity
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
     def get_serializer_class(self):
         if self.request.method == 'PUT':
             return ActivitiesSerializer
@@ -218,7 +223,15 @@ class ActivityDetail(RetrieveUpdateDestroyAPIView):
         
         return Response(status=status.HTTP_200_OK)
 
-    def put(self, request, *args, **kwargs):
+    def put(self, request, **kwargs):
+        user = User.objects.get(pk = request.user.id)
+        print(user)
+        putActivities = self.putByTeacher if user.groups.filter(name = "Teacher") else self.putByAdmin
+        putActivities(request, **kwargs)
+            
+        return Response(status=status.HTTP_202_ACCEPTED)
+
+    def putByAdmin(self, request, **kwargs):
         activity = Activity.objects.get(id=kwargs['activity_id'])
         activities_related = Activity.objects.all().filter(dayofweek = activity.dayofweek, 
                                                             startime = activity.startime) 
@@ -228,7 +241,20 @@ class ActivityDetail(RetrieveUpdateDestroyAPIView):
             act.startime = request.data['startime']
             act.endtime = request.data['endtime']
             act.save(update_fields=['capacity','dayofweek', 'startime','endtime'])
-        return Response(status=status.HTTP_202_ACCEPTED)
+
+    def putByTeacher(self, request, **kwargs):
+        activity = Activity.objects.get(id=kwargs['activity_id'])
+        activityBU = ActivityBU( id = activity.id)
+        activityBU.addMemento(activity)
+        activities_related = Activity.objects.all().filter(dayofweek = activity.dayofweek, 
+                                                            startime = activity.startime) 
+        for act in activities_related:
+            act.capacity = request.data['capacity']
+            act.dayofweek = request.data['dayofweek']
+            act.startime = request.data['startime']
+            act.endtime = request.data['endtime']
+            act.state = 0
+            act.save(update_fields=['capacity','dayofweek', 'startime','endtime', 'state'])        
 
 class ActivityRejected(RetrieveUpdateDestroyAPIView):
     model = Activity
@@ -237,12 +263,34 @@ class ActivityRejected(RetrieveUpdateDestroyAPIView):
             return ActivitiesSerializer
         return ActivitiesSerializer
 
+    @transaction.atomic
     def put(self, request, *args, **kwargs):
         activity = Activity.objects.get(id=kwargs['activity_id'])
         activities_related = Activity.objects.all().filter(dayofweek = activity.dayofweek, 
                                                             startime = activity.startime) 
-        for act in activities_related:
-            act.delete()
+        
+        # Volver al estado original
+        backUp = ActivityBU.objects.filter(id = activity.id)
+        if backUp.count() > 0: #encuentra un back up, lo restaura
+            actBU = backUp[0].restoreMemento(backUp[0].id)
+            # serviceBU = Service.objects.get(id=actBU.service)
+            # teacherBU = Teacher.objects.get(person_id = actBU.teacher) 
+            # scheduleBU = Schedule.objects.last()
+            # userBU = User.objects.get(id = actBU.creator)
+            for act in activities_related:
+                act.capacity = actBU.capacity
+                act.dayofweek = actBU.dayofweek
+                act.startime = actBU.startime
+                act.endtime = actBU.endtime
+                act.state = 1
+                act.save(update_fields=["capacity","dayofweek","startime","endtime","state"])
+                #borra la copia ya restaurada
+            activity.notify("El administrador ha rechazado la solicitud de modificación a "+activity.service.name)
+            backUp.delete()
+        else:
+            activity.notify("El administrador ha rechazado tu solicitud de creación de "+activity.service.name)
+            activity.detachAll()
+            activity.delete()
         return Response(status=status.HTTP_200_OK)
 
 class ActivityAccepted(RetrieveUpdateDestroyAPIView):
@@ -252,13 +300,20 @@ class ActivityAccepted(RetrieveUpdateDestroyAPIView):
             return ActivitiesSerializer
         return ActivitiesSerializer
 
+    @transaction.atomic
     def put(self, request, *args, **kwargs):
         activity = Activity.objects.get(id=kwargs['activity_id'])
         activities_related = Activity.objects.all().filter(dayofweek = activity.dayofweek, 
                                                             startime = activity.startime) 
+        
+        activityBU = ActivityBU.objects.filter(id=kwargs['activity_id'])
+        if activityBU.count() > 0:
+            activityBU.delete()
+
         for act in activities_related:
             act.state = 1
             act.save(update_fields=['state'])
+        act.notify("El administrador ha aceptado tu actividad de "+act.service.name)
         return Response(status=status.HTTP_200_OK)
 
 class ActivityTeacher(RetrieveUpdateDestroyAPIView):
