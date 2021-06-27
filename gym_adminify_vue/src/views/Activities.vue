@@ -17,23 +17,23 @@
             <Disclosure v-on:click ="act.client == null ? getDetails(act) : null" v-bind:title="getLiteralState(act.state)+' '+  act.service_name+' - '+act.startime +' - '+getLiteralDay(act.dayofweek-1)">
               <div class="relative">
                 <div v-if="act.state === 0 && canAcceptActivity">
-                  <button type="button"  v-on:click ="acceptActivity(act.activities[0].id)"  class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <button type="button" v-if="(changing === '')" v-on:click ="acceptActivity(act.activities[0].id)"  class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                     <i class="fas fa-check-circle fa-lg"></i>
                   </button>
-                  <button type="button" v-on:click ='rejectActivity(act.activities[0].id)' class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                  <button type="button" v-if="(changing === '')" v-on:click ='rejectActivity(act.activities[0].id)' class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                     <i class="fas fa-times-circle fa-lg"></i>
                   </button>
                 </div>
                 <dl>
                   
                   <div v-if='canChangeActivityDetails'> 
-                    <button type="button" v-if="(changing === '')&(act.state!=0)" @click="changing = act.activities[0].id" class="absolute top-0 right-3 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <button type="button" v-if="(changing === '')" @click="changing = act.activities[0].id" class="absolute top-8 right-3 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                       <i class="fas fa-pencil-alt fa-md"></i>
                     </button>
-                    <button type="button" v-if="(changing !== '')&(act.state!=0)" @click="saveModifyActivity(act.client)" class="absolute top-0 right-3 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <button type="button" v-if="(changing !== '')" @click="saveModifyActivity(act.client)" class="absolute top-0 right-3 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                       <i class="fas fa-save fa-lg"></i>
                     </button>
-                    <button type="button" v-if="(changing !== '')&(act.state!=0)" @click="changing = ''" class="absolute top-0 right-11 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <button type="button" v-if="(changing !== '')" @click="changing = ''" class="absolute top-0 right-11 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                       <i class="fas fa-times-circle fa-lg"></i>
                     </button>
                   </div>

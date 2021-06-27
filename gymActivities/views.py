@@ -141,8 +141,9 @@ class AllActivities(ListCreateAPIView):
                                 creator = user,
                                 state = 1,                    
                             )
-            new_Act.attach(user)
             new_Act.save()
+            new_Act.attach(user)
+            
 
     def create(self, request, pk=None):
         if self.checkOverlap(request.data['startTime'],request.data['endTime'], request.data['day']):
@@ -200,9 +201,6 @@ class ActivityEnrollClients(ListCreateAPIView):
             act.save()
         return Response(status=status.HTTP_202_ACCEPTED)
 
-
-
-    
 class ActivityDetail(RetrieveUpdateDestroyAPIView):
     model = Activity
     authentication_classes = [authentication.TokenAuthentication]
@@ -220,12 +218,23 @@ class ActivityDetail(RetrieveUpdateDestroyAPIView):
     def delete(self, request, activity_id, format=None):
         activity = Activity.objects.get(pk=activity_id)
         activity.delete()
-        
         return Response(status=status.HTTP_200_OK)
+
+    def checkOverlap(self,startTime,endTime, day):
+        activities = Activity.objects.filter(dayofweek = day)
+        for activity in activities:
+            if activity.startime <= datetime.strptime(endTime, '%H:%M').time() and datetime.strptime(startTime, '%H:%M').time() <= activity.endtime:
+                return True
+        return False
 
     def put(self, request, **kwargs):
         user = User.objects.get(pk = request.user.id)
         print(user)
+        #aca revisa que no choque con otra actividad
+
+        if self.checkOverlap(request.data['startime'],request.data['endtime'], request.data['dayofweek']):
+            return Response(status=status.HTTP_409_CONFLICT)
+
         putActivities = self.putByTeacher if user.groups.filter(name = "Teacher") else self.putByAdmin
         putActivities(request, **kwargs)
             
@@ -289,8 +298,9 @@ class ActivityRejected(RetrieveUpdateDestroyAPIView):
             backUp.delete()
         else:
             activity.notify("El administrador ha rechazado tu solicitud de creación de "+activity.service.name)
-            activity.detachAll()
-            activity.delete()
+            for act in activities_related:
+                act.detachAll()
+                act.delete()
         return Response(status=status.HTTP_200_OK)
 
 class ActivityAccepted(RetrieveUpdateDestroyAPIView):
