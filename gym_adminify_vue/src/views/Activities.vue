@@ -14,86 +14,141 @@
       <div class>
         <dl class="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
           <div v-for="act in activities" :key="act" class="relative">
-            <Disclosure v-on:click ="act.client == null ? getDetails(act) : null" v-bind:title="act.service_name+' - '+act.startime +' - '+getLiteralDay(act.dayofweek-1)">
-              <dl>
-                <div>
-                  <span class="font-extrabold height: 100% width:25% float:left">Instructor fijo: </span>
-                  <span>{{ act.teacher.name }}</span>
+            <Disclosure v-on:click ="act.client == null ? getDetails(act) : null" v-bind:title="getLiteralState(act.state)+' '+  act.service_name+' - '+act.startime +' - '+getLiteralDay(act.dayofweek-1)">
+              <div class="relative">
+                <div v-if="act.state === 0 && canAcceptActivity">
+                  <button type="button" v-if="(changing === '')" v-on:click ="acceptActivity(act.activities[0].id)"  class="absolute top-0 right-8 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <i class="fas fa-check-circle fa-lg"></i>
+                  </button>
+                  <button type="button" v-if="(changing === '')" v-on:click ='rejectActivity(act.activities[0].id)' class="absolute top-0 right-0 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <i class="fas fa-times-circle fa-lg"></i>
+                  </button>
                 </div>
-                <div>
-                  <span class="font-extrabold height: 100% width:25% float:left">  Hora: </span>
-                  <span>{{ act.startime }} </span> <span> - </span> <span>{{ act.endtime }} </span> 
-                  <span class="font-extrabold height: 100% width:25% float:left"> Dia: </span>
-                  <span>{{daysOfWeek[act.dayofweek-1]}} {{act.dayofmonth}}  </span>
-                </div>
-                <div>
-                  <span class="font-extrabold height: 100% width:25% float:left"> Capacidad: </span>
-                  <span>{{ act.capacity }}</span>
-                </div>
-                <div>
-                  <span class="font-extrabold height: 100% width:25% float:left">  Cupos disponibles: </span>
-                  <span>{{ act.spaces > 0 ? parseInt(act.spaces) : "No hay cupos disponibles"}} </span> 
-                </div>
-                <div>
-                  <span style="color:red" class="font-extrabold height: 100% width:25% float:left"> Aforo permitido: </span>
-                  <span style="color:red">{{ parseInt(act.capacity * this.capacityPercentage) }}</span>
-                </div>
-                <dl class="md:grid md:grid-cols-2 md:gap-x-1">
-                  <div v-for="activity in act.activities" :key="activity" class="relative">
-                    <Disclosure :colors="''" v-bind:title="activity.dayofmonth+'/'+act.schedule.month+'/'+act.schedule.year">
-                      <div class="relative">
-                        <div v-if="changing === '/'+activity.id+'/'">
-                          <Multiselect class="mt-3" v-model="activity.teacher.get_absolute_url" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
+                <dl>
+                  
+                  <div v-if='canChangeActivityDetails'> 
+                    <button type="button" v-if="(changing === '')" @click="changing = act.activities[0].id" class="absolute top-8 right-3 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                      <i class="fas fa-pencil-alt fa-md"></i>
+                    </button>
+                    <button type="button" v-if="(changing !== '')" @click="saveModifyActivity(act.client)" class="absolute top-0 right-3 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                      <i class="fas fa-save fa-lg"></i>
+                    </button>
+                    <button type="button" v-if="(changing !== '')" @click="changing = ''" class="absolute top-0 right-11 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                      <i class="fas fa-times-circle fa-lg"></i>
+                    </button>
+                  </div>
+                  <div>
+                    <div>
+                      <span class="font-extrabold height: 100% width:25% float:left">Instructor fijo: </span>
+                      <span>{{ act.teacher.name }}</span>
+                    </div>
+                    <div v-if="changing !== ''"> 
+                      <div class="table-responsive">
+                        <table class="table-hover" >
+                        <br />
+                          <tbody>
+                              <tr>
+                                <span class="px-2">Hora inicio</span>
+                                <td>
+                                  <input v-model="activityStartTime_edit" type="time" min=this.start[getDay(activityDay_new)]/>
+                                </td>
+                                <button v-if="isChanging" type="button" class="rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                                  <i class="far fa-times-circle fa-sm"></i>
+                                </button>
+                                
+                                <span class="px-2">Hora fin</span>
+                                <td>
+                                  <input v-model="activityEndTime_edit" type="time" max=this.end[getDay(activityDay_new)]/>
+                                </td>
+                                <button v-if="isChanging" type="button" class="rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                                  <i class="far fa-times-circle fa-sm"></i>
+                                </button>
+                              </tr>
+                              <br />
+                          </tbody>
+                        </table>
+                      </div>
+                      <Multiselect class="mt-3" v-model="activityDay_edit" placeholder="Seleccione el día " v-on:click ='selectedDay=true' :options="this.days"/>
+                      <input v-model="activityCapacity_edit" class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" style="width:88%;height:30px;" type="number" placeholder="Capacidad" aria-label="Full name" min="1" >
+                    </div>
+                    <div v-if="changing === ''">
+                      <div>
+                        <span class="font-extrabold height: 100% width:25% float:left">  Hora: </span>
+                        <span>{{ act.startime }} </span> <span> - </span> <span>{{ act.endtime }} </span> 
+                        <span class="font-extrabold height: 100% width:25% float:left"> Dia: </span>
+                        <span>{{daysOfWeek[act.dayofweek-1]}} {{act.dayofmonth}}  </span>
+                      </div>
+                      <div>
+                        <span class="font-extrabold height: 100% width:25% float:left"> Capacidad: </span>
+                        <span>{{ act.capacity }}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <span class="font-extrabold height: 100% width:25% float:left">  Cupos disponibles: </span>
+                      <span>{{ act.spaces > 0 ? parseInt(act.spaces) : "No hay cupos disponibles"}} </span> 
+                    </div>
+                    <div>
+                      <span style="color:red" class="font-extrabold height: 100% width:25% float:left"> Aforo permitido: </span>
+                      <span style="color:red">{{ parseInt(act.capacity * this.capacityPercentage) }}</span>
+                    </div>
+                  </div>
+                  <dl class="md:grid md:grid-cols-2 md:gap-x-1">
+                    <div v-for="activity in act.activities" :key="activity" class="relative">
+                      <Disclosure :colors="''" v-bind:title="activity.dayofmonth+'/'+act.schedule.month+'/'+act.schedule.year">
+                        <div class="relative">
+                          <div v-if="changing === '/'+activity.id+'/'">
+                            <Multiselect class="mt-3" v-model="activity.teacher.get_absolute_url" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
+                          </div>
+                          <div v-else>
+                            <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
+                            <span>{{ activity.teacher.name }}</span>
+                          </div>
+                          <div v-if="canChangeActivity"> 
+                            <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                              <i class="fas fa-pencil-alt fa-md"></i>
+                            </button> 
+                            <div v-else class="mt-2 space-x-2">
+                              <button v-if="!(changing === '')" type="button"  v-on:click ="saveTeacherActivity(activity)"  class="-mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                                <i class="fas fa-save fa-lg"></i>
+                              </button>
+                              <button v-if="!(changing === '')" v-on:click ='changing = ""' type="button" class=" -mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                                <i class="fas fa-times-circle fa-lg"></i>
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                        <div v-else>
-                          <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
-                          <span>{{ activity.teacher.name }}</span>
+                      </Disclosure>
+                    </div>
+                  </dl>
+                  <Disclosure v-if='canChangeActivity' v-bind:title="'Clientes'" >
+                    <div class="relative">
+                      <div class="grid relative py-3 md:grid-cols-2 sm:grid-cols-1">
+                        <button v-on:click ='enrollClient(act)' type="button" class="absolute top-0 right-2 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                          <i class="fas fa-save fa-lg"></i>
+                        </button>
+                        <div>
+                          <span class="font-extrabold height: 100% width:25% float:left">Matriculados: </span>
+                          <div v-for="cli in act.client" :key="cli.person.id">
+                              <button v-on:click ='unroll(act,cli.person), enrolling=act.client' type="button" class="-mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                                <i class="fas fa-times-circle"></i>
+                                {{ cli.name }}
+                              </button>
+                          </div>
                         </div>
-                        <div v-if="canChangeActivity"> 
-                          <button v-if="!(changing === '/'+activity.id+'/')" @click="changing = '/'+activity.id+'/'" type="button" class="absolute top-0 right-0 -mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                            <i class="fas fa-pencil-alt fa-md"></i>
-                          </button> 
-                          <div v-else class="mt-2 space-x-2">
-                            <button v-if="!(changing === '')" type="button"  v-on:click ="saveModifyActivity(activity)"  class="-mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                              <i class="fas fa-save fa-lg"></i>
-                            </button>
-                            <button v-if="!(changing === '')" v-on:click ='changing = ""' type="button" class=" -mr-1 p-1 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                              <i class="fas fa-times-circle fa-lg"></i>
-                            </button>
+                        <div>
+                          <span class="font-extrabold height: 100% width:25% float:left">No matriculados: </span>
+                          <div v-for="cli in act.unrolled_clients" :key="cli.person.id">
+                              <button v-on:click ='roll(act,cli.person), enrolling=act.client' type="button" class="-mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"> 
+                                <i class="fas fa-check-circle"></i>
+                                {{ cli.name }}
+                              </button>
                           </div>
                         </div>
                       </div>
-                    </Disclosure>
-                  </div>
-                </dl>
-                <Disclosure v-if='canChangeActivity' v-bind:title="'Clientes'" >
-                  <div class="relative">
-                    <div class="grid relative py-3 md:grid-cols-2 sm:grid-cols-1">
-                      <button v-on:click ='enrollClient(act)' type="button" class="absolute top-0 right-2 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                        <i class="fas fa-save fa-lg"></i>
-                      </button>
-                      <div>
-                        <span class="font-extrabold height: 100% width:25% float:left">Matriculados: </span>
-                        <div v-for="cli in act.client" :key="cli.person.id">
-                            <button v-on:click ='unroll(act,cli.person), enrolling=act.client' type="button" class="-mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                               <i class="fas fa-times-circle"></i>
-                               {{ cli.name }}
-                            </button>
-                        </div>
-                      </div>
-                      <div>
-                        <span class="font-extrabold height: 100% width:25% float:left">No matriculados: </span>
-                        <div v-for="cli in act.unrolled_clients" :key="cli.person.id">
-                            <button v-on:click ='roll(act,cli.person), enrolling=act.client' type="button" class="-mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2"> 
-                              <i class="fas fa-check-circle"></i>
-                              {{ cli.name }}
-                            </button>
-                        </div>
-                      </div>
                     </div>
-                  </div>
-                </Disclosure>
-              </dl>
+                  </Disclosure>
+                </dl>
+              </div>
             </Disclosure>
           </div>
           <Disclosure v-bind:title="'Nueva Actividad'" v-if="newOne">
@@ -111,7 +166,7 @@
               </div>
               
               <Multiselect class="mt-3" v-model="activityService_new" placeholder="Seleccione el servicio que se brindara" :options="this.servicesNames"/>
-              <Multiselect class="mt-3" v-model="activityTeacher_new" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
+              <Multiselect v-if="canSelectTeacher" class="mt-3" v-model="activityTeacher_new" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
               <Multiselect class="mt-3" v-model="activityDay_new" placeholder="Seleccione el día " v-on:click ='selectedDay=true' :options="this.days"/>
               
               <div class="table-responsive">
@@ -180,6 +235,8 @@ export default {
       clientsUnenrolled:[],
       clientsEnrolled:[],
 
+      activityTeacher_new:"1",
+
       days:[],
       start:[],
       end:[],
@@ -200,14 +257,25 @@ export default {
   mounted() {
     this.getActivities().then(()=> {
       this.getTeachers()
+    }).then(()=>{
+      this.getSettings()
     })
   },
   computed: {
+    canAcceptActivity(){
+      return this.permissions.includes("gymActivities.accept_activity")
+    },
+    canSelectTeacher(){
+      return this.permissions.includes("gymActivities.select_teacher")
+    },
     canAddActivity() { //admin
       return this.permissions.includes("gymActivities.add_activity") 
     },
     canChangeActivity() { //change teacher and enroll clients
       return this.permissions.includes("gymActivities.change_activity")
+    },
+    canChangeActivityDetails() { //change capacity, day, ...
+      return this.permissions.includes("gymActivities.change_activity_details")
     },
   },
   methods: {
@@ -325,6 +393,9 @@ export default {
     getLiteralDay(day){
       return this.daysOfWeek[day]
     },
+    getLiteralState(state){
+      return state == 1 ? "✓" : "✗";
+    },
     validateHours(){
       console.log("hours");
       var splitS = this.activityStartTime_new.split(":"); 
@@ -334,6 +405,9 @@ export default {
       } 
       return true;
     },
+    test(ac){
+      console.log(ac)
+    },
     async getActivities() {
       this.$store.commit("setIsLoading", true);
       await axios
@@ -341,7 +415,7 @@ export default {
         .then((response) => {
           this.capacityPercentage = response.data["config"].capacitypercentage;
           this.activities = response.data["gen_act"];
-          // this.activitiesPerWeek = this.groupBy();
+          console.log(this.activities)
         })
         .catch((error) => {
           toast({
@@ -361,7 +435,6 @@ export default {
         this.createJsonTeacher(response.data,this.teachersNames);
       })
       .catch((error) => {
-        console.log(error)
         toast({
           message: "Ocurrio un problema con los datos de: Instructores", type: "is-danger",
           dismissible: true, pauseOnHover: true,
@@ -370,19 +443,35 @@ export default {
       });
       this.$store.commit("setIsLoading", false);
     },
+    async getSettings() {
+      this.$store.commit("setIsLoading", true);
+      await axios
+        .get("/api/v1/update-settings/")
+        .then((response) => {
+          this.createJsonSchedule(response.data['config'].timeperday, this.days, this.start, this.end);
+        })
+        .catch((error) => {
+          toast({
+            message: "Ocurrio un problema obteniendo la informacion",
+            type: "is-danger",
+            dismissible: true,
+            pauseOnHover: true,
+            duration: 2000,
+            position: "bottom-right",
+          });
+        });
+      this.$store.commit("setIsLoading", false);
+    },
     async newActivity(){
       this.newOne = !this.newOne
       this.$store.commit("setIsLoading", true);
       await axios
         .get("/api/v1/activities-detail/")
         .then((response) => {
-          console.log(response.data);
           this.createJson(response.data['service'],this.servicesNames);
-          this.createJsonSchedule(response.data['config'].timeperday, this.days, this.start, this.end);
           document.title = 'New_Activity';
         })
         .catch((error) => {
-          console.log(error);
           toast({
             message: "Ocurrio un problema recuperando la información", type: "is-danger",
             dismissible: true, pauseOnHover: true,
@@ -393,7 +482,6 @@ export default {
     },
     async saveNewActivity(){
       this.$store.commit("setIsLoading", true);
-      console.log(this.validateHours());
       const formData = {
         capacity: this.activityCapacity_new,
         service: (this.activityService_new.replace("/", "")).replace("/", ""),
@@ -427,16 +515,52 @@ export default {
           duration: 3000, position: "bottom-right",
         });
       }
-    this.$store.commit("setIsLoading", false);
+      this.$store.commit("setIsLoading", false);
     },
-    async saveModifyActivity(activity){
+    async saveModifyActivity(actClient){
+      if (actClient.length == 0){
+        this.$store.commit("setIsLoading", true);
+        const formData = {
+          capacity: this.activityCapacity_edit,
+          dayofweek: this.days.indexOf(this.activityDay_edit)+1,
+          startime: this.activityStartTime_edit,
+          endtime: this.activityEndTime_edit,
+        }
+        await axios
+        .put("/api/v1/activities/"+this.changing+"/", formData)
+        .then(response => {
+            toast({
+              message: "Ha modificado la actividad exitosamente", type: "is-success",
+              dismissible: true, pauseOnHover: true,
+              duration: 3000, position: "bottom-right",
+            });
+        })
+        .catch(error => {
+          console.log(error)
+            toast({
+              message: "Ocurrio un problema al editar la actividad", type: "is-danger",
+              dismissible: true, pauseOnHover: true,
+              duration: 3000, position: "bottom-right",
+            });
+        })
+        this.$store.commit("setIsLoading", false);
+        this.changing =  ""
+      } else {
+        toast({
+          message: "La actividad no se puede editar, tiene clientes matriculados", type: "is-danger",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+      }
+    },
+    async saveTeacherActivity(activity){
       this.$store.commit("setIsLoading", true);
       var teacher = activity.teacher.get_absolute_url;
       const formData = {
         teacher : (teacher.replace("/", "")).replace("/", ""),
       }
       await axios
-      .put("/api/v1/activities"+this.changing, formData)
+      .put("/api/v1/activitiesTeacher/"+this.changing+"/", formData)
       .then(response => {
           toast({
             message: "Ha cambiado el instructor de la actividad exitosamente", type: "is-success",
@@ -444,7 +568,6 @@ export default {
             duration: 3000, position: "bottom-right",
           });
           activity.teacher.name = response.data
-          this.changing =  ""
       })
       .catch(error => {
         console.log(error)
@@ -467,7 +590,7 @@ export default {
           capacityPercentage : this.capacityPercentage
         }
         await axios
-        .put("/api/v1/activities-enroll"+"/"+act.id+"/", formData)
+        .put("/api/v1/activities-enroll"+"/"+act.activities[0].id+"/", formData)
         .then(response => {
             toast({
               message: "Ha actualizado los clientes de la actividad exitosamente", type: "is-success",
@@ -476,9 +599,8 @@ export default {
             });
         })
         .catch(error => {
-            console.log(error)
             toast({
-              message: "Ocurrio un problema al modificar los clientes de la actividad", type: "is-danger",
+              message: "Ocurrio un problema al modificar los clientes de la actividad, no se pueden matricular clientes morosos", type: "is-danger",
               dismissible: true, pauseOnHover: true,
               duration: 3000, position: "bottom-right",
             });
@@ -491,6 +613,48 @@ export default {
           duration: 3000, position: "bottom-right",
         });
       }
+    },
+    async acceptActivity(act){
+      this.$store.commit("setIsLoading", true);
+      await axios
+      .put("/api/v1/activitiesAccepted/"+act+"/")
+      .then((response) => {
+        toast({
+          message: "Actividad aceptada", type: "is-success",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+        location.reload();
+      })
+      .catch((error) => {
+        toast({
+          message: "Ocurrio un problema con la actividad", type: "is-danger",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+      });
+      this.$store.commit("setIsLoading", false);
+    },
+    async rejectActivity(act){
+      this.$store.commit("setIsLoading", true);
+      await axios
+      .put("/api/v1/activitiesRejected/"+act+"/")
+      .then((response) => {
+        toast({
+          message: "Actividad rechazada", type: "is-success",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+        location.reload();
+      })
+      .catch((error) => {
+        toast({
+          message: "Ocurrio un problema con la actividad", type: "is-danger",
+          dismissible: true, pauseOnHover: true,
+          duration: 3000, position: "bottom-right",
+        });
+      });
+      this.$store.commit("setIsLoading", false);
     },
   },
 };
