@@ -27,7 +27,7 @@
                 <dl>
                   
                   <div v-if='canChangeActivityDetails'> 
-                    <button type="button" v-if="(changing === '')" @click="changing = act.activities[0].id" class="absolute top-8 right-3 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                    <button type="button" v-if="(changing === '') && canSelectTeacher" @click="changing = act.activities[0].id" class="absolute top-8 right-3 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
                       <i class="fas fa-pencil-alt fa-md"></i>
                     </button>
                     <button type="button" v-if="(changing !== '')" @click="saveModifyActivity(act.client)" class="absolute top-0 right-3 -mr-1 p-2 rounded-md transition hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
