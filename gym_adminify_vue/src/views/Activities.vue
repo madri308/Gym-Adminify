@@ -97,7 +97,7 @@
                       <Disclosure :colors="''" v-bind:title="activity.dayofmonth+'/'+act.schedule.month+'/'+act.schedule.year">
                         <div class="relative">
                           <div v-if="changing === '/'+activity.id+'/'">
-                            <Multiselect class="mt-3" v-model="activity.teacher.get_absolute_url" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
+                            <Multiselect v-if="canSelectTeacher" class="mt-3" v-model="activity.teacher.get_absolute_url" placeholder="Seleccione el instructor a cargo" :options="this.teachersNames"/>
                           </div>
                           <div v-else>
                             <span class="font-extrabold height: 100% width:25% float:left">Instructor: </span>
