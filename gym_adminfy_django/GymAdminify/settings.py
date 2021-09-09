@@ -97,22 +97,22 @@ WSGI_APPLICATION = 'GymAdminify.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'sI9eL5baMe',
-    #     'USER': 'sI9eL5baMe',
-    #     'PASSWORD': 'THwdZlvsMp',
-    #     'HOST': 'remotemysql.com',
-    #     'PORT': '3306',
-    # },
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'GymAdminify',
-        'USER': 'admin',
-        'PASSWORD': 'admin',
-        'HOST': '35.193.50.45',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
         'PORT': '3306',
     },
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'GymAdminify',
+    #     'USER': 'admin',
+    #     'PASSWORD': 'admin',
+    #     'HOST': '35.193.50.45',
+    #     'PORT': '3306',
+    # },
     
 }
 
